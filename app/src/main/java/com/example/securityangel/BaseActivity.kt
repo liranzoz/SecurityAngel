@@ -17,7 +17,6 @@ import com.example.securityangel.databinding.ActivityBaseBinding
 open class BaseActivity : AppCompatActivity() {
 
     private lateinit var baseBinding: ActivityBaseBinding
-    // שמרנו את ה-toggle כמשתנה כדי שנוכל לגשת אליו ולשנות צבעים אח"כ
     private lateinit var toggle: ActionBarDrawerToggle
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,16 +26,13 @@ open class BaseActivity : AppCompatActivity() {
         baseBinding = ActivityBaseBinding.inflate(layoutInflater)
         super.setContentView(baseBinding.root)
 
-        // טיפול ב-Padding (כדי שהמגירה לא תסתיר את הסטטוס בר)
         ViewCompat.setOnApplyWindowInsetsListener(baseBinding.drawerLayout) { v, insets ->
             insets
         }
 
-        // הגדרת הטולבר
         setSupportActionBar(baseBinding.toolbarBase)
         supportActionBar?.title = ""
 
-        // הגדרת המגירה וה-Toggle
         toggle = ActionBarDrawerToggle(
             this,
             baseBinding.drawerLayout,
@@ -58,7 +54,6 @@ open class BaseActivity : AppCompatActivity() {
             }
         })
 
-        // ניהול הלחיצות בתפריט הצד
         baseBinding.navigationViewBase.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_dash -> {
@@ -75,6 +70,11 @@ open class BaseActivity : AppCompatActivity() {
                 R.id.nav_sand_box -> {
                     if (this !is SandBoxActivity){
                         openFromDrawer(SandBoxActivity::class.java)
+                    }
+                }
+                R.id.nav_pass_vault -> {
+                    if (this !is PasswordVaultActivity){
+                        openFromDrawer(PasswordVaultActivity::class.java)
                     }
                 }
             }

@@ -94,6 +94,7 @@
                 app:cardBackgroundColor="@color/white">
 
                 <LinearLayout
+                    android:id="@+id/lyVault"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
@@ -135,7 +136,9 @@
                 app:cardCornerRadius="20dp"
                 app:cardElevation="8dp"
                 app:cardBackgroundColor="@color/white">
+
                 <LinearLayout
+                    android:id="@+id/lyFamilySafety"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:orientation="vertical"
