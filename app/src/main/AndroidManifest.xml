@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SecurityAngel">
         <activity
+            android:name=".SandBoxActivity"
+            android:exported="false" />
+        <activity
             android:name=".BaseActivity"
             android:exported="false" />
         <activity
@@ -19,7 +22,8 @@
             android:exported="false" />
         <activity
             android:name=".DashboardActivity"
-            android:exported="true">
+            android:exported="true"
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

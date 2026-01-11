@@ -3,7 +3,6 @@ package com.example.securityangel
 import android.os.Bundle
 import com.example.securityangel.databinding.ActivityFamilySafetyBinding
 
-// ירושה מ-BaseActivity
 class FamilySafetyActivity : BaseActivity() {
 
     private lateinit var binding: ActivityFamilySafetyBinding

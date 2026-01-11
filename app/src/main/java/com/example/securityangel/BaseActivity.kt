@@ -1,5 +1,6 @@
 package com.example.securityangel
 
+import android.app.Activity
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
@@ -21,7 +22,7 @@ open class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // הופך את הסטטוס בר לשקוף
+        enableEdgeToEdge()
 
         baseBinding = ActivityBaseBinding.inflate(layoutInflater)
         super.setContentView(baseBinding.root)
@@ -60,24 +61,49 @@ open class BaseActivity : AppCompatActivity() {
         // ניהול הלחיצות בתפריט הצד
         baseBinding.navigationViewBase.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
-                R.id.nav_home -> {
-                    if (this !is DashboardActivity) {
-                        startActivity(Intent(this, DashboardActivity::class.java))
-                        finish()
+                R.id.nav_dash -> {
+                    if (this !is DashboardActivity){
+                        openFromDrawer(DashboardActivity::class.java)
                     }
+
                 }
                 R.id.nav_family -> {
-                    if (this !is FamilySafetyActivity) {
-                        startActivity(Intent(this, FamilySafetyActivity::class.java))
-                        finish() // אופציונלי
+                    if (this !is FamilySafetyActivity){
+                        openFromDrawer(FamilySafetyActivity::class.java)
+                    }
+                }
+                R.id.nav_sand_box -> {
+                    if (this !is SandBoxActivity){
+                        openFromDrawer(SandBoxActivity::class.java)
                     }
                 }
             }
+
             baseBinding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
+
     }
 
+    private fun openFromDrawer(target: Class<out Activity>) {
+        val intent = Intent(this, target)
+
+        when (target) {
+            DashboardActivity::class.java -> {
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+                startActivity(intent)
+
+                if (this !is DashboardActivity) finish()
+            }
+
+            else -> {
+                startActivity(intent)
+
+
+                if (this !is DashboardActivity) finish()
+            }
+        }
+    }
 
     fun setContent(view: View) {
         baseBinding.contentFrame.addView(view)
