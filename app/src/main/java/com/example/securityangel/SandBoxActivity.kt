@@ -18,7 +18,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.securityangel.databinding.ActivityFamilySafetyBinding
 import com.example.securityangel.databinding.ActivitySandBoxBinding
 
-class SandBoxActivity : AppCompatActivity(){
+class SandBoxActivity : BaseActivity(){
 
     private lateinit var binding: ActivitySandBoxBinding
 
@@ -34,11 +34,7 @@ class SandBoxActivity : AppCompatActivity(){
         binding = ActivitySandBoxBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val btnArrowBack = binding.imgBackClickable
-        btnArrowBack.isClickable = true
-        btnArrowBack.isFocusable = true
-        btnArrowBack.setOnClickListener { finish() }
-
+        buttonHandler()
 
         val dummyData = listOf(
             ScanResult("Norton", "Clean"),
@@ -50,11 +46,19 @@ class SandBoxActivity : AppCompatActivity(){
             ScanResult("Malwarebytes", "Clean")
         )
 
-
         val recyclerView = findViewById<RecyclerView>(R.id.rvResults)
         recyclerView.layoutManager = LinearLayoutManager(this)
         recyclerView.adapter = ScanResultsAdapter(dummyData)
     }
+
+    override fun buttonHandler() {
+        val btnArrowBack = binding.imgBackClickable
+        btnArrowBack.isClickable = true
+        btnArrowBack.isFocusable = true
+        btnArrowBack.setOnClickListener { finish() }
+    }
+
+
 }
 
 

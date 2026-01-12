@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.securityangel.databinding.ActivityPasswordVaultBinding
 import com.example.securityangel.databinding.ItemPasswordBinding
-class PasswordVaultActivity : AppCompatActivity() {
+class PasswordVaultActivity : BaseActivity() {
 
     private lateinit var binding: ActivityPasswordVaultBinding
 
@@ -28,12 +28,15 @@ class PasswordVaultActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+        buttonHandler()
+        setupRecyclerView()
+    }
 
-        binding.btnBack.setOnClickListener {
+    override fun buttonHandler() {
+        val btnBack = binding.btnBack
+        btnBack.setOnClickListener {
             finish()
         }
-
-        setupRecyclerView()
     }
 
     private fun setupRecyclerView() {

@@ -13,8 +13,11 @@ class FamilySafetyActivity : BaseActivity() {
         setContent(binding.root)
         setupFamilyMembers()
 
-        // אומרים למגירה: יש כאן רקע לבן, אז שים אייקון שחור!
         setToolbarIconColor(isDarkBackground = false)
+    }
+
+    override fun buttonHandler() {
+        TODO("Not yet implemented")
     }
 
     private fun setupFamilyMembers() {

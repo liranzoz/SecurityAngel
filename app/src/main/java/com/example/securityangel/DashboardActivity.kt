@@ -15,11 +15,16 @@ class DashboardActivity : BaseActivity() {
 
         setToolbarIconColor(isDarkBackground = true)
 
-//        val btnVault = binding.lyVault
-//        btnVault.setOnClickListener {
-//            val intent = intent(this, )
-//
-//        }
+        buttonHandler()
+    }
+
+    override fun buttonHandler() {
+        val btnVault = binding.lyVault
+        btnVault.setOnClickListener {
+            val intent = Intent(this, PasswordVaultActivity::class.java)
+            startActivity(intent)
+
+        }
 
         val btnFamilySafety = binding.lyFamilySafety
         btnFamilySafety.setOnClickListener {
@@ -27,4 +32,6 @@ class DashboardActivity : BaseActivity() {
             startActivity(intent)
         }
     }
+
+
 }

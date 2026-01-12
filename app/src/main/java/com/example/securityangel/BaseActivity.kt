@@ -14,7 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.securityangel.databinding.ActivityBaseBinding
 
-open class BaseActivity : AppCompatActivity() {
+abstract class BaseActivity : AppCompatActivity() {
 
     private lateinit var baseBinding: ActivityBaseBinding
     private lateinit var toggle: ActionBarDrawerToggle
@@ -99,7 +99,6 @@ open class BaseActivity : AppCompatActivity() {
             else -> {
                 startActivity(intent)
 
-
                 if (this !is DashboardActivity) finish()
             }
         }
@@ -118,4 +117,6 @@ open class BaseActivity : AppCompatActivity() {
 
         toggle.drawerArrowDrawable.color = color
     }
+
+    abstract fun buttonHandler()
 }
