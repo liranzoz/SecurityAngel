@@ -12,6 +12,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.securityangel.databinding.ActivityFamilySafetyBinding
 import com.example.securityangel.databinding.ActivityPasswordVaultBinding
 import com.example.securityangel.databinding.ItemPasswordBinding
 class PasswordVaultActivity : BaseActivity() {
@@ -20,23 +21,15 @@ class PasswordVaultActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         binding = ActivityPasswordVaultBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-        ViewCompat.setOnApplyWindowInsetsListener(binding.root) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-        }
-        buttonHandler()
+        setContent(binding.root)
+
+        setToolbarIconColor(isDarkBackground = false)
         setupRecyclerView()
     }
 
     override fun buttonHandler() {
-        val btnBack = binding.btnBack
-        btnBack.setOnClickListener {
-            finish()
-        }
+
     }
 
     private fun setupRecyclerView() {

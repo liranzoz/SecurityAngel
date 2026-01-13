@@ -24,17 +24,11 @@ class SandBoxActivity : BaseActivity(){
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
-        setContentView(R.layout.activity_sand_box)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.headerLayout)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(0, systemBars.top, 0, 0)
-            insets
-        }
         binding = ActivitySandBoxBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        setContent(binding.root)
 
-        buttonHandler()
+        setToolbarIconColor(isDarkBackground = false)
+
 
         val dummyData = listOf(
             ScanResult("Norton", "Clean"),
@@ -52,10 +46,10 @@ class SandBoxActivity : BaseActivity(){
     }
 
     override fun buttonHandler() {
-        val btnArrowBack = binding.imgBackClickable
-        btnArrowBack.isClickable = true
-        btnArrowBack.isFocusable = true
-        btnArrowBack.setOnClickListener { finish() }
+//        val btnArrowBack = binding.imgBackClickable
+//        btnArrowBack.isClickable = true
+//        btnArrowBack.isFocusable = true
+//        btnArrowBack.setOnClickListener { finish() }
     }
 
 
