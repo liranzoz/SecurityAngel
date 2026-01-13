@@ -77,6 +77,11 @@ abstract class BaseActivity : AppCompatActivity() {
                         openFromDrawer(PasswordVaultActivity::class.java)
                     }
                 }
+                R.id.nav_settings -> {
+                    if (this !is PasswordVaultActivity){
+                        openFromDrawer(SettingsActivity::class.java)
+                    }
+                }
             }
 
             baseBinding.drawerLayout.closeDrawer(GravityCompat.START)
