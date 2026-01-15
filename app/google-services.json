@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1032926031501",
+    "project_id": "securityangel-e429a",
+    "storage_bucket": "securityangel-e429a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032926031501:android:7e7c19025cf6cf1888fcc4",
+        "android_client_info": {
+          "package_name": "com.example.securityangel"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNkt4aycBXfJiouPBP9RmEEdmSE1syFW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

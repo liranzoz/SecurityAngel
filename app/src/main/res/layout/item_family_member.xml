@@ -7,17 +7,17 @@
     android:paddingHorizontal="16dp"
     android:background="?attr/selectableItemBackground">
 
-    <ImageView
+    <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/imgAvatar"
         android:layout_width="48dp"
         android:layout_height="48dp"
-        android:src="@drawable/ic_launcher_foreground"
-        android:background="@drawable/circle_progress_background"
-        android:backgroundTint="#F3F4F6"
-        android:padding="8dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        app:lottie_rawRes="@raw/anim_male_avater"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        android:scaleType="centerCrop"
+        android:scaleX="1.3"
+        android:scaleY="1.3"
+        app:lottie_speed="1.0"/>
 
     <TextView
         android:id="@+id/tvName"

@@ -33,6 +33,8 @@ abstract class BaseActivity : AppCompatActivity() {
         setSupportActionBar(baseBinding.toolbarBase)
         supportActionBar?.title = ""
 
+        loadUserData()
+
         toggle = ActionBarDrawerToggle(
             this,
             baseBinding.drawerLayout,
@@ -78,8 +80,13 @@ abstract class BaseActivity : AppCompatActivity() {
                     }
                 }
                 R.id.nav_settings -> {
-                    if (this !is PasswordVaultActivity){
+                    if (this !is SettingsActivity){
                         openFromDrawer(SettingsActivity::class.java)
+                    }
+                }
+                R.id.nav_generator -> {
+                    if (this !is PasswordGeneratorActivity){
+                        openFromDrawer(PasswordGeneratorActivity::class.java)
                     }
                 }
             }
@@ -122,6 +129,48 @@ abstract class BaseActivity : AppCompatActivity() {
 
         toggle.drawerArrowDrawable.color = color
     }
+
+
+    protected fun fetchUserDetails(onSuccess: (User) -> Unit) {
+        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+
+        db.collection("users").document(userId).get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val user = document.toObject(User::class.java)
+                    if (user != null) {
+                        onSuccess(user)
+                    }
+                }
+            }
+    }
+
+    private fun loadUserData() {
+        fetchUserDetails { user ->
+            updateNavigationHeader(user)
+        }
+    }
+    protected fun getAvatarAnimation(gender: String): Int {
+        return when (gender) {
+            "Male" -> R.raw.anim_male_avater
+            "Female" -> R.raw.anim_female_avater
+            else -> R.raw.anim_else_avatar
+        }
+    }
+    private fun updateNavigationHeader(user: User) {
+        val headerView = baseBinding.navigationViewBase.getHeaderView(0)
+        val headerBinding = com.example.securityangel.databinding.NavHeaderBinding.bind(headerView)
+
+        headerBinding.tvUserName.text = "${user.firstName} ${user.lastName}"
+        headerBinding.tvUserEmail.text = user.email
+
+        val animationResId = getAvatarAnimation(user.gender)
+
+        headerBinding.lottieProfile.setAnimation(animationResId)
+        headerBinding.lottieProfile.playAnimation()
+    }
+
 
     abstract fun buttonHandler()
 }

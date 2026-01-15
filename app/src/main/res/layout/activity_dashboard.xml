@@ -10,7 +10,9 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:clipChildren="false"
+        android:clipToPadding="false">
 
         <View
             android:id="@+id/viewHeaderBackground"
@@ -82,6 +84,8 @@
             android:orientation="horizontal"
             android:paddingHorizontal="16dp"
             android:layout_marginTop="-50dp"
+            android:clipChildren="false"
+            android:clipToPadding="false"
             app:layout_constraintTop_toBottomOf="@id/viewHeaderBackground">
 
             <androidx.cardview.widget.CardView
@@ -101,14 +105,17 @@
                     android:padding="16dp"
                     android:gravity="center_vertical">
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:background="@drawable/bg_status_badge"
-                        android:backgroundTint="@color/icon_blue_bg"
-                        app:tint="@color/icon_blue"
-                        android:padding="10dp"/>
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieVault"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        app:lottie_rawRes="@raw/anim_vault"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        android:scaleType="centerCrop"
+                        android:scaleX="1.6"
+                        android:scaleY="1.6"
+                        app:lottie_speed="1.0"/>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -145,14 +152,15 @@
                     android:padding="16dp"
                     android:gravity="center_vertical">
 
-                    <ImageView
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:background="@drawable/bg_status_badge"
-                        android:backgroundTint="@color/status_warning_bg"
-                        app:tint="@color/status_warning_text"
-                        android:padding="10dp"/>
+                    <com.airbnb.lottie.LottieAnimationView
+                        android:id="@+id/lottieFamily"
+                        android:layout_width="55dp"
+                        android:layout_height="55dp"
+                        app:lottie_rawRes="@raw/anim_family_bold"
+                        app:lottie_autoPlay="true"
+                        app:lottie_loop="true"
+                        android:scaleType="centerCrop"
+                        app:lottie_speed="0.2"/>
 
                     <TextView
                         android:layout_width="wrap_content"
