@@ -38,23 +38,13 @@
             app:layout_constraintTop_toBottomOf="@id/tvTitle">
 
             <LinearLayout
+                android:id="@+id/membersContainer"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
                 android:paddingVertical="8dp">
-
-                <include layout="@layout/item_family_member" android:id="@+id/rowMember1"/>
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="80dp"/>
-
-                <include layout="@layout/item_family_member" android:id="@+id/rowMember2"/>
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="80dp"/>
-
-                <include layout="@layout/item_family_member" android:id="@+id/rowMember3"/>
-                <View android:layout_width="match_parent" android:layout_height="1dp" android:background="@color/divider" android:layout_marginStart="80dp"/>
-
-                <include layout="@layout/item_family_member" android:id="@+id/rowMember4"/>
-
             </LinearLayout>
+
         </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.button.MaterialButton

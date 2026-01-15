@@ -59,7 +59,5 @@ class SettingsActivity : BaseActivity() {
             startActivity(intent)
             finish()
         }
-
-
     }
 }
