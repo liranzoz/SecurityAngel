@@ -14,16 +14,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SecurityAngel">
         <activity
-            android:name=".AddMemberActivity"
+            android:name=".ui.settings.SecurityLogActivity"
             android:exported="false" />
         <activity
-            android:name=".PasswordGeneratorActivity"
+            android:name=".ui.family.FamilyManagementActivity"
             android:exported="false" />
         <activity
-            android:name=".SignUpActivity"
+            android:name=".ui.family.AddMemberActivity"
             android:exported="false" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".ui.password.PasswordGeneratorActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.SignUpActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ui.auth.LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -32,22 +38,22 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".SettingsActivity"
+            android:name=".ui.settings.SettingsActivity"
             android:exported="false" />
         <activity
-            android:name=".PasswordVaultActivity"
+            android:name=".ui.vault.PasswordVaultActivity"
             android:exported="false" />
         <activity
-            android:name=".SandBoxActivity"
+            android:name=".ui.scanner.SandBoxActivity"
             android:exported="false" />
         <activity
-            android:name=".BaseActivity"
+            android:name=".ui.base.BaseActivity"
             android:exported="false" />
         <activity
-            android:name=".FamilySafetyActivity"
+            android:name=".ui.family.FamilySafetyActivity"
             android:exported="false" />
         <activity
-            android:name=".DashboardActivity"
+            android:name=".ui.dash.DashboardActivity"
             android:exported="true"
             android:launchMode="singleTask" />
     </application>

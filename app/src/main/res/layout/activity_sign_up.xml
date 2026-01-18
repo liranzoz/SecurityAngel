@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:background="@color/background_main"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:text="Sign up to start protecting your data."
-            android:textColor="#757575"
+            android:textColor="@color/text_secondary"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tvTitle" />
@@ -89,8 +89,8 @@
                 android:layout_height="wrap_content"
                 android:text="Male"
                 android:textSize="16sp"
-                android:textColor="#212121"
-                android:buttonTint="#2E9E82"
+                android:textColor="@color/text_primary"
+                android:buttonTint="@color/text_secondary"
                 android:layout_marginEnd="32dp"/>
 
                 <RadioButton
@@ -99,8 +99,8 @@
                 android:layout_height="wrap_content"
                 android:text="Female"
                 android:textSize="16sp"
-                android:textColor="#212121"
-                android:buttonTint="#2E9E82"
+                android:textColor="@color/text_primary"
+                android:buttonTint="@color/text_secondary"
                 android:layout_marginEnd="32dp"/>
 
                 <RadioButton
@@ -109,8 +109,8 @@
                 android:layout_height="wrap_content"
                 android:text="Else"
                 android:textSize="16sp"
-                android:textColor="#212121"
-                android:buttonTint="#2E9E82"/>
+                android:textColor="@color/text_primary"
+                android:buttonTint="@color/text_secondary"/>
 
             </RadioGroup>
             <TextView
@@ -144,7 +144,7 @@
             android:layout_width="match_parent"
             android:layout_height="60dp"
             android:layout_marginTop="32dp"
-            android:backgroundTint="#2E9E82"
+            android:backgroundTint="@color/primary_green"
             android:text="Sign Up"
             android:textAllCaps="false"
             android:textSize="18sp"
@@ -167,14 +167,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Already have an account? "
-                android:textColor="#757575" />
+                android:textColor="@color/ui_ic" />
 
             <TextView
                 android:id="@+id/tvLoginLink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Login"
-                android:textColor="#2E9E82"
+                android:textColor="@color/primary_green"
                 android:textStyle="bold" />
         </LinearLayout>
 

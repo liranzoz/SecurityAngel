@@ -1,28 +1,45 @@
-package com.example.securityangel
+package com.example.securityangel.ui.base
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
+import com.example.securityangel.ui.dash.DashboardActivity
+import com.example.securityangel.ui.family.FamilySafetyActivity
+import com.example.securityangel.ui.password.PasswordGeneratorActivity
+import com.example.securityangel.ui.vault.PasswordVaultActivity
+import com.example.securityangel.R
+import com.example.securityangel.ui.scanner.SandBoxActivity
+import com.example.securityangel.ui.settings.SecurityLogActivity
+import com.example.securityangel.ui.settings.SettingsActivity
+import com.example.securityangel.data.models.User
 import com.example.securityangel.databinding.ActivityBaseBinding
+import com.example.securityangel.databinding.NavHeaderBinding
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 abstract class BaseActivity : AppCompatActivity() {
 
     private lateinit var baseBinding: ActivityBaseBinding
     private lateinit var toggle: ActionBarDrawerToggle
 
+    private lateinit var sharedPrefs : SharedPreferences
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
+        sharedPrefs  = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
         baseBinding = ActivityBaseBinding.inflate(layoutInflater)
         super.setContentView(baseBinding.root)
 
@@ -33,7 +50,7 @@ abstract class BaseActivity : AppCompatActivity() {
         setSupportActionBar(baseBinding.toolbarBase)
         supportActionBar?.title = ""
 
-        loadUserData()
+
 
         toggle = ActionBarDrawerToggle(
             this,
@@ -56,6 +73,24 @@ abstract class BaseActivity : AppCompatActivity() {
             }
         })
 
+
+        handleScreenshot()
+        loadUserData()
+        handleDrawer()
+        handleDarkMode()
+
+    }
+   private fun handleScreenshot(){
+       val preventScreenshots = sharedPrefs.getBoolean("prevent_screenshots", false)
+       if (preventScreenshots) {
+           window.setFlags(
+               WindowManager.LayoutParams.FLAG_SECURE,
+               WindowManager.LayoutParams.FLAG_SECURE
+           )
+       }
+
+   }
+    private fun handleDrawer(){
         baseBinding.navigationViewBase.setNavigationItemSelectedListener { item ->
             when (item.itemId) {
                 R.id.nav_dash -> {
@@ -89,14 +124,26 @@ abstract class BaseActivity : AppCompatActivity() {
                         openFromDrawer(PasswordGeneratorActivity::class.java)
                     }
                 }
+                R.id.nav_Logs -> {
+                    if (this !is SecurityLogActivity){
+                        openFromDrawer(SecurityLogActivity::class.java)
+                    }
+                }
             }
 
             baseBinding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
+    }
+    fun handleDarkMode(){
+        val isDarkMode = sharedPrefs.getBoolean("dark_mode", false)
+        if (isDarkMode) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+        } else {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+        }
 
     }
-
     private fun openFromDrawer(target: Class<out Activity>) {
         val intent = Intent(this, target)
 
@@ -132,8 +179,8 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     protected fun fetchUserDetails(onSuccess: (User) -> Unit) {
-        val userId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: return
-        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        val db = FirebaseFirestore.getInstance()
 
         db.collection("users").document(userId).get()
             .addOnSuccessListener { document ->
@@ -160,7 +207,7 @@ abstract class BaseActivity : AppCompatActivity() {
     }
     private fun updateNavigationHeader(user: User) {
         val headerView = baseBinding.navigationViewBase.getHeaderView(0)
-        val headerBinding = com.example.securityangel.databinding.NavHeaderBinding.bind(headerView)
+        val headerBinding = NavHeaderBinding.bind(headerView)
 
         headerBinding.tvUserName.text = "${user.firstName} ${user.lastName}"
         headerBinding.tvUserEmail.text = user.email
@@ -171,6 +218,21 @@ abstract class BaseActivity : AppCompatActivity() {
         headerBinding.lottieProfile.playAnimation()
     }
 
+    fun setToolbarVisibility(isVisible: Boolean) {
+        if (isVisible) {
+            baseBinding.toolbarBase.visibility = View.VISIBLE
+        } else {
+            baseBinding.toolbarBase.visibility = View.GONE
+        }
+    }
 
+    fun setToolbarElevation(elevation: Float) {
+        baseBinding.toolbarBase.elevation = elevation
+    }
+
+    // הוסף ב-BaseActivity
+    fun openDrawer() {
+        baseBinding.drawerLayout.openDrawer(GravityCompat.START)
+    }
     abstract fun buttonHandler()
 }

@@ -1,13 +1,11 @@
-package com.example.securityangel
+package com.example.securityangel.ui.password
 
 import android.content.ClipData
 import android.content.ClipboardManager
-import android.content.Context
 import android.os.Bundle
-import android.widget.Toast
-import androidx.core.view.GravityCompat
 import com.example.securityangel.databinding.ActivityPasswordGeneratorBinding
-import kotlin.random.Random
+import com.example.securityangel.ui.base.BaseActivity
+import com.example.securityangel.utils.toast
 
 class PasswordGeneratorActivity : BaseActivity() {
 
@@ -71,7 +69,7 @@ class PasswordGeneratorActivity : BaseActivity() {
     }
 
     private fun copyToClipboard(text: String) {
-        val clipboard = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clipboard = getSystemService(CLIPBOARD_SERVICE) as ClipboardManager
         val clip = ClipData.newPlainText("Generated Password", text)
         clipboard.setPrimaryClip(clip)
         toast("Password copied!") }

@@ -8,7 +8,7 @@
     app:cardCornerRadius="12dp"
     app:cardElevation="0dp"
     app:strokeWidth="0dp"
-    app:cardBackgroundColor="@color/white">
+    app:cardBackgroundColor="@color/background_main">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -42,7 +42,7 @@
             app:layout_constraintEnd_toStartOf="@id/tvStatus" />
 
         <TextView
-            android:id="@+id/tvSubtitle"
+            android:id="@+id/tvTime"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:text="2 mins ago"

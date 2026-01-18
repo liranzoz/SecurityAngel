@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/background_main"
     android:fillViewport="true"
-    tools:context=".DashboardActivity">
+    tools:context=".ui.dash.DashboardActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -176,7 +176,7 @@
                         android:layout_height="wrap_content"
                         android:text="1 alert"
                         android:textSize="13sp"
-                        android:textColor="#EF4444"/>
+                        android:textColor="@color/status_warning_text_red"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>
@@ -194,18 +194,17 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/layoutCards"/>
 
-        <LinearLayout
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvRecentScans"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"
-            app:layout_constraintTop_toBottomOf="@id/tvRecentScansTitle">
-
-            <include layout="@layout/item_scan_result" />
-            <include layout="@layout/item_scan_result" />
-            <include layout="@layout/item_scan_result" />
-
-        </LinearLayout>
+            android:nestedScrollingEnabled="false"
+            android:paddingHorizontal="16dp"
+            android:layout_marginTop="8dp"
+            app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+            app:layout_constraintTop_toBottomOf="@id/tvRecentScansTitle"
+            tools:listitem="@layout/item_scan_result"
+            tools:itemCount="3"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

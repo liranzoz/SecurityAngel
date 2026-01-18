@@ -1,10 +1,16 @@
-package com.example.securityangel
+package com.example.securityangel.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
+import com.example.securityangel.ui.dash.DashboardActivity
+import com.example.securityangel.R
+import com.example.securityangel.data.models.User
 import com.example.securityangel.databinding.ActivitySignUpBinding
+import com.example.securityangel.ui.base.BaseActivity
+import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 class SignUpActivity : BaseActivity() {
 
@@ -83,7 +89,7 @@ class SignUpActivity : BaseActivity() {
     }
 
     private fun saveUserToDatabase(user: User) {
-        val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        val db = FirebaseFirestore.getInstance()
 
         db.collection("users").document(user.id).set(user)
             .addOnSuccessListener {

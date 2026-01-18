@@ -1,16 +1,26 @@
-package com.example.securityangel
+package com.example.securityangel.ui.family
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.TextView
 import com.airbnb.lottie.LottieAnimationView
+import com.example.securityangel.R
+import com.example.securityangel.data.models.User
 import com.example.securityangel.databinding.ActivityFamilySafetyBinding
+import com.example.securityangel.ui.base.BaseActivity
+import com.example.securityangel.utils.toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class FamilySafetyActivity : BaseActivity() {
 
     private lateinit var binding: ActivityFamilySafetyBinding
+    private var familyListener: ListenerRegistration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,27 +38,52 @@ class FamilySafetyActivity : BaseActivity() {
     }
 
     private fun loadFamilyData() {
-        fetchUserDetails { currentUser ->
-            val familyId = currentUser.familyId
+        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
+        FirebaseFirestore.getInstance()
+            .collection("users").document(currentUserId).get()
+            .addOnSuccessListener { userDoc ->
+                val familyId = userDoc.getString("familyId")
 
-            if (familyId == null) {
-                toast("No family members")
-                binding.membersContainer.removeAllViews()
-            } else {
-                FamilyRepository.getFamilyData(
-                    familyId = familyId,
-                    onSuccess = { family ->
-                        FamilyRepository.getFamilyMembers(familyId) { members ->
-                            updateMembersUI(members, family.adminId)
-                        }
-                    },
-                    onFailure = {
-                        toast("Failed to load family info")
-                    }
-                )
+                if (familyId == null) {
+                    binding.membersContainer.removeAllViews()
+                    return@addOnSuccessListener
+                }
+
+                startRealtimeFamilyMonitoring(familyId)
             }
-        }
     }
+
+    private fun startRealtimeFamilyMonitoring(familyId: String) {
+        val db = FirebaseFirestore.getInstance()
+
+        familyListener = db.collection("users")
+            .whereEqualTo("familyId", familyId)
+            .addSnapshotListener { snapshots, e ->
+                if (e != null) {
+                    toast("Listen failed: ${e.message}")
+                    return@addSnapshotListener
+                }
+
+                if (snapshots != null) {
+                    val members = snapshots.toObjects(User::class.java)
+
+                    fetchFamilyAdminId(familyId) { adminId ->
+                        updateMembersUI(members, adminId)
+                    }
+                }
+            }
+    }
+
+    private fun fetchFamilyAdminId(familyId: String, onFound: (String) -> Unit) {
+        FirebaseFirestore.getInstance()
+            .collection("families").document(familyId).get()
+            .addOnSuccessListener { doc ->
+                val adminId = doc.getString("adminId") ?: ""
+                onFound(adminId)
+            }
+    }
+
+
 
     private fun updateMembersUI(members: List<User>, adminId: String) {
         binding.membersContainer.removeAllViews()
@@ -84,8 +119,8 @@ class FamilySafetyActivity : BaseActivity() {
             binding.membersContainer.addView(memberView)
 
             val divider = View(this)
-            divider.layoutParams = android.widget.LinearLayout.LayoutParams(
-                android.view.ViewGroup.LayoutParams.MATCH_PARENT, 2
+            divider.layoutParams = LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, 2
             )
             divider.setBackgroundColor(getColor(R.color.divider))
             binding.membersContainer.addView(divider)
@@ -97,5 +132,11 @@ class FamilySafetyActivity : BaseActivity() {
             val intent = Intent(this, AddMemberActivity::class.java)
             startActivity(intent)
         }
+    }
+
+
+    override fun onDestroy() {
+        super.onDestroy()
+        familyListener?.remove()
     }
 }

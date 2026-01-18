@@ -1,14 +1,17 @@
-package com.example.securityangel
+package com.example.securityangel.ui.family
 
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.securityangel.data.models.User
+import com.example.securityangel.data.repo.FamilyRepository
 import com.example.securityangel.databinding.ActivityAddMemberBinding
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
-class AddMemberActivity : androidx.appcompat.app.AppCompatActivity() {
+class AddMemberActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddMemberBinding
     private var currentFamilyId: String? = null

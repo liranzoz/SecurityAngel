@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:text="Welcome Back,"
-        android:textColor="#212121"
+        android:textColor="@color/text_primary"
         android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
@@ -35,7 +35,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Sign in to continue securely."
-        android:textColor="#757575"
+        android:textColor="@color/text_secondary"
         android:textSize="16sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvWelcome" />
@@ -52,7 +52,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Email Address"
-            android:textColor="#424242"
+            android:textColor="@color/text_primary"
             android:textStyle="bold"
             android:layout_marginBottom="8dp"/>
 
@@ -63,11 +63,11 @@
             android:background="@drawable/bg_input_field"
             android:drawableStart="@android:drawable/ic_dialog_email"
             android:drawablePadding="12dp"
-            android:drawableTint="#2E9E82"
+            android:drawableTint="@color/primary_green_dark"
             android:paddingHorizontal="16dp"
             android:hint="user@example.com"
             android:inputType="textEmailAddress"
-            android:textColor="#212121"
+            android:textColor="@color/ui_ic"
             android:textSize="16sp" />
 
         <TextView
@@ -86,11 +86,11 @@
             android:background="@drawable/bg_input_field"
             android:drawableStart="@android:drawable/ic_lock_idle_lock"
             android:drawablePadding="12dp"
-            android:drawableTint="#2E9E82"
+            android:drawableTint="@color/primary_green_dark"
             android:paddingHorizontal="16dp"
             android:hint="••••••••"
             android:inputType="textPassword"
-            android:textColor="#212121"
+            android:textColor="@color/ui_ic"
             android:textSize="16sp" />
 
         <TextView
@@ -100,7 +100,7 @@
             android:layout_gravity="end"
             android:layout_marginTop="12dp"
             android:text="Forgot Password?"
-            android:textColor="#2E9E82"
+            android:textColor="@color/primary_green_dark"
             android:textStyle="bold" />
 
     </LinearLayout>
@@ -114,7 +114,7 @@
         android:textStyle="bold"
         android:textAllCaps="false"
         app:cornerRadius="16dp"
-        android:backgroundTint="#2E9E82"
+        android:backgroundTint="@color/primary_green"
         android:layout_marginTop="32dp"
         app:layout_constraintTop_toBottomOf="@id/inputContainer" />
 
@@ -131,14 +131,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Don't have an account? "
-            android:textColor="#757575" />
+            android:textColor="@color/ui_ic" />
 
         <TextView
             android:id="@+id/tvSignUp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Sign Up"
-            android:textColor="#2E9E82"
+            android:textColor="@color/primary_green_dark"
             android:textStyle="bold" />
     </LinearLayout>
 

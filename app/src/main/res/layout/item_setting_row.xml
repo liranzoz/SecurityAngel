@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="60dp"
-    android:background="?attr/selectableItemBackground"
+    android:background="@color/background_main"
     android:paddingHorizontal="16dp">
 
     <androidx.cardview.widget.CardView
@@ -12,7 +12,7 @@
         android:layout_height="36dp"
         app:cardCornerRadius="18dp"
         app:cardElevation="0dp"
-        app:cardBackgroundColor="#E0F2F1"
+        app:cardBackgroundColor="@color/light_green"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
@@ -23,7 +23,7 @@
             android:layout_height="20dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_launcher_foreground"
-            app:tint="#00695C"/>
+            app:tint="@color/primary_green_dark"/>
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -44,7 +44,7 @@
         android:layout_height="24dp"
         android:src="@drawable/ic_arrow_back"
         android:rotation="180"
-        app:tint="#BDBDBD"
+        app:tint="@color/ui_ic"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />

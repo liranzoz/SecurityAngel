@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F7FA">
+    android:background="@color/background_main">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/headerLayout"
@@ -58,7 +58,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Enter the email address of the family member you want to add. They must already have an account."
-            android:textColor="#757575"
+            android:textColor="@color/text_secondary"
             android:layout_marginBottom="24dp"/>
 
         <com.google.android.material.textfield.TextInputLayout

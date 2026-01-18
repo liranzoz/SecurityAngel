@@ -1,4 +1,4 @@
-package com.example.securityangel
+package com.example.securityangel.data.models
 
 data class Family(
     val id: String = "",

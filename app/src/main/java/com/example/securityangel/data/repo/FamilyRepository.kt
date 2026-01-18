@@ -1,5 +1,7 @@
-package com.example.securityangel
+package com.example.securityangel.data.repo
 
+import com.example.securityangel.data.models.Family
+import com.example.securityangel.data.models.User
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
 
@@ -52,6 +54,10 @@ object FamilyRepository {
                     batch.update(familiesRef.document(familyId), "members", FieldValue.arrayUnion(userId))
                     batch.update(usersRef.document(userId), "familyId", familyId)
                 }.addOnSuccessListener {
+                    SecurityLogger.logEvent(
+                        SecurityLogger.TYPE_FAMILY_UPDATE,
+                        "Joined the family group."
+                    )
                     onSuccess()
                 }.addOnFailureListener { e ->
                     onFailure(e.message ?: "Failed to add member")
@@ -88,4 +94,15 @@ object FamilyRepository {
             }
     }
 
+    fun removeMember(familyId: String, memberId: String, onSuccess: () -> Unit, onFailure: (String) -> Unit) {
+        db.runBatch { batch ->
+            batch.update(familiesRef.document(familyId), "members", FieldValue.arrayRemove(memberId))
+
+            batch.update(usersRef.document(memberId), "familyId", null)
+        }.addOnSuccessListener {
+            onSuccess()
+        }.addOnFailureListener { e ->
+            onFailure(e.message ?: "Failed to remove member")
+        }
+    }
 }
