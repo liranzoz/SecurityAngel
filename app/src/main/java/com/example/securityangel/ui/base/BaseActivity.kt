@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.securityangel.ui.dash.DashboardActivity
 import com.example.securityangel.ui.family.FamilySafetyActivity
 import com.example.securityangel.ui.password.PasswordGeneratorActivity
@@ -25,6 +26,7 @@ import com.example.securityangel.ui.settings.SettingsActivity
 import com.example.securityangel.data.models.User
 import com.example.securityangel.databinding.ActivityBaseBinding
 import com.example.securityangel.databinding.NavHeaderBinding
+import com.example.securityangel.ui.ai.AIChatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -38,12 +40,20 @@ abstract class BaseActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = Color.TRANSPARENT
 
         sharedPrefs  = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
         baseBinding = ActivityBaseBinding.inflate(layoutInflater)
         super.setContentView(baseBinding.root)
 
-        ViewCompat.setOnApplyWindowInsetsListener(baseBinding.drawerLayout) { v, insets ->
+
+        ViewCompat.setOnApplyWindowInsetsListener(baseBinding.contentFrame) { v, insets ->
+            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
+            val isImeVisible = ime.bottom > 0
+            val bottomPadding = if (isImeVisible) ime.bottom else systemBars.bottom
+            v.setPadding(0, 0, 0, bottomPadding)
             insets
         }
 
@@ -127,6 +137,11 @@ abstract class BaseActivity : AppCompatActivity() {
                 R.id.nav_Logs -> {
                     if (this !is SecurityLogActivity){
                         openFromDrawer(SecurityLogActivity::class.java)
+                    }
+                }
+                R.id.nav_ai_chat -> {
+                    if (this !is AIChatActivity){
+                        openFromDrawer(AIChatActivity::class.java)
                     }
                 }
             }
@@ -230,7 +245,6 @@ abstract class BaseActivity : AppCompatActivity() {
         baseBinding.toolbarBase.elevation = elevation
     }
 
-    // הוסף ב-BaseActivity
     fun openDrawer() {
         baseBinding.drawerLayout.openDrawer(GravityCompat.START)
     }

@@ -40,7 +40,7 @@
             android:layout_height="180dp"
             android:indeterminate="false"
             android:max="100"
-            android:progress="85"
+            android:progress="100"
             android:progressDrawable="@drawable/circle_progress_background"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_marginTop="24dp"
@@ -59,9 +59,10 @@
             app:layout_constraintTop_toTopOf="@id/progressBarScore">
 
             <TextView
+                android:id="@+id/tvScoreValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="85"
+                android:text="100"
                 android:textSize="56sp"
                 android:textStyle="bold"
                 android:textColor="@color/white"
@@ -129,7 +130,7 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="8 passwords"
+                        android:text="Manage Passwords"
                         android:textSize="13sp"
                         android:textColor="@color/text_secondary"/>
                 </LinearLayout>
@@ -172,11 +173,13 @@
                         android:textColor="@color/text_primary"/>
 
                     <TextView
+                        android:id="@+id/tvFamilyStatus"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="1 alert"
+                        android:text="Checking..."
                         android:textSize="13sp"
-                        android:textColor="@color/status_warning_text_red"/>
+                        android:textStyle="bold"
+                        android:textColor="@color/text_secondary"/>
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
         </LinearLayout>

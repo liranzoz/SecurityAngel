@@ -10,6 +10,10 @@
             android:icon="@drawable/ic_scanner"
             android:title="URL Scanner" />
         <item
+            android:id="@+id/nav_ai_chat"
+            android:icon="@drawable/ic_ai_lock"
+            android:title="Angel AI" />
+        <item
             android:id="@+id/nav_pass_vault"
             android:icon="@drawable/ic_password"
             android:title="My Passwords" />

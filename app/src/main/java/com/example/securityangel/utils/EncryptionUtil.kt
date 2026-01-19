@@ -12,7 +12,7 @@ object EncryptionUtil {
     fun encrypt(value: String): String {
         try {
             val key = SecretKeySpec(SECRET_KEY.toByteArray(), "AES")
-            val iv = IvParameterSpec(ByteArray(16)) // וקטור איפוס פשוט
+            val iv = IvParameterSpec(ByteArray(16))
             val cipher = Cipher.getInstance(ALGORITHM)
             cipher.init(Cipher.ENCRYPT_MODE, key, iv)
             val encrypted = cipher.doFinal(value.toByteArray())

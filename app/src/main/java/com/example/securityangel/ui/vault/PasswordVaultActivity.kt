@@ -35,6 +35,7 @@ class PasswordVaultActivity : BaseActivity() {
         binding = ActivityPasswordVaultBinding.inflate(layoutInflater)
         setContent(binding.root)
         setToolbarIconColor(isDarkBackground = false)
+        setToolbarVisibility(false)
 
         if (userId == null) {
             toast("Error: User not logged in")
@@ -52,6 +53,17 @@ class PasswordVaultActivity : BaseActivity() {
         binding.fabAddPassword.setOnClickListener {
             showAddOrEditDialog(null)
         }
+
+        val btnRef = binding.icRefresh
+        btnRef.isFocusable = true
+        btnRef.isClickable = true
+        btnRef.setOnClickListener { scanVaultForLeaks() }
+
+        val btnDrw = binding.icBack
+        btnDrw.isFocusable = true
+        btnDrw.isClickable = true
+        btnDrw.setOnClickListener { openDrawer() }
+
     }
 
     private fun setupRecyclerView() {
@@ -133,6 +145,7 @@ class PasswordVaultActivity : BaseActivity() {
                 val encryptedEmail = EncryptionUtil.encrypt(email)
 
                 val dataMap = hashMapOf(
+                    "searchKey" to name.lowercase(),
                     "siteName" to name,
                     "domain" to domain,
                     "email" to encryptedEmail,
@@ -182,17 +195,48 @@ class PasswordVaultActivity : BaseActivity() {
             .show()
     }
 
+
     private fun setupSearch() {
         binding.etSearch.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                val query = s.toString()
-                val filtered = allAccounts.filter {
-                    it.siteName.contains(query, true) || it.domain.contains(query, true)
-                }
-                adapter.updateList(filtered)
-            }
             override fun afterTextChanged(s: Editable?) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                val query = s.toString().lowercase()
+
+                if (query.isEmpty()) {
+                    adapter.updateList(allAccounts)
+                    return
+                }
+
+                firestore.collection("users").document(userId!!).collection("vault")
+                    .orderBy("searchKey")
+                    .startAt(query)
+                    .endAt(query + "\uf8ff")
+                    .get()
+                    .addOnSuccessListener { documents ->
+                        val searchResults = mutableListOf<PasswordAccount>()
+
+                        for (doc in documents) {
+                            val encryptedPass = doc.getString("password") ?: ""
+                            val encryptedEmail = doc.getString("email") ?: ""
+                            val decryptedPass = EncryptionUtil.decrypt(encryptedPass)
+                            val decryptedEmail = EncryptionUtil.decrypt(encryptedEmail)
+
+                            val account = PasswordAccount(
+                                id = doc.id,
+                                siteName = doc.getString("siteName") ?: "",
+                                searchKey = doc.getString("searchKey") ?: "",
+                                email = decryptedEmail,
+                                domain = doc.getString("domain") ?: "",
+                                password = decryptedPass,
+                                isLeaked = doc.getBoolean("isLeaked") ?: false
+                            )
+                            searchResults.add(account)
+                        }
+                        adapter.updateList(searchResults)
+                    }
+            }
         })
     }
 
@@ -230,7 +274,7 @@ class PasswordVaultActivity : BaseActivity() {
                 if (checkedCount == allAccounts.size) {
                     runOnUiThread {
                         if (leaksFound > 0) {
-                            showSecurityAlert(leaksFound)
+                            toast("⚠️ found $leaksFound compromised passwords in your vault")
                         } else {
                             toast("Scan complete. No leaks found! ✅")
                             onPasswordFixed()
@@ -241,13 +285,6 @@ class PasswordVaultActivity : BaseActivity() {
         }
     }
 
-    private fun showSecurityAlert(count: Int) {
-        AlertDialog.Builder(this)
-            .setTitle("Security Alert!")
-            .setMessage("⚠️ We found $count compromised passwords in your vault.\n\nPlease change them immediately.")
-            .setPositiveButton("OK", null)
-            .show()
-    }
     fun onPasswordLeakDetected() {
         val myUserId = FirebaseAuth.getInstance().currentUser!!.uid
         SecurityRepository.reportRisk(myUserId, SecurityConstants.RISK_PASSWORD_LEAK)

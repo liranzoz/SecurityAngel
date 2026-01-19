@@ -2,6 +2,7 @@ package com.example.securityangel.data.models
 
 data class PasswordAccount (
     var id: String = "",
+    val searchKey : String = "",
     val siteName: String = "",
     val email: String = "",
     val domain: String = "",
