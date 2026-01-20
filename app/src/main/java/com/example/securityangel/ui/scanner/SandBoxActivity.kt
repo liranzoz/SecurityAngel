@@ -129,6 +129,22 @@ class SandBoxActivity : BaseActivity() {
         }
 
         binding.btnBack.setOnClickListener { openDrawer() }
+
+        binding.btnPaste.setOnClickListener {
+            val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
+            if (clipboard.hasPrimaryClip() && clipboard.primaryClip?.itemCount!! > 0) {
+                val clipData = clipboard.primaryClip?.getItemAt(0)
+                val pasteText = clipData?.text.toString()
+                if (pasteText.isNotEmpty()) {
+                    binding.etUrlInput.setText(pasteText)
+                    binding.etUrlInput.setSelection(pasteText.length)
+                } else {
+                    toast("Clipboard is empty")
+                }
+            } else {
+                toast("Nothing to paste")
+            }
+        }
     }
 
     private fun showInfoDialog(){

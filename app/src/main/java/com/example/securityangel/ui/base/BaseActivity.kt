@@ -88,8 +88,59 @@ abstract class BaseActivity : AppCompatActivity() {
         loadUserData()
         handleDrawer()
         handleDarkMode()
+        highlightCurrentNavigationItem()
 
     }
+
+    private fun updateMenuBadges(user: User) {
+        val navView = baseBinding.navigationViewBase
+        val menu = navView.menu
+
+        val hasPasswordRisk = user.activeRisks.contains("risk_password_leak") || user.activeRisks.contains("RISK_PASSWORD_LEAK")
+        val vaultItem = menu.findItem(R.id.nav_pass_vault)
+
+        if (hasPasswordRisk) {
+            vaultItem.actionView = createBadge("!")
+        } else {
+            vaultItem.actionView = null
+        }
+
+        val familyItem = menu.findItem(R.id.nav_family)
+        if (user.riskCount > 0) {
+            familyItem.actionView = createBadge(user.riskCount.toString())
+        } else {
+            familyItem.actionView = null
+        }
+    }
+
+    fun createBadge(text: String): View {
+        val view = android.view.LayoutInflater.from(this).inflate(R.layout.layout_menu_badge, null)
+        val tv = view.findViewById<android.widget.TextView>(R.id.tvBadge)
+        tv.text = text
+        return view
+    }
+    private fun highlightCurrentNavigationItem(){
+        val navView = baseBinding.navigationViewBase
+
+        val targetId = when (this) {
+            is DashboardActivity -> R.id.nav_dash
+            is FamilySafetyActivity -> R.id.nav_family
+            is SandBoxActivity -> R.id.nav_sand_box
+            is PasswordVaultActivity -> R.id.nav_pass_vault
+            is SettingsActivity -> R.id.nav_settings
+            is PasswordGeneratorActivity -> R.id.nav_generator
+            is SecurityLogActivity -> R.id.nav_Logs
+            is AIChatActivity -> R.id.nav_ai_chat
+            else -> -1
+        }
+        if (targetId != -1) {
+            navView.setCheckedItem(targetId)
+        }
+
+
+    }
+
+
    private fun handleScreenshot(){
        val preventScreenshots = sharedPrefs.getBoolean("prevent_screenshots", false)
        if (preventScreenshots) {
@@ -211,6 +262,7 @@ abstract class BaseActivity : AppCompatActivity() {
     private fun loadUserData() {
         fetchUserDetails { user ->
             updateNavigationHeader(user)
+            updateMenuBadges(user)
         }
     }
     protected fun getAvatarAnimation(gender: String): Int {

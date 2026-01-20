@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securityangel.data.models.ChatMessage
 import com.example.securityangel.databinding.ActivityAiChatBinding
 import com.example.securityangel.ui.base.BaseActivity
+import com.example.securityangel.ui.family.FamilySafetyActivity
 import com.example.securityangel.ui.password.PasswordGeneratorActivity
 import com.example.securityangel.ui.scanner.SandBoxActivity
 import com.example.securityangel.ui.settings.SecurityLogActivity
@@ -41,7 +42,7 @@ class AIChatActivity : BaseActivity() {
         buttonHandler()
         setupRecyclerView()
         loadChatHistory()
-        addBotMessage("Hello! I am Security Angel AI. How can I help you stay safe today?")
+//        addBotMessage("Hello! I am Security Angel AI. How can I help you stay safe today?")
     }
 
     private fun setupRecyclerView() {
@@ -177,16 +178,31 @@ class AIChatActivity : BaseActivity() {
     private fun handleAction(actionCode: String) {
         val intent = when (actionCode) {
             "OPEN_VAULT" -> android.content.Intent(this, PasswordVaultActivity::class.java)
-//            "OPEN_FAMILY" -> android.content.Intent(this, FamilySafetyActivity::class.java)
+            "OPEN_FAMILY" -> android.content.Intent(this, FamilySafetyActivity::class.java)
             "OPEN_SCANNER" -> android.content.Intent(this, SandBoxActivity::class.java)
             "GENERATE_PASS" -> android.content.Intent(this, PasswordGeneratorActivity::class.java)
             "OPEN_LOGS" -> android.content.Intent(this, SecurityLogActivity::class.java)
             else -> null
         }
-
         if (intent != null) {
-            startActivity(intent)
+            val friendlyName = actionCode.replace("OPEN_", "").replace("_", " ").lowercase().capitalize()
+
+            showConfirmationDialog(friendlyName, intent)
         }
+    }
+    private fun showConfirmationDialog(screenName: String, targetIntent: android.content.Intent) {
+        com.google.android.material.dialog.MaterialAlertDialogBuilder(this)
+            .setTitle("Action Required")
+            .setMessage("Security Angel wants to take you to the $screenName screen. Proceed?")
+            .setCancelable(false)
+            .setPositiveButton("Take me") { dialog, _ ->
+                startActivity(targetIntent)
+                dialog.dismiss()
+            }
+            .setNegativeButton("No, Stay here") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .show()
     }
 
     private fun loadChatHistory() {

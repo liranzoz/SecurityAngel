@@ -11,5 +11,7 @@ data class User(
     val familyId: String? = null,
     val securityStatus: String = "Safe",
     val riskCount: Int = 0,
-    val lastScanDate: Long = 0
+    val lastScanDate: Long = 0,
+    val securityScore: Int = 100,
+    val activeRisks: List<String> = emptyList()
 )

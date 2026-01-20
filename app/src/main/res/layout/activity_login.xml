@@ -67,7 +67,7 @@
             android:paddingHorizontal="16dp"
             android:hint="user@example.com"
             android:inputType="textEmailAddress"
-            android:textColor="@color/ui_ic"
+            android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
         <TextView
@@ -90,7 +90,7 @@
             android:paddingHorizontal="16dp"
             android:hint="••••••••"
             android:inputType="textPassword"
-            android:textColor="@color/ui_ic"
+            android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
         <TextView

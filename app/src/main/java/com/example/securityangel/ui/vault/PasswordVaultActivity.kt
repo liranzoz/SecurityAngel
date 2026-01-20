@@ -20,6 +20,7 @@ import com.example.securityangel.utils.toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import kotlin.collections.mutableListOf
 
 class PasswordVaultActivity : BaseActivity() {
 
@@ -261,6 +262,7 @@ class PasswordVaultActivity : BaseActivity() {
                 if (isLeaked) {
                     leaksFound++
                     onPasswordLeakDetected()
+                    saveToFirebase(account)
                     SecurityLogger.logEvent(
                         SecurityLogger.TYPE_LEAK_FOUND,
                         "Password leak detected for site: ${account.siteName}"
@@ -295,6 +297,12 @@ class PasswordVaultActivity : BaseActivity() {
         SecurityRepository.resolveRisk(myUserId, SecurityConstants.RISK_PASSWORD_LEAK)
     }
 
+    private fun saveToFirebase(account : PasswordAccount){
+        firestore.collection("users").document(userId!!)
+            .collection("vault").document(account.id)
+            .update("isLeaked", true)
+
+    }
 
 
 }

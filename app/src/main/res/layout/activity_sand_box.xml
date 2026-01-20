@@ -60,11 +60,30 @@
         android:layout_marginHorizontal="24dp"
         android:layout_marginTop="24dp"
         android:background="@drawable/bg_input_rounded"
-        android:padding="16dp"
-        android:text="google.com"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:paddingEnd="50dp"
         android:textColor="@color/text_primary"
         android:textSize="16sp"
+        android:inputType="textUri"
         app:layout_constraintTop_toBottomOf="@id/headerLayout" />
+
+    <ImageView
+        android:id="@+id/btnPaste"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:padding="8dp"
+        android:src="@drawable/ic_paste"
+        app:tint="@color/text_secondary"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:layout_marginEnd="8dp"
+        android:elevation="4dp"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintEnd_toEndOf="@id/etUrlInput"
+        app:layout_constraintTop_toTopOf="@id/etUrlInput"
+        app:layout_constraintBottom_toBottomOf="@id/etUrlInput"/>
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btnScan"
