@@ -15,7 +15,7 @@ object SecurityLogger {
 
 
     fun logEvent(eventType: String, description: String) {
-        val currentUser = FirebaseAuth.getInstance().currentUser ?: return // אם אין משתמש, לא עושים כלום
+        val currentUser = FirebaseAuth.getInstance().currentUser ?: return
 
         db.collection("users").document(currentUser.uid).get()
             .addOnSuccessListener { document ->

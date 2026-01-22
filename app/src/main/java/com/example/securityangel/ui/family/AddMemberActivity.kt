@@ -1,5 +1,6 @@
 package com.example.securityangel.ui.family
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
 import android.view.View
@@ -15,7 +16,7 @@ class AddMemberActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddMemberBinding
     private var currentFamilyId: String? = null
-    private var currentUser: User? = null // שומרים את המשתמש המלא כדי שנוכל להשתמש בשם שלו ליצירת המשפחה
+    private var currentUser: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,16 +30,12 @@ class AddMemberActivity : AppCompatActivity() {
     private fun setupInitialData() {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
 
-        // טעינת המשתמש הנוכחי
         FirebaseFirestore.getInstance().collection("users").document(userId).get()
             .addOnSuccessListener { document ->
                 currentUser = document.toObject(User::class.java)
                 currentFamilyId = currentUser?.familyId
 
-                // שינוי לוגיקה: אם אין משפחה - אנחנו לא סוגרים את המסך!
-                // אנחנו פשוט נדע שבזמן הלחיצה צריך קודם ליצור אחת.
                 if (currentFamilyId == null) {
-                    // אופציונלי: עדכון כותרת כדי שהמשתמש יבין שהוא יוצר קבוצה
                     binding.btnAddBtn.text = "Create Family & Add Member"
                 }
             }
@@ -50,38 +47,32 @@ class AddMemberActivity : AppCompatActivity() {
         binding.btnAddBtn.setOnClickListener {
             val email = binding.etEmail.text.toString().trim()
 
-            // ולידציה
             if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
                 binding.tilEmail.error = "Please enter a valid email address"
                 return@setOnClickListener
             }
-            if (currentUser == null) return@setOnClickListener // הגנה למקרה שהנתונים עוד לא נטענו
+            if (currentUser == null) return@setOnClickListener
 
             setLoading(true)
 
-            // --- הצומת המרכזי: האם אנחנו מוסיפים למשפחה קיימת או יוצרים חדשה? ---
-
             if (currentFamilyId != null) {
-                // תרחיש א': יש משפחה - מוסיפים רגיל
-                addMemberToExistingFamily(currentFamilyId!!, email)
+                generateCodeAndInvite(email)
             } else {
-                // תרחיש ב': אין משפחה - יוצרים חדשה ואז מוסיפים
                 createNewFamilyAndAddMember(email)
             }
+
         }
     }
 
-    // פונקציה ליצירת משפחה חדשה (תרחיש ב')
     private fun createNewFamilyAndAddMember(emailToAdd: String) {
         val admin = currentUser!!
-        val familyName = "${admin.lastName} Family" // שם ברירת מחדל, למשל "Cohen Family"
+        val familyName = "${admin.lastName} Family"
 
         FamilyRepository.createFamily(
             admin = admin,
             familyName = familyName,
             onSuccess = { newFamilyId ->
-                // הצלחנו ליצור משפחה! עכשיו נוסיף את החבר
-                currentFamilyId = newFamilyId // מעדכנים את המשתנה המקומי
+                currentFamilyId = newFamilyId
                 addMemberToExistingFamily(newFamilyId, emailToAdd)
             },
             onFailure = { error ->
@@ -91,7 +82,6 @@ class AddMemberActivity : AppCompatActivity() {
         )
     }
 
-    // פונקציה להוספת חבר (משותפת לשני התרחישים)
     private fun addMemberToExistingFamily(familyId: String, email: String) {
         FamilyRepository.addMemberByEmail(
             familyId = familyId,
@@ -113,4 +103,56 @@ class AddMemberActivity : AppCompatActivity() {
         binding.btnAddBtn.isEnabled = !isLoading
         binding.etEmail.isEnabled = !isLoading
     }
+
+    private fun generateCodeAndInvite(email: String) {
+        val invitationCode = (100000..999999).random().toString()
+        val familyId = currentFamilyId ?: return
+
+        val invitation = hashMapOf(
+            "email" to email,
+            "familyId" to familyId,
+            "code" to invitationCode,
+            "status" to "pending",
+            "timestamp" to System.currentTimeMillis()
+        )
+
+        setLoading(true)
+
+        FirebaseFirestore.getInstance().collection("invitations")
+            .document(email)
+            .set(invitation)
+            .addOnSuccessListener {
+                setLoading(false)
+                shareInvitationCode(email, invitationCode)
+            }
+            .addOnFailureListener { e ->
+                setLoading(false)
+                Toast.makeText(this, "Failed to create invitation: ${e.message}", Toast.LENGTH_SHORT).show()
+            }
+    }
+
+    private fun shareInvitationCode(email: String, code: String) {
+        val shareText = """
+            Hey! I want to add you to my family in Security Angel.
+            
+            1. Download the app.
+            2. Register with email: $email
+            3. Use this secure code to join: *$code*
+            
+            Stay safe!
+        """.trimIndent()
+
+        val sendIntent: Intent = Intent().apply {
+            action = Intent.ACTION_SEND
+            putExtra(Intent.EXTRA_TEXT, shareText)
+            putExtra(Intent.EXTRA_SUBJECT, "Join my Family on Security Angel")
+            type = "text/plain"
+        }
+
+        val shareIntent = Intent.createChooser(sendIntent, "Send Invitation via...")
+        startActivity(shareIntent)
+
+        finish()
+    }
+
 }

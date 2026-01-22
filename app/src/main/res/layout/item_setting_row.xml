@@ -32,7 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:text="Setting Title"
-        android:textColor="#212121"
+        android:textColor="@color/text_primary"
         android:textSize="16sp"
         app:layout_constraintStart_toEndOf="@id/iconContainer"
         app:layout_constraintTop_toTopOf="parent"

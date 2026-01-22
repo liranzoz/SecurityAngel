@@ -20,7 +20,6 @@ import retrofit2.Response
 class SandBoxActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySandBoxBinding
-    private val apiKey = "REDACTED_VIRUSTOTAL_API_KEY_ROTATED"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,10 +37,10 @@ class SandBoxActivity : BaseActivity() {
         binding.btnScan.text = "Scanning..."
         binding.btnScan.isEnabled = false
 
-        val api = VirusTotalApi.Companion.create()
-        val urlId = VirusTotalApi.Companion.urlToBase64(url)
+        val api = VirusTotalApi.create()
+        val urlId = VirusTotalApi.urlToBase64(url)
 
-        api.scanUrl(apiKey, urlId).enqueue(object : Callback<VtResponse> {
+        api.scanUrl(urlId).enqueue(object : Callback<VtResponse> {
             override fun onResponse(call: Call<VtResponse>, response: Response<VtResponse>) {
                 binding.btnScan.text = "Scan"
                 binding.btnScan.isEnabled = true

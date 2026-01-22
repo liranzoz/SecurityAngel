@@ -3,6 +3,7 @@ package com.example.securityangel.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import com.example.securityangel.ui.dash.DashboardActivity
 import com.example.securityangel.R
 import com.example.securityangel.data.models.User
@@ -12,10 +13,12 @@ import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
+
 class SignUpActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var auth: FirebaseAuth
+    private var isGoogleSignIn = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,6 +27,12 @@ class SignUpActivity : BaseActivity() {
 
         auth = FirebaseAuth.getInstance()
         buttonHandler()
+        isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
+        isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
+
+        if (isGoogleSignIn) {
+            setupGoogleMode()
+        }
 
     }
 
@@ -33,17 +42,41 @@ class SignUpActivity : BaseActivity() {
         }
 
         binding.tvLoginLink.setOnClickListener {
-            finish()
+            performCancelRegistration()
         }
 
         binding.btnBack.setOnClickListener {
-            finish()
+            performCancelRegistration()
         }
     }
 
+    private fun performCancelRegistration() {
+        if (isGoogleSignIn) {
+            auth.signOut()
+            toast("Registration cancelled")
+        }
+
+        val intent = Intent(this, LoginActivity::class.java)
+        startActivity(intent)
+        finish()
+    }
+    private fun setupGoogleMode() {
+        val email = intent.getStringExtra("GOOGLE_EMAIL")
+        val name = intent.getStringExtra("GOOGLE_NAME")
+
+        binding.etEmail.setText(email)
+        binding.etEmail.isEnabled = false
+
+        if (name != null) {
+            val parts = name.split(" ")
+            if (parts.isNotEmpty()) binding.etFirstName.setText(parts[0])
+            if (parts.size > 1) binding.etLastName.setText(parts.drop(1).joinToString(" "))
+        }
+        binding.etEmail.visibility = View.GONE
+        binding.etPassword.visibility = View.GONE
+    }
     private fun performSignUp() {
         val email = binding.etEmail.text.toString().trim()
-        val password = binding.etPassword.text.toString().trim()
         val firstName = binding.etFirstName.text.toString().trim()
         val lastName = binding.etLastName.text.toString().trim()
         val phone = binding.etPhone.text.toString().trim()
@@ -54,54 +87,45 @@ class SignUpActivity : BaseActivity() {
             else -> "Not Selected"
         }
 
-        if (email.isEmpty() || !Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            binding.etEmail.error = "Valid email required"
-            return
-        }
-        if (password.length < 6) {
-            binding.etPassword.error = "Min 6 chars password"
-            return
-        }
         if (firstName.isEmpty()) {
             binding.etFirstName.error = "Name required"
             return
         }
 
-        auth.createUserWithEmailAndPassword(email, password)
-            .addOnSuccessListener { authResult ->
-
-                val userId = authResult.user?.uid ?: return@addOnSuccessListener
-
-                val newUser = User(
-                    id = userId,
-                    firstName = firstName,
-                    lastName = lastName,
-                    email = email,
-                    phone = phone,
-                    gender = gender
-                )
-
-                saveUserToDatabase(newUser)
+        if (isGoogleSignIn) {
+            val currentUser = auth.currentUser
+            if (currentUser != null) {
+                val finalEmail = if (email.isNotEmpty()) email else currentUser.email ?: ""
+                saveUserToDatabase(currentUser.uid, firstName, lastName, finalEmail, phone, gender)
+            } else {
+                toast("Error: Session expired, please login again")
+                finish()
             }
-            .addOnFailureListener { e ->
-                toast("Sign Up Failed: ${e.message}")
+        } else {
+            val password = binding.etPassword.text.toString().trim()
+            if (password.length < 6) {
+                binding.etPassword.error = "Min 6 chars"
+                return
             }
+            auth.createUserWithEmailAndPassword(email, password)
+                .addOnSuccessListener { res ->
+                    val uid = res.user?.uid ?: return@addOnSuccessListener
+                    saveUserToDatabase(uid, firstName, lastName, email, phone, gender)
+                }
+                .addOnFailureListener { e -> toast("Error: ${e.message}") }
+        }
     }
 
-    private fun saveUserToDatabase(user: User) {
-        val db = FirebaseFirestore.getInstance()
+    private fun saveUserToDatabase(uid: String, first: String, last: String, email: String, phone: String, gender: String) {
+        val user = User(uid, first, last, email, phone, gender)
 
-        db.collection("users").document(user.id).set(user)
+        FirebaseFirestore.getInstance().collection("users").document(uid).set(user)
             .addOnSuccessListener {
-                toast("Account created & saved!")
-
+                toast("Welcome!")
                 val intent = Intent(this, DashboardActivity::class.java)
                 intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 startActivity(intent)
-
             }
-            .addOnFailureListener { e ->
-                toast("Failed to save user details: ${e.message}")
-            }
+            .addOnFailureListener { e -> toast("Save failed: ${e.message}") }
     }
 }

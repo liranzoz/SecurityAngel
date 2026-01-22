@@ -130,11 +130,7 @@
 
                     <include layout="@layout/item_setting_row" android:id="@+id/rowBiometric"/>
 
-                    <include layout="@layout/item_setting_row" android:id="@+id/rowPrivacy"/>
 
-                    <include layout="@layout/item_setting_row" android:id="@+id/rowBackup"/>
-
-                    <include layout="@layout/item_setting_row" android:id="@+id/rowHelp"/>
 
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>

@@ -42,6 +42,10 @@ class FamilyManagementActivity : BaseActivity() {
             if (familyId == null) {
                 binding.tvFamilyName.text = "No Family Created"
                 binding.membersListContainer.removeAllViews()
+                binding.btnJoinWithCode.visibility = View.VISIBLE
+                binding.btnJoinWithCode.setOnClickListener {
+                    startActivity(Intent(this, JoinFamilyActivity::class.java))
+                }
             } else {
                 FamilyRepository.getFamilyData(
                     familyId = familyId,

@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.launch
+import com.example.securityangel.BuildConfig
 
 class AIChatActivity : BaseActivity() {
 
@@ -26,7 +27,7 @@ class AIChatActivity : BaseActivity() {
 
     private val generativeModel = GenerativeModel(
         modelName = "gemini-3-flash-preview",
-        apiKey = "AIzaSyDVtzG9ncdCEuCgu-un6DxSjsv_cj1-6Ek"
+        apiKey = BuildConfig.GEMINI_API_KEY
     )
 
     private val chat = generativeModel.startChat(

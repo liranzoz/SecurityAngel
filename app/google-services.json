@@ -12,7 +12,20 @@
           "package_name": "com.example.securityangel"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "1032926031501-rh486pd69bgf0pl4pjstd4p7d3rfjcoc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.securityangel",
+            "certificate_hash": "7808fe21a8b7b97da5659684092c7a7f6eceaacc"
+          }
+        },
+        {
+          "client_id": "1032926031501-9jnak44cqk8ordniv85qhp7mo2k8eeh9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBNkt4aycBXfJiouPBP9RmEEdmSE1syFW4"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1032926031501-9jnak44cqk8ordniv85qhp7mo2k8eeh9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }

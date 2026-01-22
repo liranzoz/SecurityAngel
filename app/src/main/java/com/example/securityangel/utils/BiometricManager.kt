@@ -17,7 +17,7 @@ object BiometricManager {
     fun showBiometricPrompt(
         activity: FragmentActivity,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit = {} // מה קורה כשנכשלים (אופציונלי)
+        onFailure: () -> Unit = {}
     ) {
         val executor = ContextCompat.getMainExecutor(activity)
 

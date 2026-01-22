@@ -1,19 +1,20 @@
 package com.example.securityangel.utils
 
 import android.util.Base64
+import com.example.securityangel.BuildConfig
 import com.example.securityangel.data.models.VtResponse
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Path
 
 interface VirusTotalApi {
 
     @GET("api/v3/urls/{id}")
     fun scanUrl(
-        @Header("x-apikey") apiKey: String,
         @Path("id") urlId: String
     ): Call<VtResponse>
 
@@ -21,8 +22,18 @@ interface VirusTotalApi {
         private const val BASE_URL = "https://www.virustotal.com/"
 
         fun create(): VirusTotalApi {
+
+            val client = OkHttpClient.Builder().addInterceptor { chain ->
+                val originalRequest = chain.request()
+                val newRequest: Request = originalRequest.newBuilder()
+                    .addHeader("x-apikey", BuildConfig.VIRUSTOTAL_API_KEY)
+                    .build()
+                chain.proceed(newRequest)
+            }.build()
+
             return Retrofit.Builder()
                 .baseUrl(BASE_URL)
+                .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(VirusTotalApi::class.java)

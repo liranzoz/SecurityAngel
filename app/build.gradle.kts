@@ -1,3 +1,7 @@
+import java.io.FileInputStream
+import java.util.Properties
+
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,22 +10,39 @@ plugins {
 
 android {
     namespace = "com.example.securityangel"
-    compileSdk {
-        version = release(36)
-
-        buildFeatures {
-            viewBinding = true
-        }
-    }
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.example.securityangel"
         minSdk = 28
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val localProperties = Properties()
+        val localPropertiesFile = rootProject.file("local.properties")
+        if (localPropertiesFile.exists()) {
+            localProperties.load(FileInputStream(localPropertiesFile))
+        }
+
+        val geminiKey = localProperties.getProperty("GEMINI_API_KEY") ?: "".replace("\"", "")
+        val virusTotalKey = localProperties.getProperty("VIRUSTOTAL_API_KEY") ?: "".replace("\"", "")
+        val secretKey = localProperties.getProperty("SECRET_KEY") ?: "".replace("\"", "")
+        val algorithm = localProperties.getProperty("ALGORITHM") ?: "AES/CBC/PKCS5Padding".replace("\"", "")
+
+        buildConfigField("String", "GEMINI_API_KEY", "\"$geminiKey\"")
+        buildConfigField("String", "VIRUSTOTAL_API_KEY", "\"$virusTotalKey\"")
+        buildConfigField("String", "SECRET_KEY", "\"$secretKey\"")
+        buildConfigField("String", "ALGORITHM", "\"$algorithm\"")
+
+
+    }
+
+    buildFeatures {
+        viewBinding = true
+        buildConfig = true
     }
 
     buildTypes {
@@ -34,11 +55,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     kotlinOptions {
-        jvmTarget = "11"
+        jvmTarget = "1.8"
     }
 }
 
@@ -60,4 +81,6 @@ dependencies {
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("androidx.biometric:biometric:1.1.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")}
+    implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
+    implementation("com.google.android.gms:play-services-auth:20.7.0")
+}
