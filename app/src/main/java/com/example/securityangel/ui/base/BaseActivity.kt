@@ -175,24 +175,19 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     private fun performLogoutAndExit() {
-        // ניתוק המשתמש מפיירבייס (כמו שביקשת)
         FirebaseAuth.getInstance().signOut()
 
         toast("Authentication failed. Logged out.")
 
-        // מעבר למסך לוגין וניקוי ההיסטוריה
         val intent = Intent(this, LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
     }
 
-    // פונקציה לטעינת המסך מה-XML והצגתו
     private fun showPrivacyScreen() {
         if (privacyOverlay == null) {
             val rootView = window.decorView as ViewGroup
-
-            // כאן אנחנו טוענים את ה-XML שיצרנו בשלב 1
             privacyOverlay = layoutInflater.inflate(R.layout.view_biometric_lock, rootView, false)
 
             rootView.addView(privacyOverlay)
@@ -202,9 +197,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private fun hidePrivacyScreen() {
         privacyOverlay?.visibility = View.GONE
-        // אופציונלי: להסיר את ה-View לגמרי כדי לחסוך זיכרון
-        // (window.decorView as ViewGroup).removeView(privacyOverlay)
-        // privacyOverlay = null
     }
 
     fun createBadge(text: String): View {
@@ -230,11 +222,7 @@ abstract class BaseActivity : AppCompatActivity() {
         if (targetId != -1) {
             navView.setCheckedItem(targetId)
         }
-
-
     }
-
-
    private fun handleScreenshot(){
        val preventScreenshots = sharedPrefs.getBoolean("prevent_screenshots", false)
        if (preventScreenshots) {
@@ -243,7 +231,6 @@ abstract class BaseActivity : AppCompatActivity() {
                WindowManager.LayoutParams.FLAG_SECURE
            )
        }
-
    }
     private fun handleDrawer(){
         baseBinding.navigationViewBase.setNavigationItemSelectedListener { item ->
