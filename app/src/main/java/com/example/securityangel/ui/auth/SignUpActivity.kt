@@ -2,7 +2,8 @@ package com.example.securityangel.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Patterns
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.View
 import com.example.securityangel.ui.dash.DashboardActivity
 import com.example.securityangel.R
@@ -25,28 +26,58 @@ class SignUpActivity : BaseActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        updateButtonState(false)
         auth = FirebaseAuth.getInstance()
         buttonHandler()
         isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
         isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
 
-        if (isGoogleSignIn) {
-            setupGoogleMode()
-        }
-
+        if (isGoogleSignIn) { setupGoogleMode() }
+        setupTextWatchers()
     }
 
-    override fun buttonHandler() {
-        binding.btnRegister.setOnClickListener {
-            performSignUp()
+    private fun setupTextWatchers() {
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                checkInputs()
+            }
+            override fun afterTextChanged(s: Editable?) {}
         }
 
-        binding.tvLoginLink.setOnClickListener {
-            performCancelRegistration()
+        binding.etFirstName.addTextChangedListener(watcher)
+        binding.etLastName.addTextChangedListener(watcher)
+        binding.etPhone.addTextChangedListener(watcher)
+        binding.etEmail.addTextChangedListener(watcher)
+        binding.etPassword.addTextChangedListener(watcher)
+    }
+    private fun checkInputs() {
+        val firstName = binding.etFirstName.text.toString().trim()
+        val lastName = binding.etLastName.text.toString().trim()
+        val phone = binding.etPhone.text.toString().trim()
+        val email = binding.etEmail.text.toString().trim()
+        val password = binding.etPassword.text.toString().trim()
+
+        val basicInfoFilled = firstName.isNotEmpty() &&
+                lastName.isNotEmpty() &&
+                phone.isNotEmpty() &&
+                email.isNotEmpty()
+
+        val passwordValid = if (isGoogleSignIn) {
+            true
+        } else {
+            password.length >= 6
         }
 
-        binding.btnBack.setOnClickListener {
-            performCancelRegistration()
+        updateButtonState(basicInfoFilled && passwordValid)
+    }
+
+    private fun updateButtonState(isEnabled: Boolean) {
+        binding.btnRegister.isEnabled = isEnabled
+        if (isEnabled) {
+            binding.btnRegister.alpha = 1.0f
+        } else {
+            binding.btnRegister.alpha = 0.5f
         }
     }
 
@@ -72,8 +103,8 @@ class SignUpActivity : BaseActivity() {
             if (parts.isNotEmpty()) binding.etFirstName.setText(parts[0])
             if (parts.size > 1) binding.etLastName.setText(parts.drop(1).joinToString(" "))
         }
-        binding.etEmail.visibility = View.GONE
         binding.etPassword.visibility = View.GONE
+        binding.tvPassword.visibility = View.GONE
     }
     private fun performSignUp() {
         val email = binding.etEmail.text.toString().trim()
@@ -127,5 +158,19 @@ class SignUpActivity : BaseActivity() {
                 startActivity(intent)
             }
             .addOnFailureListener { e -> toast("Save failed: ${e.message}") }
+    }
+
+    override fun buttonHandler() {
+        binding.btnRegister.setOnClickListener {
+            performSignUp()
+        }
+
+        binding.tvLoginLink.setOnClickListener {
+            performCancelRegistration()
+        }
+
+        binding.btnBack.setOnClickListener {
+            performCancelRegistration()
+        }
     }
 }

@@ -129,7 +129,9 @@
                 style="@style/InputStyle"
                 android:hint="john@example.com"
                 android:inputType="textEmailAddress"
-                android:drawableStart="@drawable/ic_email" /> <TextView
+                android:drawableStart="@drawable/ic_email" />
+            <TextView
+                android:id="@+id/tvPassword"
             style="@style/LabelStyle"
             android:text="Password" />
             <EditText

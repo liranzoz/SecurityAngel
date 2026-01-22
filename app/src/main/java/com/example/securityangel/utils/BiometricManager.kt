@@ -1,15 +1,16 @@
 package com.example.securityangel.utils
 
-import android.content.Context
-import android.widget.Toast
+import android.content.Intent
+import android.provider.Settings
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.FragmentActivity
+import com.example.securityangel.R
 
 object BiometricManager {
 
-    fun isBiometricAvailable(context: Context): Boolean {
+    fun isBiometricAvailable(context: android.content.Context): Boolean {
         val biometricManager = BiometricManager.from(context)
         return biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG) == BiometricManager.BIOMETRIC_SUCCESS
     }
@@ -17,7 +18,7 @@ object BiometricManager {
     fun showBiometricPrompt(
         activity: FragmentActivity,
         onSuccess: () -> Unit,
-        onFailure: () -> Unit = {}
+        onFailure: () -> Unit
     ) {
         val executor = ContextCompat.getMainExecutor(activity)
 
@@ -29,9 +30,6 @@ object BiometricManager {
 
             override fun onAuthenticationError(errorCode: Int, errString: CharSequence) {
                 super.onAuthenticationError(errorCode, errString)
-                if (errorCode != BiometricPrompt.ERROR_USER_CANCELED && errorCode != BiometricPrompt.ERROR_NEGATIVE_BUTTON) {
-                    Toast.makeText(activity, "Authentication error: $errString", Toast.LENGTH_SHORT).show()
-                }
                 onFailure()
             }
 
@@ -40,14 +38,13 @@ object BiometricManager {
             }
         }
 
-        val biometricPrompt = BiometricPrompt(activity, executor, callback)
-
         val promptInfo = BiometricPrompt.PromptInfo.Builder()
             .setTitle("Security Angel Locked")
-            .setSubtitle("Unlock using your biometric credential")
-            .setNegativeButtonText("Cancel")
+            .setSubtitle("Authenticate to access")
+            .setNegativeButtonText("Exit App")
             .build()
 
+        val biometricPrompt = BiometricPrompt(activity, executor, callback)
         biometricPrompt.authenticate(promptInfo)
     }
 }

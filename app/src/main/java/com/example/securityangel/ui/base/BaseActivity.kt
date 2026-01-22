@@ -6,6 +6,7 @@ import android.content.SharedPreferences
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import android.view.WindowManager
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.enableEdgeToEdge
@@ -27,6 +28,10 @@ import com.example.securityangel.data.models.User
 import com.example.securityangel.databinding.ActivityBaseBinding
 import com.example.securityangel.databinding.NavHeaderBinding
 import com.example.securityangel.ui.ai.AIChatActivity
+import com.example.securityangel.ui.auth.LoginActivity
+import com.example.securityangel.ui.auth.SignUpActivity
+import com.example.securityangel.utils.BiometricManager
+import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -37,12 +42,22 @@ abstract class BaseActivity : AppCompatActivity() {
 
     private lateinit var sharedPrefs : SharedPreferences
 
+    private var privacyOverlay: View? = null
+    protected var requireBiometricCheck = true
+
+    companion object {
+        private var activeActivities = 0
+        private var isAppLocked = true
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         androidx.core.view.WindowCompat.setDecorFitsSystemWindows(window, false)
         window.statusBarColor = Color.TRANSPARENT
 
+        if (this is LoginActivity || this is SignUpActivity) {
+            requireBiometricCheck = false
+        }
         sharedPrefs  = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
         baseBinding = ActivityBaseBinding.inflate(layoutInflater)
         super.setContentView(baseBinding.root)
@@ -92,6 +107,51 @@ abstract class BaseActivity : AppCompatActivity() {
 
     }
 
+    override fun onStart() {
+        super.onStart()
+        activeActivities++;
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (!isChangingConfigurations) {
+            activeActivities--
+        }
+        if (activeActivities == 0) {
+            isAppLocked = true
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (requireBiometricCheck) {
+            checkSecurity()
+        }
+    }
+
+    private fun checkSecurity() {
+        val auth = FirebaseAuth.getInstance()
+        val sharedPrefs = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
+        val isBiometricEnabled = sharedPrefs.getBoolean("biometric_enabled", false)
+
+        if (isAppLocked && auth.currentUser != null && isBiometricEnabled && BiometricManager.isBiometricAvailable(this)) {
+
+            showPrivacyScreen()
+
+            BiometricManager.showBiometricPrompt(
+                activity = this,
+                onSuccess = {
+                    isAppLocked = false
+                    hidePrivacyScreen()
+                },
+                onFailure = {
+                    performLogoutAndExit()
+                }
+            )
+        }
+    }
+
+
     private fun updateMenuBadges(user: User) {
         val navView = baseBinding.navigationViewBase
         val menu = navView.menu
@@ -111,6 +171,40 @@ abstract class BaseActivity : AppCompatActivity() {
         } else {
             familyItem.actionView = null
         }
+    }
+
+
+    private fun performLogoutAndExit() {
+        // ניתוק המשתמש מפיירבייס (כמו שביקשת)
+        FirebaseAuth.getInstance().signOut()
+
+        toast("Authentication failed. Logged out.")
+
+        // מעבר למסך לוגין וניקוי ההיסטוריה
+        val intent = Intent(this, LoginActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
+        finish()
+    }
+
+    // פונקציה לטעינת המסך מה-XML והצגתו
+    private fun showPrivacyScreen() {
+        if (privacyOverlay == null) {
+            val rootView = window.decorView as ViewGroup
+
+            // כאן אנחנו טוענים את ה-XML שיצרנו בשלב 1
+            privacyOverlay = layoutInflater.inflate(R.layout.view_biometric_lock, rootView, false)
+
+            rootView.addView(privacyOverlay)
+        }
+        privacyOverlay?.visibility = View.VISIBLE
+    }
+
+    private fun hidePrivacyScreen() {
+        privacyOverlay?.visibility = View.GONE
+        // אופציונלי: להסיר את ה-View לגמרי כדי לחסוך זיכרון
+        // (window.decorView as ViewGroup).removeView(privacyOverlay)
+        // privacyOverlay = null
     }
 
     fun createBadge(text: String): View {

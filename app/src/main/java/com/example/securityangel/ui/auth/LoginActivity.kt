@@ -3,6 +3,7 @@ package com.example.securityangel.ui.auth
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
+import android.view.View
 import com.example.securityangel.R
 import com.example.securityangel.ui.dash.DashboardActivity
 import com.example.securityangel.databinding.ActivityLoginBinding
@@ -37,14 +38,14 @@ class LoginActivity : BaseActivity() {
             val isBiometricEnabled = sharedPrefs.getBoolean("biometric_enabled", false)
 
             if (isBiometricEnabled && BiometricManager.isBiometricAvailable(this)) {
+
                 BiometricManager.showBiometricPrompt(
                     activity = this,
                     onSuccess = {
                         navigateToDashboard()
                     },
                     onFailure = {
-                        // כישלון או ביטול - נשארים במסך ההתחברות
-                        // (אופציונלי: אפשר לנתק את המשתמש אם רוצים להכריח סיסמה)
+                        toast("Authentication failed. Please login manually.")
                     }
                 )
             } else {
@@ -55,30 +56,23 @@ class LoginActivity : BaseActivity() {
         buttonHandler()
 
     }
-
-    override fun buttonHandler() {
-        binding.btnLogin.setOnClickListener {
-            performLogin()
-        }
-
-        binding.tvSignUp.setOnClickListener {
-            startActivity(Intent(this, SignUpActivity::class.java))
-        }
-    }
-
     private fun setupGoogleSignIn() {
         val gso = com.google.android.gms.auth.api.signin.GoogleSignInOptions.Builder(
             com.google.android.gms.auth.api.signin.GoogleSignInOptions.DEFAULT_SIGN_IN
         )
             .requestIdToken(getString(R.string.default_web_client_id))
+            .requestEmail()
             .build()
 
         googleSignInClient = com.google.android.gms.auth.api.signin.GoogleSignIn.getClient(this, gso)
 
         binding.btnGoogle.setOnClickListener {
-            val signInIntent = googleSignInClient.signInIntent
-            startActivityForResult(signInIntent, RC_SIGN_IN)
+            googleSignInClient.signOut().addOnCompleteListener {
+                val signInIntent = googleSignInClient.signInIntent
+                startActivityForResult(signInIntent, RC_SIGN_IN)
+            }
         }
+
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
@@ -88,21 +82,22 @@ class LoginActivity : BaseActivity() {
             val task = com.google.android.gms.auth.api.signin.GoogleSignIn.getSignedInAccountFromIntent(data)
             try {
                 val account = task.getResult(com.google.android.gms.common.api.ApiException::class.java)
-                firebaseAuthWithGoogle(account.idToken!!)
+                val googleEmail = account.email
+                firebaseAuthWithGoogle(account.idToken!!, googleEmail)
             } catch (e: com.google.android.gms.common.api.ApiException) {
                 toast("Google sign in failed: ${e.statusCode}")
             }
         }
     }
 
-    private fun firebaseAuthWithGoogle(idToken: String) {
+    private fun firebaseAuthWithGoogle(idToken: String, googleEmail: String?) {
         val credential = com.google.firebase.auth.GoogleAuthProvider.getCredential(idToken, null)
         auth.signInWithCredential(credential)
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {
                     val user = auth.currentUser
 
-                    checkAndCreateUserInFirestore(user)
+                    checkAndCreateUserInFirestore(user,googleEmail)
 
                 } else {
                     toast("Firebase auth failed")
@@ -139,7 +134,7 @@ class LoginActivity : BaseActivity() {
                 }
             }
     }
-    private fun checkAndCreateUserInFirestore(firebaseUser: com.google.firebase.auth.FirebaseUser?) {
+    private fun checkAndCreateUserInFirestore(firebaseUser: com.google.firebase.auth.FirebaseUser?,googleEmail: String?) {
         if (firebaseUser == null) return
 
         val db = com.google.firebase.firestore.FirebaseFirestore.getInstance()
@@ -149,10 +144,11 @@ class LoginActivity : BaseActivity() {
             if (document.exists()) {
                 navigateToDashboard()
             } else {
+                val emailToSend = googleEmail ?: firebaseUser.email ?: ""
                 val intent = Intent(this, SignUpActivity::class.java)
 
                 intent.putExtra("IS_GOOGLE_SIGN_IN", true)
-                intent.putExtra("GOOGLE_EMAIL", firebaseUser.email)
+                intent.putExtra("GOOGLE_EMAIL", emailToSend)
                 intent.putExtra("GOOGLE_NAME", firebaseUser.displayName)
 
                 startActivity(intent)
@@ -165,5 +161,15 @@ class LoginActivity : BaseActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
         finish()
+    }
+
+    override fun buttonHandler() {
+        binding.btnLogin.setOnClickListener {
+            performLogin()
+        }
+
+        binding.tvSignUp.setOnClickListener {
+            startActivity(Intent(this, SignUpActivity::class.java))
+        }
     }
 }
