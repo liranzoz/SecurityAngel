@@ -12,6 +12,7 @@ import com.example.securityangel.databinding.ActivitySignUpBinding
 import com.example.securityangel.ui.base.BaseActivity
 import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 
 
@@ -20,6 +21,7 @@ class SignUpActivity : BaseActivity() {
     private lateinit var binding: ActivitySignUpBinding
     private lateinit var auth: FirebaseAuth
     private var isGoogleSignIn = false
+    private var pendingUser: User? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +32,7 @@ class SignUpActivity : BaseActivity() {
         auth = FirebaseAuth.getInstance()
         buttonHandler()
         isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
-        isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
+//        isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
 
         if (isGoogleSignIn) { setupGoogleMode() }
         setupTextWatchers()
@@ -123,10 +125,11 @@ class SignUpActivity : BaseActivity() {
             return
         }
 
+        val tempUser = User("", firstName, lastName, email, phone, gender)
         if (isGoogleSignIn) {
             val currentUser = auth.currentUser
             if (currentUser != null) {
-                val finalEmail = if (email.isNotEmpty()) email else currentUser.email ?: ""
+                val finalEmail = email.ifEmpty { currentUser.email ?: "" }
                 saveUserToDatabase(currentUser.uid, firstName, lastName, finalEmail, phone, gender)
             } else {
                 toast("Error: Session expired, please login again")
@@ -134,23 +137,73 @@ class SignUpActivity : BaseActivity() {
             }
         } else {
             val password = binding.etPassword.text.toString().trim()
-            if (password.length < 6) {
-                binding.etPassword.error = "Min 6 chars"
-                return
-            }
+            if (password.length < 6) return
+
+            binding.btnRegister.text = "Creating Account..."
+            binding.btnRegister.isEnabled = false
+
             auth.createUserWithEmailAndPassword(email, password)
                 .addOnSuccessListener { res ->
-                    val uid = res.user?.uid ?: return@addOnSuccessListener
-                    saveUserToDatabase(uid, firstName, lastName, email, phone, gender)
+                    val user = res.user ?: return@addOnSuccessListener
+
+                    tempUser.id = user.uid
+                    pendingUser = tempUser
+
+                    user.sendEmailVerification()
+                        .addOnSuccessListener {
+                            showVerificationUI(email)
+                        }
+                        .addOnFailureListener { e ->
+                            toast("Failed to send email: ${e.message}")
+                        }
                 }
-                .addOnFailureListener { e -> toast("Error: ${e.message}") }
+                .addOnFailureListener { e ->
+                    binding.btnRegister.text = "Sign Up"
+                    binding.btnRegister.isEnabled = true
+
+                    if (e is FirebaseAuthUserCollisionException) {
+                        binding.etEmail.error = "Email already registered!"
+                        toast("This email is already in use. Please login.")
+                    } else {
+                        toast("Error: ${e.message}")
+                    }
+                }
         }
     }
+    private fun showVerificationUI(email: String) {
+        binding.mainFormContainer.visibility = View.GONE
+        binding.verificationContainer.visibility = View.VISIBLE
+        binding.tvTitle.text = "Check your inbox"
+        binding.tvVerificationText.text = "We sent a link to:\n$email\n\nClick it to verify your account."
+    }
 
+    private fun checkEmailVerification() {
+        val user = auth.currentUser
+
+        user?.reload()?.addOnCompleteListener { task ->
+            if (user.isEmailVerified) {
+                toast("Email verified successfully!")
+                pendingUser?.let { saveUserToDatabase(it) }
+            } else {
+                toast("Email not verified yet. Please click the link.")
+            }
+        }
+    }
     private fun saveUserToDatabase(uid: String, first: String, last: String, email: String, phone: String, gender: String) {
         val user = User(uid, first, last, email, phone, gender)
 
         FirebaseFirestore.getInstance().collection("users").document(uid).set(user)
+            .addOnSuccessListener {
+                toast("Welcome!")
+                val intent = Intent(this, DashboardActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                startActivity(intent)
+            }
+            .addOnFailureListener { e -> toast("Save failed: ${e.message}") }
+    }
+
+    private fun saveUserToDatabase(user: User) {
+        FirebaseFirestore.getInstance().collection("users").document(user.id).set(user)
             .addOnSuccessListener {
                 toast("Welcome!")
                 val intent = Intent(this, DashboardActivity::class.java)
@@ -171,6 +224,16 @@ class SignUpActivity : BaseActivity() {
 
         binding.btnBack.setOnClickListener {
             performCancelRegistration()
+        }
+
+        binding.btnCheckVerification.setOnClickListener {
+            checkEmailVerification()
+        }
+
+        binding.btnResendEmail.setOnClickListener {
+            auth.currentUser?.sendEmailVerification()
+                ?.addOnSuccessListener { toast("Link resent! Check your inbox.") }
+                ?.addOnFailureListener { toast("Wait a moment before retrying.") }
         }
     }
 }

@@ -73,6 +73,7 @@ class AddMemberActivity : AppCompatActivity() {
             familyName = familyName,
             onSuccess = { newFamilyId ->
                 currentFamilyId = newFamilyId
+                generateCodeAndInvite(emailToAdd)
                 addMemberToExistingFamily(newFamilyId, emailToAdd)
             },
             onFailure = { error ->
