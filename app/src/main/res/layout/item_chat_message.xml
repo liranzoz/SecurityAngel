@@ -15,14 +15,28 @@
         app:cardElevation="0dp"
         android:layout_marginHorizontal="8dp">
 
-        <TextView
-            android:id="@+id/tvMessage"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:text="Message content"
-            android:textSize="16sp"
-            android:maxWidth="280dp"/>
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/ivMessageImage"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:scaleType="centerCrop"
+                android:visibility="gone"
+                android:layout_margin="4dp"/>
+
+            <TextView
+                android:id="@+id/tvMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="12dp"
+                android:text="Message content"
+                android:textSize="16sp"
+                android:maxWidth="280dp"/>
+        </LinearLayout>
     </androidx.cardview.widget.CardView>
 
     <com.airbnb.lottie.LottieAnimationView

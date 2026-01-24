@@ -6,12 +6,15 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.securityangel.R
 import com.example.securityangel.data.models.ChatMessage
 import com.example.securityangel.databinding.ItemChatMessageBinding
+import io.noties.markwon.Markwon
 
 class ChatAdapter(private val messages: MutableList<ChatMessage> = mutableListOf()) :
     RecyclerView.Adapter<ChatAdapter.ChatViewHolder>() {
+    private var markwon: Markwon? = null
 
     inner class ChatViewHolder(val binding: ItemChatMessageBinding) :
         RecyclerView.ViewHolder(binding.root)
@@ -35,7 +38,18 @@ class ChatAdapter(private val messages: MutableList<ChatMessage> = mutableListOf
         } else {
             holder.binding.cardMessage.visibility = View.VISIBLE
             holder.binding.lottieLoading.visibility = View.GONE
-            holder.binding.tvMessage.text = msg.text
+            if (markwon == null) {
+                markwon = Markwon.create(context)
+            }
+            markwon?.setMarkdown(holder.binding.tvMessage, msg.text ?: "")
+            if (msg.imageUri != null) {
+                holder.binding.ivMessageImage.visibility = View.VISIBLE
+                Glide.with(context)
+                    .load(msg.imageUri)
+                    .into(holder.binding.ivMessageImage)
+            } else {
+                holder.binding.ivMessageImage.visibility = View.GONE
+            }
 
             if (msg.isUser) {
                 holder.binding.rootLayout.gravity = Gravity.END

@@ -204,7 +204,6 @@ class SandBoxActivity : BaseActivity() {
             if (url.isNotEmpty()) startScanFlow(url) else toast("Enter a URL")
         }
 
-        // ... שאר הכפתורים (Paste, Back, Info) ללא שינוי ...
         binding.btnPaste.setOnClickListener {
             val clipboard = getSystemService(CLIPBOARD_SERVICE) as android.content.ClipboardManager
             val clip = clipboard.primaryClip
@@ -212,9 +211,28 @@ class SandBoxActivity : BaseActivity() {
                 binding.etUrlInput.setText(clip.getItemAt(0).text.toString())
             }
         }
-        binding.btnBack.setOnClickListener { finish() }
-    }
+        binding.btnBack.setOnClickListener { openDrawer() }
 
+        binding.btnInfo.setOnClickListener { showInfoDialog() }
+    }
+    private fun showInfoDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("How it works")
+            .setMessage(
+                "Our scanner analyzes URLs using over 70 antivirus engines to detect malware, phishing, and other threats.\n\n" +
+                        "• Green check: The site is safe.\n" +
+                        "• Red warning: Threats were detected.\n\n" +
+                        "⚠️ DISCLAIMER:\n" +
+                        "While we use advanced analysis tools, no system is 100% perfect. False positives or negatives may occur.\n" +
+                        "Accessing any website is strictly at your own risk. Security Angel is not responsible for damages resulting from visiting scanned links.\n\n" +
+                        "Stay safe and never enter passwords on suspicious sites!"
+            )
+            .setPositiveButton("Got it") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setIcon(R.drawable.ic_info)
+            .show()
+    }
     private fun saveScanToHistory(url: String, isSafe: Boolean) {
         val uid = FirebaseAuth.getInstance().currentUser?.uid ?: return
         val item = ScanHistoryItem(url, if(isSafe) "safe" else "unsafe", System.currentTimeMillis())

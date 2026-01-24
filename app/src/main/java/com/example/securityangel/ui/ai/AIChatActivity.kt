@@ -1,6 +1,12 @@
 package com.example.securityangel.ui.ai
 
+import android.graphics.ImageDecoder
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.MediaStore
+import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securityangel.data.models.ChatMessage
@@ -17,6 +23,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.launch
 import com.example.securityangel.BuildConfig
+import com.google.ai.client.generativeai.type.content
+import io.noties.markwon.Markwon
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 class AIChatActivity : BaseActivity() {
 
@@ -24,9 +34,17 @@ class AIChatActivity : BaseActivity() {
     private lateinit var adapter: ChatAdapter
     private val db = FirebaseFirestore.getInstance()
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
+    private var selectedImageUri: Uri? = null
+    private val markwon by lazy { Markwon.create(this) }
 
+    private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
+        uri?.let {
+            selectedImageUri = it
+            showImagePreview(it)
+        }
+    }
     private val generativeModel = GenerativeModel(
-        modelName = "gemini-3-flash-preview",
+        modelName = "gemini-2.5-flash",
         apiKey = BuildConfig.GEMINI_API_KEY
     )
 
@@ -54,62 +72,77 @@ class AIChatActivity : BaseActivity() {
 
     private fun sendMessage() {
         val userText = binding.etMessage.text.toString()
-        if (userText.isBlank()) return
+        val imageUri = selectedImageUri
 
-        val userMsg = ChatMessage(text = userText, isUser = true)
+        if (userText.isBlank() && imageUri == null) return
+
+        val userMsg = ChatMessage(text = userText, isUser = true, imageUri = imageUri?.toString())
         adapter.addMessage(userMsg)
         saveMessageToFirebase(userMsg)
         binding.rvChat.smoothScrollToPosition(adapter.itemCount - 1)
+
         binding.etMessage.text.clear()
+        binding.btnClosePreview.performClick()
 
-        val loadingMsg = ChatMessage(
-            text = "",
-            isUser = false,
-            isLoading = true
-        )
-
+        val loadingMsg = ChatMessage(isLoading = true)
         adapter.addMessage(loadingMsg)
         binding.rvChat.smoothScrollToPosition(adapter.itemCount - 1)
-        buildSecurityContext { contextData ->
 
+        buildSecurityContext { contextData ->
             lifecycleScope.launch {
                 try {
-                    val fullPrompt = """
+                    val prompt = """
                         SYSTEM_CONTEXT:
                         $contextData
                         
-                        USER_QUESTION:
+                        USER_INPUT:
                         $userText
+                        
+                        INSTRUCTIONS:
+                        If an image is provided, analyze it for phishing, scams, or sensitive data leaks.
+                        If it's a screenshot of an email or SMS, check the sender and content for red flags.
+                        Give a clear verdict: SAFE, SUSPICIOUS, or DANGEROUS. Consult to user what to do.
                     """.trimIndent()
 
-                    val response = chat.sendMessage(fullPrompt)
-                    var aiText = response.text ?: "I'm sorry, I couldn't process that."
-                    adapter.removeLoadingMessage()
-
-                    val actionRegex = "\\[ACTION:([A-Z_]+)\\]".toRegex()
-                    val matchResult = actionRegex.find(aiText)
-
-                    if (matchResult != null) {
-                        val actionCode = matchResult.groupValues[1]
-
-                        aiText = aiText.replace(matchResult.value, "").trim()
-
-                        binding.root.postDelayed({
-                            handleAction(actionCode)
-                        }, 1500)
+                    val responseText = if (imageUri != null) {
+                        generateResponseWithImage(prompt, imageUri)
+                    } else {
+                        generativeModel.generateContent(prompt).text ?: "No response."
                     }
 
-                    addBotMessage(aiText)
+                    adapter.removeLoadingMessage()
+                    handleAiResponse(responseText)
 
                 } catch (e: Exception) {
                     adapter.removeLoadingMessage()
-                    addBotMessage("Sorry, I'm having trouble connecting. Error: ${e.message}")
-                    e.printStackTrace()
+                    addBotMessage("Connection error: ${e.message}")
                 }
             }
         }
     }
+    private suspend fun generateResponseWithImage(text: String, uri: Uri): String = withContext(
+        Dispatchers.IO) {
+        val bitmap = try {
+            if (Build.VERSION.SDK_INT < 28) {
+                MediaStore.Images.Media.getBitmap(contentResolver, uri)
+            } else {
+                val source = ImageDecoder.createSource(contentResolver, uri)
+                ImageDecoder.decodeBitmap(source)
+            }
+        } catch (e: Exception) {
+            throw Exception("Failed to process image")
+        }
 
+        val prompt = if (text.isEmpty()) "Analyze this image for security risks, phishing, or scams." else text
+
+        val inputContent = content {
+            image(bitmap)
+            text(prompt)
+        }
+
+        val response = generativeModel.generateContent(inputContent)
+        response.text ?: "Could not analyze the image."
+    }
     private fun addBotMessage(text: String) {
         val botMsg = ChatMessage(text = text, isUser = false)
         adapter.addMessage(botMsg)
@@ -244,5 +277,39 @@ class AIChatActivity : BaseActivity() {
 
         binding.btnSend.setOnClickListener {
             sendMessage()
-        }}
+        }
+
+        binding.btnAddImage.setOnClickListener {
+            imagePickerLauncher.launch("image/*")
+        }
+
+        binding.btnClosePreview.setOnClickListener {
+            clearImagePreview()
+        }
+    }
+
+    private fun showImagePreview(uri: Uri) {
+        binding.previewContainer.visibility = View.VISIBLE
+        binding.ivPreview.setImageURI(uri)    }
+
+    private fun clearImagePreview() {
+        selectedImageUri = null
+        binding.previewContainer.visibility = View.GONE
+        binding.ivPreview.setImageDrawable(null)
+    }
+
+    private fun handleAiResponse(aiText: String) {
+        var finalText = aiText
+        val actionRegex = "\\[ACTION:([A-Z_]+)\\]".toRegex()
+        val matchResult = actionRegex.find(finalText)
+
+        if (matchResult != null) {
+            val actionCode = matchResult.groupValues[1]
+            finalText = finalText.replace(matchResult.value, "").trim()
+            binding.root.postDelayed({ handleAction(actionCode) }, 1500)
+        }
+
+        addBotMessage(finalText)
+    }
 }
+

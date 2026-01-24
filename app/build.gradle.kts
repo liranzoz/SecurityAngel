@@ -83,4 +83,5 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.ai.client.generativeai:generativeai:0.9.0")
     implementation("com.google.android.gms:play-services-auth:20.7.0")
+    implementation("io.noties.markwon:core:4.6.2")
 }
