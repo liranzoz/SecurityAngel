@@ -265,7 +265,8 @@ class PasswordVaultActivity : BaseActivity() {
                     saveToFirebase(account)
                     SecurityLogger.logEvent(
                         SecurityLogger.TYPE_LEAK_FOUND,
-                        "Password leak detected for site: ${account.siteName}"
+                        "Password Leak Detected",
+                        "Password for ${account.siteName} was found in a breach."
                     )
                     runOnUiThread {
                          account.isLeaked = true

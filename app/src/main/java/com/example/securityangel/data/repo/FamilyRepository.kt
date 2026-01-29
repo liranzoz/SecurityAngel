@@ -54,12 +54,10 @@ object FamilyRepository {
                     batch.update(familiesRef.document(familyId), "members", FieldValue.arrayUnion(userId))
                     batch.update(usersRef.document(userId), "familyId", familyId)
                 }.addOnSuccessListener {
-                    SecurityLogger.logEvent(
-                        SecurityLogger.TYPE_FAMILY_UPDATE,
-                        "Joined the family group."
-                    )
+                  
                     onSuccess()
                 }.addOnFailureListener { e ->
+
                     onFailure(e.message ?: "Failed to add member")
                 }
             }

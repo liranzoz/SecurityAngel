@@ -80,7 +80,7 @@ class SecurityLogActivity : BaseActivity() {
                     if (family.adminId == currentUserId) {
                         loadLogs(familyId)
                     } else {
-                        toast("Access Denied: Only family admins can view activity logs")
+                        toast("Access Denied: Only admin can view activity logs")
                         finish()
                     }
                 },

@@ -8,6 +8,7 @@ import com.example.securityangel.R
 import com.example.securityangel.data.models.ScanHistoryItem
 import com.example.securityangel.data.models.VtAttributes
 import com.example.securityangel.data.models.VtResponse
+import com.example.securityangel.data.repo.SecurityLogger
 import com.example.securityangel.databinding.ActivitySandBoxBinding
 import com.example.securityangel.ui.base.BaseActivity
 import com.example.securityangel.utils.VirusTotalApi
@@ -131,6 +132,7 @@ class SandBoxActivity : BaseActivity() {
             override fun onResponse(call: Call<VtResponse>, response: Response<VtResponse>) {
                 if (response.isSuccessful) {
                     showResults(response.body()?.data?.attributes, url)
+
                 } else {
                     resetButton()
                     toast("Failed to get final report")
@@ -164,6 +166,11 @@ class SandBoxActivity : BaseActivity() {
 
         // עדכון כותרת
         if (!isSafe) {
+            SecurityLogger.logEvent(
+                SecurityLogger.TYPE_SCAN_SAFE,
+                "Scan Completed",
+                "Website $url is not safe!"
+            )
             binding.tvSafeTitle.text = "Unsafe!"
             binding.tvSafeSubtitle.text = "Found $maliciousCount threats."
             binding.iconContainer.setBackgroundResource(R.drawable.bg_circle_light_red)
@@ -171,6 +178,11 @@ class SandBoxActivity : BaseActivity() {
             binding.icSafeUnsafe.setImageResource(R.drawable.ic_warning)
             binding.icSafeUnsafe.setColorFilter(getColor(R.color.white))
         } else {
+            SecurityLogger.logEvent(
+                SecurityLogger.TYPE_SCAN_SAFE,
+                "Scan Completed",
+                "Website $url is safe."
+            )
             binding.tvSafeTitle.text = "Safe"
             binding.tvSafeSubtitle.text = "No threats detected."
             binding.iconContainer.setBackgroundResource(R.drawable.bg_circle_light_teal)

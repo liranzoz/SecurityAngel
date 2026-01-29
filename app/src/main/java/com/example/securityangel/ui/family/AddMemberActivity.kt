@@ -8,7 +8,9 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.securityangel.data.models.User
 import com.example.securityangel.data.repo.FamilyRepository
+import com.example.securityangel.data.repo.SecurityLogger
 import com.example.securityangel.databinding.ActivityAddMemberBinding
+import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -75,10 +77,11 @@ class AddMemberActivity : AppCompatActivity() {
                 currentFamilyId = newFamilyId
                 generateCodeAndInvite(emailToAdd)
                 addMemberToExistingFamily(newFamilyId, emailToAdd)
+
             },
             onFailure = { error ->
                 setLoading(false)
-                Toast.makeText(this, "Failed to create family: $error", Toast.LENGTH_LONG).show()
+                toast("Failed to create family: $error")
             }
         )
     }
@@ -88,12 +91,14 @@ class AddMemberActivity : AppCompatActivity() {
             familyId = familyId,
             email = email,
             onSuccess = {
+
                 setLoading(false)
-                Toast.makeText(this, "Member added successfully!", Toast.LENGTH_SHORT).show()
+                toast("Member added successfully!")
                 finish()
             },
             onFailure = { errorMessage ->
                 setLoading(false)
+
                 binding.tilEmail.error = errorMessage
             }
         )
@@ -128,7 +133,7 @@ class AddMemberActivity : AppCompatActivity() {
             }
             .addOnFailureListener { e ->
                 setLoading(false)
-                Toast.makeText(this, "Failed to create invitation: ${e.message}", Toast.LENGTH_SHORT).show()
+                toast("Failed to create invitation: ${e.message}")
             }
     }
 

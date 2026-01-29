@@ -34,6 +34,10 @@ class DashboardActivity : BaseActivity() {
 
         binding.rvRecentScans.layoutManager = LinearLayoutManager(this)
 
+        val userId = FirebaseAuth.getInstance().currentUser?.uid
+        if (userId != null) {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().subscribeToTopic("user_$userId")
+        }
         loadRecentScans()
         listenToSecurityStatus()
         buttonHandler()
