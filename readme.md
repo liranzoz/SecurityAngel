@@ -34,7 +34,7 @@ A centralized dashboard for family heads and parents.
 
 |                 AI Assistant 🧠                  |                  URL Scanner 🔍                  |           Family Dashboard 👨‍👩‍👧‍👦           |               Password Generator ➕               |
 |:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
-| <img src="screenshots/IMG_0388.JPG" width="250"> | <img src="screenshots/IMG_0382.JPG" width="250"> | <img src="screenshots/IMG_0381.JPG" width="250"> | <img src="screenshots/IMG_0381.JPG" width="250"> |
+| <img src="app/src/main/res/screenshots/IMG_0388.JPG" width="250"> | <img src="app/src/main/res/screenshots/IMG_0382.JPG" width="250"> | <img src="app/src/main/res/screenshots/IMG_0381.JPG" width="250"> | <img src="app/src/main/res/screenshots/IMG_0386.JPG" width="250"> |
 |                *Visual Analysis*                 |                 *Real-time Scan*                 |                *Risk Monitoring*                 |                *Strong Passwords*                |
 
 
