@@ -32,10 +32,10 @@ A centralized dashboard for family heads and parents.
 * **Zero-Knowledge Architecture:** Designed to keep credentials secure and accessible only to the user.
 
 
-| AI Assistant 🧠 | URL Scanner 🔍 | Family Dashboard 👨‍👩‍👧‍👦 |                 Password Generator ➕                 |
-|:---:|:---:|:---:|:----------------------------------------------------:|
-| <img src="res/screenshots/IMG_0388.JPG" width="250"> | <img src="res/screenshots/IMG_0382.JPG" width="250"> | <img src="res/screenshots/IMG_0381.JPG" width="250"> | <img src="res/screenshots/IMG_0381.JPG" width="250"> |
-| *Visual Analysis* | *Real-time Scan* | *Risk Monitoring* |                  *Strong Passwords*                  |
+|                 AI Assistant 🧠                  |                  URL Scanner 🔍                  |           Family Dashboard 👨‍👩‍👧‍👦           |               Password Generator ➕               |
+|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|:------------------------------------------------:|
+| <img src="screenshots/IMG_0388.JPG" width="250"> | <img src="screenshots/IMG_0382.JPG" width="250"> | <img src="screenshots/IMG_0381.JPG" width="250"> | <img src="screenshots/IMG_0381.JPG" width="250"> |
+|                *Visual Analysis*                 |                 *Real-time Scan*                 |                *Risk Monitoring*                 |                *Strong Passwords*                |
 
 
 
