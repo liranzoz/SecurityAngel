@@ -58,10 +58,10 @@
                 android:layout_marginTop="32dp">
 
                 <TextView style="@style/LabelStyle" android:text="First Name" />
-                <EditText android:id="@+id/etFirstName" style="@style/InputStyle" android:hint="John" android:inputType="textPersonName" android:drawableStart="@drawable/ic_person" />
+                <EditText android:id="@+id/etFirstName" style="@style/InputStyle" android:hint="John" android:inputType="textPersonName" android:autofillHints="personGivenName" android:drawableStart="@drawable/ic_person" />
 
                 <TextView style="@style/LabelStyle" android:text="Last Name" />
-                <EditText android:id="@+id/etLastName" style="@style/InputStyle" android:hint="Doe" android:inputType="textPersonName" android:drawableStart="@drawable/ic_person" />
+                <EditText android:id="@+id/etLastName" style="@style/InputStyle" android:hint="Doe" android:inputType="textPersonName" android:autofillHints="personFamilyName" android:drawableStart="@drawable/ic_person" />
 
                 <TextView style="@style/LabelStyle" android:text="Gender" />
                 <RadioGroup android:id="@+id/rgGender" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal" android:layout_marginBottom="8dp">
@@ -71,13 +71,13 @@
                 </RadioGroup>
 
                 <TextView style="@style/LabelStyle" android:text="Phone Number" />
-                <EditText android:id="@+id/etPhone" style="@style/InputStyle" android:hint="050-1234567" android:inputType="phone" android:drawableStart="@drawable/ic_phone" />
+                <EditText android:id="@+id/etPhone" style="@style/InputStyle" android:hint="050-1234567" android:inputType="phone" android:autofillHints="phone" android:drawableStart="@drawable/ic_phone" />
 
                 <TextView style="@style/LabelStyle" android:text="Email" />
-                <EditText android:id="@+id/etEmail" style="@style/InputStyle" android:hint="john@example.com" android:inputType="textEmailAddress" android:drawableStart="@drawable/ic_email" />
+                <EditText android:id="@+id/etEmail" style="@style/InputStyle" android:hint="john@example.com" android:inputType="textEmailAddress" android:autofillHints="emailAddress" android:drawableStart="@drawable/ic_email" />
 
                 <TextView android:id="@+id/tvPassword" style="@style/LabelStyle" android:text="Password" />
-                <EditText android:id="@+id/etPassword" style="@style/InputStyle" android:hint="••••••••" android:inputType="textPassword" android:drawableStart="@drawable/ic_lock_check" />
+                <EditText android:id="@+id/etPassword" style="@style/InputStyle" android:hint="••••••••" android:inputType="textPassword" android:autofillHints="newPassword" android:drawableStart="@drawable/ic_lock_check" />
             </LinearLayout>
 
             <com.google.android.material.button.MaterialButton

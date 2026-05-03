@@ -67,6 +67,7 @@
             android:paddingHorizontal="16dp"
             android:hint="user@example.com"
             android:inputType="textEmailAddress"
+            android:autofillHints="emailAddress"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
 
@@ -90,6 +91,7 @@
             android:paddingHorizontal="16dp"
             android:hint="••••••••"
             android:inputType="textPassword"
+            android:autofillHints="password"
             android:textColor="@color/text_primary"
             android:textSize="16sp" />
 

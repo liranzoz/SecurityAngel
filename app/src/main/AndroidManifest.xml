@@ -106,6 +106,12 @@
             android:theme="@style/Theme.SecurityAngel.Dialog"
             android:windowSoftInputMode="adjustResize" />
 
+        <activity
+            android:name=".ui.autofill.AutofillCredentialFillActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SecurityAngel.Dialog"
+            android:windowSoftInputMode="adjustResize" />
+
         <service
             android:name=".utils.SecurityAngelAutofillService"
             android:exported="true"

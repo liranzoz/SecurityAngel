@@ -18,6 +18,7 @@ import com.example.securityangel.ui.family.FamilyManagementActivity
 import com.example.securityangel.utils.BiometricManager
 import com.example.securityangel.utils.VaultSessionManager
 import com.example.securityangel.utils.toast
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
@@ -181,14 +182,36 @@ class SettingsActivity : BaseActivity() {
             imgArrow.visibility    = View.VISIBLE
             switchSetting.visibility = View.GONE
 
-            root.setOnClickListener {
+            root.setOnClickListener { showAutofillInfoDialog() }
+        }
+        refreshAutofillRowStatus()
+    }
+
+    // Browsers like Chrome and Edge ignore third-party autofill by default and
+    // rely on Google Password Manager.  The user has to switch the autofill
+    // provider inside the browser too — surfacing this up front avoids the
+    // "I enabled it but it doesn't work in Chrome" support loop.
+    private fun showAutofillInfoDialog() {
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Enable Security Angel Autofill")
+            .setMessage(
+                "1. Tap \"Open System Settings\" below.\n" +
+                "2. Choose Security Angel as your Autofill service.\n\n" +
+                "For Chrome / Edge / Brave:\n" +
+                "These browsers use Google Password Manager by default and ignore " +
+                "third-party autofill services.\n" +
+                "To use Security Angel inside them, open the browser → Settings → " +
+                "\"Autofill and passwords\" → set the Autofill provider to Security Angel " +
+                "(or disable Google Password Manager autofill)."
+            )
+            .setPositiveButton("Open System Settings") { _, _ ->
                 val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
                     data = Uri.parse("package:$packageName")
                 }
                 startActivity(intent)
             }
-        }
-        refreshAutofillRowStatus()
+            .setNegativeButton("Close", null)
+            .show()
     }
 
     private fun refreshAutofillRowStatus() {
