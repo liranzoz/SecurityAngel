@@ -2,25 +2,31 @@ package com.example.securityangel.ui.vault
 
 import android.os.Bundle
 import android.text.Editable
+import android.text.InputType
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.widget.EditText
-import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.securityangel.R
-import com.example.securityangel.utils.SecurityConstants
 import com.example.securityangel.data.models.PasswordAccount
 import com.example.securityangel.data.repo.SecurityLogger
 import com.example.securityangel.data.repo.SecurityRepository
 import com.example.securityangel.databinding.ActivityPasswordVaultBinding
 import com.example.securityangel.ui.base.BaseActivity
+import com.example.securityangel.utils.BiometricKeyStoreHelper
+import com.example.securityangel.utils.BiometricManager
 import com.example.securityangel.utils.BreachCheckUtil
-import com.example.securityangel.utils.EncryptionUtil
+import com.example.securityangel.utils.VaultSessionManager
+import com.example.securityangel.utils.SecurityConstants
+import com.example.securityangel.utils.VaultCryptoManager
 import com.example.securityangel.utils.toast
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import kotlin.collections.mutableListOf
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class PasswordVaultActivity : BaseActivity() {
 
@@ -30,6 +36,10 @@ class PasswordVaultActivity : BaseActivity() {
     private val userId = FirebaseAuth.getInstance().currentUser?.uid
 
     private var allAccounts = mutableListOf<PasswordAccount>()
+
+    // Both are set before the snapshot listener is ever attached.
+    private var masterPin = ""
+    private var vaultSalt = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,70 +57,181 @@ class PasswordVaultActivity : BaseActivity() {
         setupRecyclerView()
         setupSearch()
         buttonHandler()
+        fetchSaltThenUnlock()
+    }
+
+    private fun fetchSaltThenUnlock() {
+        // Fast path: the vault was already unlocked earlier this process session.
+        if (VaultSessionManager.isValid) {
+            masterPin = VaultSessionManager.masterPin
+            vaultSalt = VaultSessionManager.vaultSalt
+            listenToPasswords()
+            return
+        }
+
+        // Slow path: fetch the per-user salt first so the key is derived and ready
+        // before the user finishes authenticating (biometric scan or PIN entry).
+        firestore.collection("users").document(userId!!)
+            .get()
+            .addOnSuccessListener { doc ->
+                val salt = doc.getString("vaultSalt")
+                if (salt.isNullOrEmpty()) {
+                    toast("Vault not configured. Please open the dashboard once and try again.")
+                    finish()
+                    return@addOnSuccessListener
+                }
+                vaultSalt = salt
+                tryBiometricUnlock()
+            }
+            .addOnFailureListener {
+                toast("Could not load vault configuration. Check your connection.")
+                finish()
+            }
+    }
+
+    private fun tryBiometricUnlock() {
+        val biometricEnabled = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
+            .getBoolean("biometric_enabled", false)
+
+        if (biometricEnabled
+            && BiometricManager.isBiometricAvailable(this)
+            && BiometricKeyStoreHelper.hasPinStored(this)
+        ) {
+            BiometricKeyStoreHelper.showDecryptPrompt(
+                activity = this,
+                title    = "Unlock Vault",
+                subtitle = "Authenticate to open your password vault",
+                onSuccess = { pin -> unlockWithPin(pin, fromBiometric = true) },
+                onFailure  = { showPinDialog() }
+            )
+        } else {
+            showPinDialog()
+        }
+    }
+
+    private fun showPinDialog() {
+        val pinInput = EditText(this).apply {
+            hint      = "Enter your Vault PIN"
+            inputType = InputType.TYPE_CLASS_NUMBER or InputType.TYPE_NUMBER_VARIATION_PASSWORD
+            setPadding(64, 32, 64, 16)
+        }
+
+        MaterialAlertDialogBuilder(this)
+            .setTitle("Unlock Vault")
+            .setMessage("Enter your master PIN to decrypt your passwords.")
+            .setView(pinInput)
+            .setCancelable(false)
+            .setPositiveButton("Unlock") { _, _ ->
+                val pin = pinInput.text.toString()
+                if (pin.isEmpty()) {
+                    toast("PIN cannot be empty")
+                    finish()
+                    return@setPositiveButton
+                }
+                unlockWithPin(pin, fromBiometric = false)
+            }
+            .setNegativeButton("Cancel") { _, _ -> finish() }
+            .show()
+    }
+
+    private fun unlockWithPin(pin: String, fromBiometric: Boolean) {
+        masterPin = pin
+        VaultSessionManager.save(pin, vaultSalt)
+        if (!fromBiometric) offerBiometricPinStorage(pin)
         listenToPasswords()
+    }
+
+    // Offers to encrypt and store the PIN in the KeyStore so future vault unlocks
+    // and autofill saves can use biometrics instead of typing the PIN again.
+    private fun offerBiometricPinStorage(pin: String) {
+        val biometricEnabled = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
+            .getBoolean("biometric_enabled", false)
+
+        if (!biometricEnabled
+            || !BiometricManager.isBiometricAvailable(this)
+            || BiometricKeyStoreHelper.hasPinStored(this)
+        ) return
+
+        BiometricKeyStoreHelper.showEncryptPrompt(
+            activity  = this,
+            pin       = pin,
+            onSuccess = { toast("Vault PIN protected — future unlocks will use biometrics") },
+            onCancel  = {}
+        )
     }
 
     override fun buttonHandler() {
         binding.fabAddPassword.setOnClickListener {
-            showAddOrEditDialog(null)
+            if (masterPin.isNotEmpty() && vaultSalt.isNotEmpty()) showAddOrEditDialog(null)
         }
 
-        val btnRef = binding.icRefresh
-        btnRef.isFocusable = true
-        btnRef.isClickable = true
-        btnRef.setOnClickListener { scanVaultForLeaks() }
+        binding.icRefresh.apply {
+            isFocusable = true
+            isClickable  = true
+            setOnClickListener { scanVaultForLeaks() }
+        }
 
-        val btnDrw = binding.icBack
-        btnDrw.isFocusable = true
-        btnDrw.isClickable = true
-        btnDrw.setOnClickListener { openDrawer() }
-
+        binding.icBack.apply {
+            isFocusable = true
+            isClickable  = true
+            setOnClickListener { openDrawer() }
+        }
     }
 
     private fun setupRecyclerView() {
         adapter = PasswordVaultAdapter(mutableListOf()) { account, action ->
-            if (action == "options") {
-                showOptionsDialog(account)
-            }
+            if (action == "options") showOptionsDialog(account)
         }
         binding.rvPasswords.layoutManager = LinearLayoutManager(this)
         binding.rvPasswords.adapter = adapter
     }
 
     private fun listenToPasswords() {
-        val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-
-        firestore.collection("users").document(userId).collection("vault")
+        firestore.collection("users").document(userId!!).collection("vault")
             .addSnapshotListener { value, error ->
-                if (error != null || value == null) {
-                    return@addSnapshotListener
-                }
+                if (error != null || value == null) return@addSnapshotListener
 
-                val tempAccounts = mutableListOf<PasswordAccount>()
+                // Decrypt on IO — PBKDF2 is expensive on first call (cached after that).
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val tempAccounts = mutableListOf<PasswordAccount>()
+                    var wrongPin = false
 
-                for (doc in value) {
-                    val encryptedPass = doc.getString("password") ?: ""
-                    val encryptedEmail = doc.getString("email") ?: ""
+                    for (doc in value) {
+                        val encryptedPass  = doc.getString("password") ?: ""
+                        val encryptedEmail = doc.getString("email")    ?: ""
 
-                    val decryptedPass = EncryptionUtil.decrypt(encryptedPass)
-                    val decryptedEmail = EncryptionUtil.decrypt(encryptedEmail)
+                        val decryptedPass  = VaultCryptoManager.decrypt(encryptedPass,  masterPin, vaultSalt)
+                        val decryptedEmail = VaultCryptoManager.decrypt(encryptedEmail, masterPin, vaultSalt)
 
-                    val account = PasswordAccount(
-                        id = doc.id,
-                        siteName = doc.getString("siteName") ?: "",
-                        email = decryptedEmail,
-                        domain = doc.getString("domain") ?: "",
-                        password = decryptedPass,
-                        isLeaked = false
-                    )
-                    tempAccounts.add(account)
-                }
+                        // A non-empty ciphertext that yields "" means wrong PIN or corrupt data.
+                        // Passwords are always non-empty when saved (enforced in showAddOrEditDialog).
+                        if (encryptedPass.isNotEmpty() && decryptedPass.isEmpty()) {
+                            wrongPin = true
+                            break
+                        }
 
-                allAccounts = tempAccounts
-                adapter.updateList(allAccounts)
+                        tempAccounts.add(
+                            PasswordAccount(
+                                id       = doc.id,
+                                siteName = doc.getString("siteName") ?: "",
+                                email    = decryptedEmail,
+                                domain   = doc.getString("domain")   ?: "",
+                                password = decryptedPass,
+                                isLeaked = false
+                            )
+                        )
+                    }
 
-                if (allAccounts.isNotEmpty()) {
-                    scanVaultForLeaks()
+                    withContext(Dispatchers.Main) {
+                        if (wrongPin) {
+                            toast("Incorrect PIN — please reopen the vault and try again.")
+                            finish()
+                            return@withContext
+                        }
+                        allAccounts = tempAccounts
+                        adapter.updateList(allAccounts)
+                        if (allAccounts.isNotEmpty()) scanVaultForLeaks()
+                    }
                 }
             }
     }
@@ -118,10 +239,10 @@ class PasswordVaultActivity : BaseActivity() {
     private fun showAddOrEditDialog(accountToEdit: PasswordAccount? = null) {
         val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_add_password, null)
 
-        val etName = dialogView.findViewById<EditText>(R.id.etSiteName)
+        val etName   = dialogView.findViewById<EditText>(R.id.etSiteName)
         val etDomain = dialogView.findViewById<EditText>(R.id.etDomain)
-        val etEmail = dialogView.findViewById<EditText>(R.id.etEmail)
-        val etPass = dialogView.findViewById<EditText>(R.id.etPassword)
+        val etEmail  = dialogView.findViewById<EditText>(R.id.etEmail)
+        val etPass   = dialogView.findViewById<EditText>(R.id.etPassword)
 
         if (accountToEdit != null) {
             etName.setText(accountToEdit.siteName)
@@ -130,51 +251,47 @@ class PasswordVaultActivity : BaseActivity() {
             etPass.setText(accountToEdit.password)
         }
 
-        val title = if (accountToEdit == null) "Add Password" else "Edit Password"
-
         MaterialAlertDialogBuilder(this)
-            .setTitle(title)
+            .setTitle(if (accountToEdit == null) "Add Password" else "Edit Password")
             .setView(dialogView)
             .setPositiveButton("Save") { _, _ ->
-            val name = etName.text.toString()
-            val domain = etDomain.text.toString()
-            val email = etEmail.text.toString()
-            val rawPass = etPass.text.toString()
+                val name    = etName.text.toString()
+                val domain  = etDomain.text.toString()
+                val email   = etEmail.text.toString()
+                val rawPass = etPass.text.toString()
 
-            if (name.isNotEmpty() && rawPass.isNotEmpty()) {
-                val encryptedPass = EncryptionUtil.encrypt(rawPass)
-                val encryptedEmail = EncryptionUtil.encrypt(email)
+                if (name.isNotEmpty() && rawPass.isNotEmpty()) {
+                    val encryptedPass  = VaultCryptoManager.encrypt(rawPass, masterPin, vaultSalt)
+                    val encryptedEmail = VaultCryptoManager.encrypt(email,   masterPin, vaultSalt)
 
-                val dataMap = hashMapOf(
-                    "searchKey" to name.lowercase(),
-                    "siteName" to name,
-                    "domain" to domain,
-                    "email" to encryptedEmail,
-                    "password" to encryptedPass
-                )
+                    val dataMap = hashMapOf(
+                        "searchKey" to name.lowercase(),
+                        "siteName"  to name,
+                        "domain"    to domain,
+                        "email"     to encryptedEmail,
+                        "password"  to encryptedPass
+                    )
 
-                if (accountToEdit == null) {
-                    firestore.collection("users").document(userId!!).collection("vault")
-                        .add(dataMap)
-                } else {
-                    firestore.collection("users").document(userId!!).collection("vault")
-                        .document(accountToEdit.id)
-                        .update(dataMap as Map<String, Any>)
+                    if (accountToEdit == null) {
+                        firestore.collection("users").document(userId!!).collection("vault").add(dataMap)
+                    } else {
+                        firestore.collection("users").document(userId!!).collection("vault")
+                            .document(accountToEdit.id)
+                            .update(dataMap as Map<String, Any>)
+                    }
                 }
             }
-        }
             .setNegativeButton("Cancel", null)
             .show()
     }
 
     private fun showOptionsDialog(account: PasswordAccount) {
-        val options = arrayOf("Edit", "Delete")
         MaterialAlertDialogBuilder(this)
             .setTitle("Options for ${account.siteName}")
-            .setItems(options) { _, which ->
+            .setItems(arrayOf("Edit", "Delete")) { _, which ->
                 when (which) {
-                    0 -> showAddOrEditDialog(account) // Edit
-                    1 -> deletePassword(account)      // Delete
+                    0 -> showAddOrEditDialog(account)
+                    1 -> deletePassword(account)
                 }
             }
             .show()
@@ -188,14 +305,11 @@ class PasswordVaultActivity : BaseActivity() {
                 firestore.collection("users").document(userId!!).collection("vault")
                     .document(account.id)
                     .delete()
-                    .addOnSuccessListener {
-                        toast("Deleted successfully")
-                    }
+                    .addOnSuccessListener { toast("Deleted successfully") }
             }
             .setNegativeButton("Cancel", null)
             .show()
     }
-
 
     private fun setupSearch() {
         binding.etSearch.addTextChangedListener(object : TextWatcher {
@@ -210,67 +324,59 @@ class PasswordVaultActivity : BaseActivity() {
                     return
                 }
 
+                if (masterPin.isEmpty() || vaultSalt.isEmpty()) return
+
                 firestore.collection("users").document(userId!!).collection("vault")
                     .orderBy("searchKey")
                     .startAt(query)
-                    .endAt(query + "\uf8ff")
+                    .endAt(query + "")
                     .get()
                     .addOnSuccessListener { documents ->
-                        val searchResults = mutableListOf<PasswordAccount>()
-
-                        for (doc in documents) {
-                            val encryptedPass = doc.getString("password") ?: ""
-                            val encryptedEmail = doc.getString("email") ?: ""
-                            val decryptedPass = EncryptionUtil.decrypt(encryptedPass)
-                            val decryptedEmail = EncryptionUtil.decrypt(encryptedEmail)
-
-                            val account = PasswordAccount(
-                                id = doc.id,
-                                siteName = doc.getString("siteName") ?: "",
+                        // AES-GCM decrypt with cached key is effectively instant — main thread is fine.
+                        val results = documents.map { doc ->
+                            PasswordAccount(
+                                id        = doc.id,
+                                siteName  = doc.getString("siteName")  ?: "",
                                 searchKey = doc.getString("searchKey") ?: "",
-                                email = decryptedEmail,
-                                domain = doc.getString("domain") ?: "",
-                                password = decryptedPass,
-                                isLeaked = doc.getBoolean("isLeaked") ?: false
+                                email     = VaultCryptoManager.decrypt(doc.getString("email")    ?: "", masterPin, vaultSalt),
+                                domain    = doc.getString("domain")    ?: "",
+                                password  = VaultCryptoManager.decrypt(doc.getString("password") ?: "", masterPin, vaultSalt),
+                                isLeaked  = doc.getBoolean("isLeaked") ?: false
                             )
-                            searchResults.add(account)
                         }
-                        adapter.updateList(searchResults)
+                        adapter.updateList(results)
                     }
             }
         })
     }
 
-
     private fun scanVaultForLeaks() {
         toast("Starting vault scan...")
-
-        val currentUserId = FirebaseAuth.getInstance().currentUser?.uid ?: return
-        var leaksFound = 0
-        var checkedCount = 0
 
         if (allAccounts.isEmpty()) {
             toast("Vault is empty")
             return
         }
 
-        for (account in allAccounts) {
+        var leaksFound   = 0
+        var checkedCount = 0
 
+        for (account in allAccounts) {
             BreachCheckUtil.checkPassword(account.password) { isLeaked ->
                 checkedCount++
 
                 if (isLeaked) {
                     leaksFound++
                     onPasswordLeakDetected()
-                    saveToFirebase(account)
+                    saveLeakFlagToFirebase(account)
                     SecurityLogger.logEvent(
                         SecurityLogger.TYPE_LEAK_FOUND,
                         "Password Leak Detected",
                         "Password for ${account.siteName} was found in a breach."
                     )
                     runOnUiThread {
-                         account.isLeaked = true
-                         adapter.notifyDataSetChanged()
+                        account.isLeaked = true
+                        adapter.notifyDataSetChanged()
                     }
                 }
 
@@ -298,12 +404,9 @@ class PasswordVaultActivity : BaseActivity() {
         SecurityRepository.resolveRisk(myUserId, SecurityConstants.RISK_PASSWORD_LEAK)
     }
 
-    private fun saveToFirebase(account : PasswordAccount){
+    private fun saveLeakFlagToFirebase(account: PasswordAccount) {
         firestore.collection("users").document(userId!!)
             .collection("vault").document(account.id)
             .update("isLeaked", true)
-
     }
-
-
 }

@@ -3,7 +3,6 @@ package com.example.securityangel.ui.vault
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
-import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -42,7 +41,7 @@ class PasswordVaultAdapter(private var accounts: List<PasswordAccount>, private 
                 holder.binding.btnView.setImageResource(R.drawable.ic_eye)
             } else {
                 holder.binding.tvPasswordHidden.text = "••••••••"
-                holder.binding.tvPasswordHidden.setTextColor(Color.parseColor("#BDBDBD"))
+                holder.binding.tvPasswordHidden.setTextColor(ContextCompat.getColor(context, R.color.ui_ic))
                 holder.binding.btnView.setImageResource(R.drawable.ic_eye)
             }
 

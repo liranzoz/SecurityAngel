@@ -21,6 +21,8 @@ import com.example.securityangel.ui.family.FamilySafetyActivity
 import com.example.securityangel.ui.password.PasswordGeneratorActivity
 import com.example.securityangel.ui.vault.PasswordVaultActivity
 import com.example.securityangel.R
+import com.example.securityangel.ui.scanner.PermissionMonitorActivity
+import com.example.securityangel.ui.scanner.RootCheckActivity
 import com.example.securityangel.ui.scanner.SandBoxActivity
 import com.example.securityangel.ui.settings.SecurityLogActivity
 import com.example.securityangel.ui.settings.SettingsActivity
@@ -31,6 +33,7 @@ import com.example.securityangel.ui.ai.AIChatActivity
 import com.example.securityangel.ui.auth.LoginActivity
 import com.example.securityangel.ui.auth.SignUpActivity
 import com.example.securityangel.utils.BiometricManager
+import com.example.securityangel.utils.VaultSessionManager
 import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -102,7 +105,6 @@ abstract class BaseActivity : AppCompatActivity() {
         handleScreenshot()
         loadUserData()
         handleDrawer()
-        handleDarkMode()
         highlightCurrentNavigationItem()
 
     }
@@ -175,6 +177,7 @@ abstract class BaseActivity : AppCompatActivity() {
 
 
     private fun performLogoutAndExit() {
+        VaultSessionManager.clear()
         FirebaseAuth.getInstance().signOut()
 
         toast("Authentication failed. Logged out.")
@@ -217,6 +220,8 @@ abstract class BaseActivity : AppCompatActivity() {
             is PasswordGeneratorActivity -> R.id.nav_generator
             is SecurityLogActivity -> R.id.nav_Logs
             is AIChatActivity -> R.id.nav_ai_chat
+            is RootCheckActivity -> R.id.nav_root_check
+            is PermissionMonitorActivity -> R.id.nav_permission_monitor
             else -> -1
         }
         if (targetId != -1) {
@@ -276,22 +281,23 @@ abstract class BaseActivity : AppCompatActivity() {
                         openFromDrawer(AIChatActivity::class.java)
                     }
                 }
+                R.id.nav_root_check -> {
+                    if (this !is RootCheckActivity){
+                        openFromDrawer(RootCheckActivity::class.java)
+                    }
+                }
+                R.id.nav_permission_monitor -> {
+                    if (this !is PermissionMonitorActivity){
+                        openFromDrawer(PermissionMonitorActivity::class.java)
+                    }
+                }
             }
 
             baseBinding.drawerLayout.closeDrawer(GravityCompat.START)
             true
         }
     }
-    fun handleDarkMode(){
-        val isDarkMode = sharedPrefs.getBoolean("dark_mode", false)
-        if (isDarkMode) {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-        } else {
-            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-        }
-
-    }
-    private fun openFromDrawer(target: Class<out Activity>) {
+     private fun openFromDrawer(target: Class<out Activity>) {
         val intent = Intent(this, target)
 
         when (target) {

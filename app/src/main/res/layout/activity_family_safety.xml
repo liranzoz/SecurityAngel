@@ -55,12 +55,12 @@
             android:textAllCaps="false"
             android:textSize="16sp"
             android:textStyle="bold"
-            android:textColor="@color/white"
+            android:textColor="#FFFFFF"
             android:backgroundTint="@color/primary_green"
             app:cornerRadius="16dp"
             app:icon="@android:drawable/ic_input_add"
             app:iconGravity="textStart"
-            app:iconTint="@color/white"
+            app:iconTint="#FFFFFF"
             android:elevation="4dp"
             android:layout_marginTop="24dp"
             app:layout_constraintTop_toBottomOf="@id/cardMemberList" />
@@ -86,7 +86,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Family Protection Active"
-                    android:textColor="#064E3B"
+                    android:textColor="@color/in_app_window_safe_text"
                     android:textStyle="bold"
                     android:textSize="16sp"/>
 

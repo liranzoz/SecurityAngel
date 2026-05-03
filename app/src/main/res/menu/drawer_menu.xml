@@ -26,6 +26,14 @@
             android:icon="@drawable/ic_family"
             android:title="Family Safety" />
         <item
+            android:id="@+id/nav_root_check"
+            android:icon="@drawable/ic_shield_check"
+            android:title="Root Check" />
+        <item
+            android:id="@+id/nav_permission_monitor"
+            android:icon="@drawable/ic_lock_check"
+            android:title="Permission Monitor" />
+        <item
             android:id="@+id/nav_Logs"
             android:icon="@drawable/ic_log"
             android:title="Log" />

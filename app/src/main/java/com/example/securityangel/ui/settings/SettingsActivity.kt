@@ -3,8 +3,11 @@ package com.example.securityangel.ui.settings
 import android.R
 import android.content.Intent
 import android.content.SharedPreferences
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.View
+import android.view.autofill.AutofillManager
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.securityangel.data.models.User
@@ -13,6 +16,7 @@ import com.example.securityangel.ui.auth.LoginActivity
 import com.example.securityangel.ui.base.BaseActivity
 import com.example.securityangel.ui.family.FamilyManagementActivity
 import com.example.securityangel.utils.BiometricManager
+import com.example.securityangel.utils.VaultSessionManager
 import com.example.securityangel.utils.toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -39,6 +43,13 @@ class SettingsActivity : BaseActivity() {
         loadSettingsUserData()
         setupDarkModeRow()
         setupFamilyManagementRow()
+        setupAutofillRow()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Refresh the autofill status each time the user returns (e.g. from system settings).
+        refreshAutofillRowStatus()
     }
 
     private fun setupFamilyManagementRow(){
@@ -60,23 +71,23 @@ class SettingsActivity : BaseActivity() {
     private fun setupDarkModeRow() {
         with(binding.rowDarkMode) {
             tvTitle.text = "Dark Mode"
-
             imgIcon.setImageResource(R.drawable.ic_menu_day)
-
             imgArrow.visibility = View.GONE
             switchSetting.visibility = View.VISIBLE
 
-            val isDarkMode = sharedPrefs.getBoolean("dark_mode", false)
-            switchSetting.isChecked = isDarkMode
+            // Silence the listener before restoring state so that programmatically
+            // setting isChecked during onCreate doesn't trigger recreate().
+            switchSetting.setOnCheckedChangeListener(null)
+            switchSetting.isChecked = sharedPrefs.getBoolean("dark_mode", false)
 
             switchSetting.setOnCheckedChangeListener { _, isChecked ->
                 sharedPrefs.edit().putBoolean("dark_mode", isChecked).apply()
-
-                if (isChecked) {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
-                } else {
-                    AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-                }
+                AppCompatDelegate.setDefaultNightMode(
+                    if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
+                )
+                // setDefaultNightMode() triggers recreation internally via AppCompat.
+                // An explicit recreate() here would cause a second recreation race that
+                // manifests as a black flash followed by a revert to the previous theme.
             }
         }
     }
@@ -163,10 +174,34 @@ class SettingsActivity : BaseActivity() {
         }
     }
 
+    private fun setupAutofillRow() {
+        with(binding.rowAutofill) {
+            imgIcon.setImageResource(com.example.securityangel.R.drawable.ic_password)
+            imgIcon.setColorFilter(getColor(com.example.securityangel.R.color.primary_green_dark))
+            imgArrow.visibility    = View.VISIBLE
+            switchSetting.visibility = View.GONE
+
+            root.setOnClickListener {
+                val intent = Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+                startActivity(intent)
+            }
+        }
+        refreshAutofillRowStatus()
+    }
+
+    private fun refreshAutofillRowStatus() {
+        val afm = getSystemService(AutofillManager::class.java) ?: return
+        val isActive = afm.hasEnabledAutofillServices()
+        binding.rowAutofill.tvTitle.text = if (isActive) "Autofill: Active ✓" else "Enable Autofill Service"
+    }
+
     override fun buttonHandler() {
         binding.btnSignOut.setOnClickListener {
+            VaultSessionManager.clear()
             FirebaseAuth.getInstance().signOut()
-            toast( "Signed out successfully")
+            toast("Signed out successfully")
             val intent = Intent(this, LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)

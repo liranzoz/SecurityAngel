@@ -7,10 +7,18 @@
 
     <style name="Theme.SecurityAngel" parent="Base.Theme.SecurityAngel" />
 
+    <!-- Transparent overlay used by AutofillSaveActivity -->
+    <style name="Theme.SecurityAngel.Dialog" parent="Base.Theme.SecurityAngel">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:backgroundDimEnabled">false</item>
+        <item name="android:windowIsFloating">false</item>
+    </style>
+
     <style name="LabelStyle">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
-        <item name="android:textColor">#424242</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textStyle">bold</item>
         <item name="android:layout_marginBottom">8dp</item>
         <item name="android:layout_marginTop">16dp</item>
@@ -19,11 +27,12 @@
     <style name="InputStyle">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">56dp</item>
-        <item name="android:background">@drawable/bg_input_field</item> <item name="android:paddingHorizontal">16dp</item>
-        <item name="android:textColor">#212121</item>
+        <item name="android:background">@drawable/bg_input_field</item>
+        <item name="android:paddingHorizontal">16dp</item>
+        <item name="android:textColor">@color/text_primary</item>
         <item name="android:textSize">16sp</item>
         <item name="android:drawablePadding">12dp</item>
-        <item name="android:drawableTint">#2E9E82</item>
+        <item name="android:drawableTint">@color/primary_green</item>
     </style>
 
 </resources>

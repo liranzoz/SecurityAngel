@@ -159,25 +159,45 @@ class AIChatActivity : BaseActivity() {
         val scanTask = db.collection("users").document(userId).collection("scans")
             .orderBy("timestamp", Query.Direction.DESCENDING)
             .limit(1).get()
+        val permissionsTask = db.collection("users").document(userId)
+            .collection("permissions_risks").document("latest").get()
 
-        com.google.android.gms.tasks.Tasks.whenAllSuccess<Any>(userTask, vaultTask, scanTask)
+        com.google.android.gms.tasks.Tasks.whenAllSuccess<Any>(userTask, vaultTask, scanTask, permissionsTask)
             .addOnSuccessListener { results ->
-                val userDoc = results[0] as com.google.firebase.firestore.DocumentSnapshot
-                val vaultDocs = results[1] as com.google.firebase.firestore.QuerySnapshot
-                val scanDocs = results[2] as com.google.firebase.firestore.QuerySnapshot
-
+                val userDoc        = results[0] as com.google.firebase.firestore.DocumentSnapshot
+                val vaultDocs      = results[1] as com.google.firebase.firestore.QuerySnapshot
+                val scanDocs       = results[2] as com.google.firebase.firestore.QuerySnapshot
+                val permissionsDoc = results[3] as com.google.firebase.firestore.DocumentSnapshot
 
                 val name = userDoc.getString("firstName") ?: "User"
 
                 val risks = userDoc.get("activeRisks") as? List<String> ?: emptyList()
                 val familyStatus = if (risks.isEmpty()) "Safe" else "At Risk (${risks.size} alerts)"
 
-                val totalPasswords = vaultDocs.size()
+                val totalPasswords  = vaultDocs.size()
                 val leakedPasswords = vaultDocs.documents.count { it.getBoolean("isLeaked") == true }
 
                 val lastScanResult = if (scanDocs.isEmpty) "No scans yet" else {
                     val item = scanDocs.documents[0]
                     "${item.getString("url")} - ${if (item.getBoolean("isSafe") == true) "Safe" else "Malicious"}"
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                val rootStatusMap = permissionsDoc.get("rootStatus") as? Map<String, Any>
+                val rootStatus = when {
+                    rootStatusMap == null          -> "Unknown (no scan data yet)"
+                    rootStatusMap["isRooted"] == true -> "ROOTED — device appears to be rooted"
+                    else                           -> "Safe"
+                }
+
+                @Suppress("UNCHECKED_CAST")
+                val riskyAppsList = permissionsDoc.get("riskyApps") as? List<Map<String, Any>> ?: emptyList()
+                val riskyAppsText = if (riskyAppsList.isEmpty()) {
+                    "None"
+                } else {
+                    riskyAppsList.joinToString("; ") { app ->
+                        "${app["appName"]} [${app["riskLevel"]}]: ${app["riskExplanation"]}"
+                    }
                 }
 
                 val contextPrompt = """
@@ -186,17 +206,19 @@ class AIChatActivity : BaseActivity() {
                     - Compromised Passwords: $leakedPasswords
                     - Family Security Status: $familyStatus
                     - Last URL Scan: $lastScanResult
-                    
+                    - Device Root Status: $rootStatus
+                    - Risky Apps Installed: $riskyAppsText
+
                     You are an actionable assistant. You can perform actions inside the app.
                     If the user asks to do something, ANSWER normally, but append a special tag at the end.
-                    
+
                     Supported Actions:
                     1. To open password vault -> append [ACTION:OPEN_VAULT]
                     2. To check family status -> append [ACTION:OPEN_FAMILY]
                     3. To scan a website -> append [ACTION:OPEN_SCANNER]
                     4. To generate a password -> append [ACTION:GENERATE_PASS]
                     5. To view activity logs -> append [ACTION:OPEN_LOGS]
-                    
+
                     Example:
                     User: "I want to see my passwords"
                     AI: "Sure, taking you to your vault now. [ACTION:OPEN_VAULT]"
