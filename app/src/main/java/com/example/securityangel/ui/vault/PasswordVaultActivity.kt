@@ -37,7 +37,6 @@ class PasswordVaultActivity : BaseActivity() {
 
     private var allAccounts = mutableListOf<PasswordAccount>()
 
-    // Both are set before the snapshot listener is ever attached.
     private var masterPin = ""
     private var vaultSalt = ""
 
@@ -61,7 +60,7 @@ class PasswordVaultActivity : BaseActivity() {
     }
 
     private fun fetchSaltThenUnlock() {
-        // Fast path: the vault was already unlocked earlier this process session.
+
         if (VaultSessionManager.isValid) {
             masterPin = VaultSessionManager.masterPin
             vaultSalt = VaultSessionManager.vaultSalt
@@ -69,8 +68,6 @@ class PasswordVaultActivity : BaseActivity() {
             return
         }
 
-        // Slow path: fetch the per-user salt first so the key is derived and ready
-        // before the user finishes authenticating (biometric scan or PIN entry).
         firestore.collection("users").document(userId!!)
             .get()
             .addOnSuccessListener { doc ->
@@ -141,8 +138,6 @@ class PasswordVaultActivity : BaseActivity() {
         listenToPasswords()
     }
 
-    // Offers to encrypt and store the PIN in the KeyStore so future vault unlocks
-    // and autofill saves can use biometrics instead of typing the PIN again.
     private fun offerBiometricPinStorage(pin: String) {
         val biometricEnabled = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
             .getBoolean("biometric_enabled", false)
@@ -191,7 +186,6 @@ class PasswordVaultActivity : BaseActivity() {
             .addSnapshotListener { value, error ->
                 if (error != null || value == null) return@addSnapshotListener
 
-                // Decrypt on IO — PBKDF2 is expensive on first call (cached after that).
                 lifecycleScope.launch(Dispatchers.IO) {
                     val tempAccounts = mutableListOf<PasswordAccount>()
                     var wrongPin = false
@@ -203,8 +197,6 @@ class PasswordVaultActivity : BaseActivity() {
                         val decryptedPass  = VaultCryptoManager.decrypt(encryptedPass,  masterPin, vaultSalt)
                         val decryptedEmail = VaultCryptoManager.decrypt(encryptedEmail, masterPin, vaultSalt)
 
-                        // A non-empty ciphertext that yields "" means wrong PIN or corrupt data.
-                        // Passwords are always non-empty when saved (enforced in showAddOrEditDialog).
                         if (encryptedPass.isNotEmpty() && decryptedPass.isEmpty()) {
                             wrongPin = true
                             break
@@ -332,7 +324,7 @@ class PasswordVaultActivity : BaseActivity() {
                     .endAt(query + "")
                     .get()
                     .addOnSuccessListener { documents ->
-                        // AES-GCM decrypt with cached key is effectively instant — main thread is fine.
+
                         val results = documents.map { doc ->
                             PasswordAccount(
                                 id        = doc.id,

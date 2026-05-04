@@ -14,12 +14,6 @@ import javax.crypto.KeyGenerator
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 
-/**
- * Manages a biometric-gated AES-GCM key in the Android KeyStore used to
- * protect the user's vault Master PIN at rest.  Both encrypt and decrypt
- * operations require a live biometric CryptoObject, so the plaintext PIN
- * never leaves the secure environment without user presence.
- */
 object BiometricKeyStoreHelper {
 
     private const val KEYSTORE_PROVIDER  = "AndroidKeyStore"
@@ -29,8 +23,6 @@ object BiometricKeyStoreHelper {
     private const val PREFS_NAME         = "sa_biometric_vault"
     private const val KEY_ENCRYPTED_PIN  = "encrypted_pin"
     private const val KEY_IV             = "pin_iv"
-
-    // ── KeyStore helpers ─────────────────────────────────────────────────────
 
     private fun getOrCreateKey(): SecretKey {
         val ks = KeyStore.getInstance(KEYSTORE_PROVIDER).apply { load(null) }
@@ -70,8 +62,6 @@ object BiometricKeyStoreHelper {
         }
     }
 
-    // ── SharedPreferences storage ─────────────────────────────────────────────
-
     fun storeEncryptedPin(cipher: Cipher, pin: String, context: Context) {
         val encrypted = cipher.doFinal(pin.toByteArray(Charsets.UTF_8))
         context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE).edit()
@@ -102,13 +92,6 @@ object BiometricKeyStoreHelper {
         return Base64.decode(b64, Base64.NO_WRAP)
     }
 
-    // ── BiometricPrompt wrappers ──────────────────────────────────────────────
-
-    /**
-     * Shows a biometric prompt that encrypts [pin] with the KeyStore key on
-     * successful authentication and persists the ciphertext.  Call this after
-     * the user has manually entered their PIN (e.g. from PasswordVaultActivity).
-     */
     fun showEncryptPrompt(
         activity: FragmentActivity,
         pin: String,
@@ -144,11 +127,6 @@ object BiometricKeyStoreHelper {
         prompt.authenticate(info, BiometricPrompt.CryptoObject(cipher))
     }
 
-    /**
-     * Shows a biometric prompt that decrypts the stored PIN on successful
-     * authentication and delivers it to [onSuccess].  Falls back via [onFailure]
-     * when the key was invalidated (new biometric enrollment) or auth was denied.
-     */
     fun showDecryptPrompt(
         activity: FragmentActivity,
         title: String = "Confirm Save",

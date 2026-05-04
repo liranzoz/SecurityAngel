@@ -86,7 +86,6 @@ class FamilyManagementActivity : BaseActivity() {
             lottieAvatar.setAnimation(getAvatarAnimation(member.gender))
             lottieAvatar.playAnimation()
 
-
             if (member.id == adminId) {
                 tvStatus.text = "Admin"
                 tvStatus.setTextColor(getColor(R.color.primary_green))

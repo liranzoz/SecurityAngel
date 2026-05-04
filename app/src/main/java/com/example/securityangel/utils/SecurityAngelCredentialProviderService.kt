@@ -103,8 +103,6 @@ class SecurityAngelCredentialProviderService : CredentialProviderService() {
             return
         }
 
-        // origin is set when the calling app verifies a web origin (browsers);
-        // otherwise we fall back to the package name for native apps.
         val callingPackage = request.callingAppInfo?.packageName ?: ""
         val callingOrigin  = request.callingAppInfo?.origin ?: ""
         val domain = callingOrigin.ifEmpty { callingPackage }

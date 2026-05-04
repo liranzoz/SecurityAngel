@@ -65,7 +65,6 @@ abstract class BaseActivity : AppCompatActivity() {
         baseBinding = ActivityBaseBinding.inflate(layoutInflater)
         super.setContentView(baseBinding.root)
 
-
         ViewCompat.setOnApplyWindowInsetsListener(baseBinding.contentFrame) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             val ime = insets.getInsets(WindowInsetsCompat.Type.ime())
@@ -77,8 +76,6 @@ abstract class BaseActivity : AppCompatActivity() {
 
         setSupportActionBar(baseBinding.toolbarBase)
         supportActionBar?.title = ""
-
-
 
         toggle = ActionBarDrawerToggle(
             this,
@@ -100,7 +97,6 @@ abstract class BaseActivity : AppCompatActivity() {
                 }
             }
         })
-
 
         handleScreenshot()
         loadUserData()
@@ -153,7 +149,6 @@ abstract class BaseActivity : AppCompatActivity() {
         }
     }
 
-
     private fun updateMenuBadges(user: User) {
         val navView = baseBinding.navigationViewBase
         val menu = navView.menu
@@ -174,7 +169,6 @@ abstract class BaseActivity : AppCompatActivity() {
             familyItem.actionView = null
         }
     }
-
 
     private fun performLogoutAndExit() {
         VaultSessionManager.clear()
@@ -324,12 +318,11 @@ abstract class BaseActivity : AppCompatActivity() {
         val color = if (isDarkBackground) {
             Color.WHITE
         } else {
-            Color.BLACK //
+            Color.BLACK
         }
 
         toggle.drawerArrowDrawable.color = color
     }
-
 
     protected fun fetchUserDetails(onSuccess: (User) -> Unit) {
         val userId = FirebaseAuth.getInstance().currentUser?.uid ?: return

@@ -11,7 +11,6 @@ import com.example.securityangel.R
 
 data class ScanResult(val name: String, val status: String)
 
-
 class ScanResultsAdapter(private val results: List<ScanResult>) :
     RecyclerView.Adapter<ScanResultsAdapter.ViewHolder>() {
 

@@ -40,8 +40,6 @@ class DashboardActivity : BaseActivity() {
     private var cachedUser: User? = null
     private var isReceiverRegistered = false
 
-    // Fires whenever an app is installed, removed, or updated while the
-    // activity is in the foreground — triggers an immediate permissions rescan.
     private val packageChangeReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
             applyPermissionsAndAnimate(myPersonalScore)
@@ -93,8 +91,7 @@ class DashboardActivity : BaseActivity() {
     override fun onResume() {
         super.onResume()
         registerPackageReceiver()
-        // Re-run the full score pipeline if user data is already loaded.
-        // Catches permission changes or uninstalls made while the app was in the background.
+
         cachedUser?.let { calculateDeepScore(it) }
     }
 
@@ -122,8 +119,6 @@ class DashboardActivity : BaseActivity() {
                 val leakedCount = vaultDocs.documents.count { it.getBoolean("isLeaked") == true }
                 val newScore = GlobalScoreIntegrator.calculatePersonalScore(leakedCount)
 
-                // Only write back when the score actually changed — prevents the snapshot
-                // listener from re-firing in a tight loop and killing the animation.
                 if (newScore != myPersonalScore) {
                     myPersonalScore = newScore
                     saveScoreToFirebase(newScore)
@@ -138,7 +133,7 @@ class DashboardActivity : BaseActivity() {
                 }
             }
             .addOnFailureListener {
-                // Vault read failed — display whatever personal score we have
+
                 animateScore(myPersonalScore)
             }
     }
@@ -181,7 +176,7 @@ class DashboardActivity : BaseActivity() {
     private fun saveScoreToFirebase(score: Int) {
         db.collection("users").document(userId!!)
             .update("securityScore", score)
-            .addOnFailureListener { /* non-critical, score is already shown locally */ }
+            .addOnFailureListener {  }
     }
 
     private fun applyPermissionsAndAnimate(baseScore: Int) {
@@ -217,7 +212,6 @@ class DashboardActivity : BaseActivity() {
         animation.start()
     }
 
-    // Provisions a per-user vault salt exactly once. Idempotent — skips write if salt already exists.
     private fun ensureVaultSaltExists(userId: String) {
         val userRef = db.collection("users").document(userId)
         userRef.get().addOnSuccessListener { doc ->

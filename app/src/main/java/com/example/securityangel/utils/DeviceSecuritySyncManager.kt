@@ -48,7 +48,7 @@ object DeviceSecuritySyncManager {
                     .set(payload)
             )
         } catch (_: Exception) {
-            // Best-effort sync — network failures must never crash the app.
+
         }
     }
 }

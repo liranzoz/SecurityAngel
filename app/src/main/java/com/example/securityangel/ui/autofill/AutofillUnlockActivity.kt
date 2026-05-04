@@ -26,21 +26,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Lightweight overlay activity launched when the autofill service needs to unlock
- * the vault before it can serve fill suggestions.
- *
- * Flow:
- *   1. Biometric prompt (or PIN dialog fallback) to obtain the master PIN.
- *   2. Fetch vaultSalt from Firestore, save to VaultSessionManager.
- *   3. Query the vault collection for entries matching the requested domain.
- *   4. Build a FillResponse containing Datasets for each match and return it
- *      via AutofillManager.EXTRA_AUTHENTICATION_RESULT so the framework fills
- *      the fields immediately — no re-focus required.
- *
- * If the vault is already unlocked (VaultSessionManager.isValid), steps 1–2
- * are skipped and the Firestore query runs immediately.
- */
 class AutofillUnlockActivity : AppCompatActivity() {
 
     companion object {
@@ -52,17 +37,16 @@ class AutofillUnlockActivity : AppCompatActivity() {
     private val firestore by lazy { FirebaseFirestore.getInstance() }
     private val userId get() = FirebaseAuth.getInstance().currentUser?.uid
 
-    // Guards against re-prompting on configuration changes.
     private var hasPrompted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (VaultSessionManager.isValid) {
-            // Fast path: vault already unlocked in this process session.
+
             fillAndReturn(VaultSessionManager.masterPin, VaultSessionManager.vaultSalt)
         }
-        // Slow path: unlock prompt fires from onResume once the salt is fetched.
+
     }
 
     override fun onResume() {
@@ -72,8 +56,6 @@ class AutofillUnlockActivity : AppCompatActivity() {
             fetchSaltThenUnlock()
         }
     }
-
-    // ── Unlock flow ───────────────────────────────────────────────────────────
 
     private fun fetchSaltThenUnlock() {
         val uid = userId ?: run { finish(); return }
@@ -130,8 +112,6 @@ class AutofillUnlockActivity : AppCompatActivity() {
         fillAndReturn(pin, vaultSalt)
     }
 
-    // ── Fill-and-return ───────────────────────────────────────────────────────
-
     private fun fillAndReturn(masterPin: String, vaultSalt: String) {
         val domain      = intent.getStringExtra(EXTRA_DOMAIN) ?: ""
         val usernameId  = intentParcelable<AutofillId>(EXTRA_USERNAME_ID)
@@ -143,7 +123,6 @@ class AutofillUnlockActivity : AppCompatActivity() {
                 lifecycleScope.launch {
                     val responseBuilder = FillResponse.Builder()
 
-                    // Rebuild SaveInfo so the save prompt stays active after auth.
                     val requiredId = passwordId ?: usernameId
                     if (requiredId != null) {
                         val sib = SaveInfo.Builder(
@@ -189,13 +168,11 @@ class AutofillUnlockActivity : AppCompatActivity() {
                 }
             }
             .addOnFailureListener {
-                // VaultSessionManager is now populated — next field focus will retry.
+
                 setResult(RESULT_CANCELED)
                 finish()
             }
     }
-
-    // ── Helpers ───────────────────────────────────────────────────────────────
 
     @Suppress("DEPRECATION")
     private inline fun <reified T : android.os.Parcelable> intentParcelable(key: String): T? =

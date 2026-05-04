@@ -140,11 +140,11 @@ class AddMemberActivity : AppCompatActivity() {
     private fun shareInvitationCode(email: String, code: String) {
         val shareText = """
             Hey! I want to add you to my family in Security Angel.
-            
+
             1. Download the app.
             2. Register with email: $email
             3. Use this secure code to join: *$code*
-            
+
             Stay safe!
         """.trimIndent()
 

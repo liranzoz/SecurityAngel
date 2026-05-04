@@ -22,12 +22,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Handles the final step of the Credential Manager get-flow on Android 14+.
- * Activated when the user picks one of the entries our CredentialProviderService
- * returned from onBeginGetCredentialRequest.  Unlocks the vault if needed,
- * decrypts the requested entry, and returns it via PendingIntentHandler.
- */
 @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 class AutofillCredentialFillActivity : AppCompatActivity() {
 
@@ -49,8 +43,7 @@ class AutofillCredentialFillActivity : AppCompatActivity() {
         if (VaultSessionManager.isValid) {
             decryptAndReturn(docId, VaultSessionManager.masterPin, VaultSessionManager.vaultSalt)
         }
-        // Slow path is deferred to onResume so the Window is fully attached
-        // before we can show the biometric prompt.
+
     }
 
     override fun onResume() {

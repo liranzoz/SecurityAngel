@@ -43,7 +43,7 @@ class SecurityLogAdapter(private var logs: List<SecurityLog>) :
                 }
                 "SCAN_SAFE" -> {
                     iconContainer.background.setTint(context.getColor(R.color.status_safe_bg))
-                    ivLogIcon.setImageResource(R.drawable.ic_lock_check) // האייקון שיש לך
+                    ivLogIcon.setImageResource(R.drawable.ic_lock_check)
                     ivLogIcon.setColorFilter(context.getColor(R.color.status_safe_text))
                 }
                 "MEMBER_ADDED" -> {

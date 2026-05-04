@@ -36,8 +36,6 @@ class SecurityAngelAutofillService : AutofillService() {
         private const val REQUEST_CODE_UNLOCK = 9001
     }
 
-    // ── onFillRequest ─────────────────────────────────────────────────────────
-
     override fun onFillRequest(
         request: FillRequest,
         cancellationSignal: CancellationSignal,
@@ -49,9 +47,11 @@ class SecurityAngelAutofillService : AutofillService() {
         val packageName = structure.activityComponent?.packageName ?: "unknown"
         Log.d("AutofillTracker", "onFillRequest started, package: $packageName")
 
-        // Collect ALL nodes from every window in the structure first, then detect
-        // the login pair once across the full set.  Calling detectLoginPair per
-        // window was bug-prone: Chrome often splits virtual views across windows.
+        if (packageName == applicationContext.packageName) {
+            callback.onSuccess(null)
+            return
+        }
+
         val allNodes = mutableListOf<ViewNode>()
         for (i in 0 until structure.windowNodeCount) {
             if (cancellationSignal.isCanceled) { callback.onSuccess(null); return }
@@ -69,7 +69,6 @@ class SecurityAngelAutofillService : AutofillService() {
             return
         }
 
-        // Domain: browsers expose webDomain on virtual form nodes; native apps don't.
         val domain = allNodes
             .firstNotNullOfOrNull { it.webDomain?.takeIf(String::isNotEmpty) }
             ?: packageName
@@ -83,7 +82,6 @@ class SecurityAngelAutofillService : AutofillService() {
                 request.inlineSuggestionsRequest?.inlinePresentationSpecs
             else null
 
-        // Auth guard — vault locked
         if (!VaultSessionManager.isValid) {
             Log.d("AutofillTracker", "Vault locked — returning unlock dataset for domain=$domain")
             val responseBuilder = FillResponse.Builder().setSaveInfo(saveInfo)
@@ -94,7 +92,6 @@ class SecurityAngelAutofillService : AutofillService() {
             return
         }
 
-        // Vault unlocked — query Firestore for matching credentials
         val userId = FirebaseAuth.getInstance().currentUser?.uid
         if (userId == null) {
             callback.onSuccess(FillResponse.Builder().setSaveInfo(saveInfo).build())
@@ -138,8 +135,6 @@ class SecurityAngelAutofillService : AutofillService() {
             }
     }
 
-    // ── onSaveRequest ─────────────────────────────────────────────────────────
-
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {
         val contexts = request.fillContexts
         if (contexts.isEmpty()) {
@@ -150,8 +145,11 @@ class SecurityAngelAutofillService : AutofillService() {
         val packageName = contexts.last().structure.activityComponent?.packageName ?: ""
         Log.d("AutofillTracker", "onSaveRequest started, package: $packageName, contexts: ${contexts.size}")
 
-        // Collect nodes from ALL historical contexts.  When a browser navigates
-        // after form submit the filled nodes only exist in earlier contexts.
+        if (packageName == applicationContext.packageName) {
+            callback.onFailure("Security Angel: skipping save for own app")
+            return
+        }
+
         val allNodes = mutableListOf<ViewNode>()
         for (context in contexts) {
             val structure = context.structure
@@ -167,7 +165,6 @@ class SecurityAngelAutofillService : AutofillService() {
         var username = ""
         var password = ""
 
-        // Pass 1 — HTML info + InputType (most reliable for browsers)
         val passwordNode = allNodes.firstOrNull { node ->
             node.autofillValue?.isText == true && isPasswordNode(node)
         }
@@ -176,8 +173,6 @@ class SecurityAngelAutofillService : AutofillService() {
             password = passwordNode.autofillValue!!.textValue.toString()
             val pIndex = allNodes.indexOf(passwordNode)
 
-            // Safe extraction: username is optional — saving with empty username
-            // is better than crashing and losing the password entirely.
             username = allNodes.subList(0, pIndex)
                 .lastOrNull { node ->
                     node.autofillValue?.isText == true &&
@@ -187,7 +182,6 @@ class SecurityAngelAutofillService : AutofillService() {
                 ?.autofillValue?.textValue?.toString() ?: ""
         }
 
-        // Pass 2 — autofillHints fallback (reliable for native apps)
         if (password.isEmpty()) {
             for (node in allNodes) {
                 val value = node.autofillValue?.takeIf { it.isText } ?: continue
@@ -220,8 +214,6 @@ class SecurityAngelAutofillService : AutofillService() {
         callback.onSuccess(pendingIntent.intentSender)
     }
 
-    // ── SaveInfo builder ──────────────────────────────────────────────────────
-
     private fun buildSaveInfo(usernameId: AutofillId?, passwordId: AutofillId?): SaveInfo {
         val requiredId = passwordId ?: usernameId!!
         val builder = SaveInfo.Builder(
@@ -232,8 +224,6 @@ class SecurityAngelAutofillService : AutofillService() {
             builder.setOptionalIds(arrayOf(usernameId))
         return builder.build()
     }
-
-    // ── Dataset builders ──────────────────────────────────────────────────────
 
     @Suppress("DEPRECATION")
     private fun buildCredentialDataset(
@@ -267,8 +257,7 @@ class SecurityAngelAutofillService : AutofillService() {
         val views = buildDropdownPresentation("Security Angel", "Tap to unlock vault")
         val piFlags = PendingIntent.FLAG_UPDATE_CURRENT or
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) PendingIntent.FLAG_MUTABLE else 0
-        // AutofillUnlockActivity handles biometric/PIN unlock and returns a FillResponse
-        // containing live datasets via AutofillManager.EXTRA_AUTHENTICATION_RESULT.
+
         val unlockIntent = Intent(this, AutofillUnlockActivity::class.java).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             putExtra(AutofillUnlockActivity.EXTRA_DOMAIN, domain)
@@ -312,8 +301,6 @@ class SecurityAngelAutofillService : AutofillService() {
         return InlinePresentation(content.slice, spec, false)
     }
 
-    // ── Domain matching ───────────────────────────────────────────────────────
-
     internal fun domainsMatch(current: String, stored: String): Boolean {
         if (current.equals(stored, ignoreCase = true)) return true
         return rootDomain(current).equals(rootDomain(stored), ignoreCase = true)
@@ -324,26 +311,20 @@ class SecurityAngelAutofillService : AutofillService() {
         return if (parts.size >= 2) "${parts[parts.size - 2]}.${parts[parts.size - 1]}" else domain
     }
 
-    // ── Login-pair detection ──────────────────────────────────────────────────
-
     private fun detectLoginPair(nodes: List<ViewNode>): Pair<AutofillId?, AutofillId?> {
         val passwordNode = nodes.firstOrNull { it.autofillId != null && isPasswordNode(it) }
 
         val usernameNode = if (passwordNode != null) {
-            // Standard form: username field appears before the password in the tree.
+
             val pIndex = nodes.indexOf(passwordNode)
             nodes.subList(0, pIndex).lastOrNull { it.autofillId != null && isUsernameNode(it) }
         } else {
-            // No password field visible yet (email-first two-step flow, or sign-up
-            // before the confirm-password field loads).  Return the best username
-            // candidate so SaveInfo can still track the field.
+
             nodes.lastOrNull { it.autofillId != null && isUsernameNode(it) }
         }
 
         return Pair(usernameNode?.autofillId, passwordNode?.autofillId)
     }
-
-    // ── Node classification ───────────────────────────────────────────────────
 
     private fun isPasswordNode(node: ViewNode): Boolean {
         node.htmlInfo?.attributes?.forEach { pair ->
@@ -373,8 +354,6 @@ class SecurityAngelAutofillService : AutofillService() {
         return isUsernameHint(node.autofillHints ?: emptyArray())
     }
 
-    // ── InputType helpers ─────────────────────────────────────────────────────
-
     private fun isPasswordInputType(inputType: Int): Boolean {
         if (inputType and InputType.TYPE_MASK_CLASS != InputType.TYPE_CLASS_TEXT) return false
         return when (inputType and InputType.TYPE_MASK_VARIATION) {
@@ -396,8 +375,6 @@ class SecurityAngelAutofillService : AutofillService() {
         }
     }
 
-    // ── Hint fallbacks ────────────────────────────────────────────────────────
-
     private fun isUsernameHint(hints: Array<String>): Boolean =
         hints.any { h ->
             h.equals(View.AUTOFILL_HINT_USERNAME, ignoreCase = true) ||
@@ -412,8 +389,6 @@ class SecurityAngelAutofillService : AutofillService() {
             h.equals(View.AUTOFILL_HINT_PASSWORD, ignoreCase = true) ||
             h.contains("pass", ignoreCase = true)
         }
-
-    // ── Tree flattening ───────────────────────────────────────────────────────
 
     private fun collectNodes(node: ViewNode, out: MutableList<ViewNode>) {
         if (node.autofillId != null || node.inputType != 0 || node.htmlInfo != null) {

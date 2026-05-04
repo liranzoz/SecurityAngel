@@ -37,7 +37,6 @@ class SandBoxActivity : BaseActivity() {
         binding.rvResults.layoutManager = LinearLayoutManager(this)
     }
 
-    // === שלב 1: בדיקה אם הלינק כבר קיים במאגר ===
     private fun startScanFlow(url: String) {
         setLoadingState("Checking Database...")
         val urlId = VirusTotalApi.urlToBase64(url)
@@ -45,10 +44,10 @@ class SandBoxActivity : BaseActivity() {
         api.scanUrl(urlId).enqueue(object : Callback<VtResponse> {
             override fun onResponse(call: Call<VtResponse>, response: Response<VtResponse>) {
                 if (response.isSuccessful && response.body() != null) {
-                    // יש תוצאה במאגר! מציגים מיד.
+
                     showResults(response.body()!!.data?.attributes, url)
                 } else if (response.code() == 404) {
-                    // הלינק לא קיים - שולחים לסריקה חדשה
+
                     submitNewScan(url)
                 } else {
                     resetButton()
@@ -63,17 +62,16 @@ class SandBoxActivity : BaseActivity() {
         })
     }
 
-    // === שלב 2: שליחת לינק חדש לסריקה ===
     private fun submitNewScan(url: String) {
         setLoadingState("Submitting URL...")
 
         api.submitUrlForScanning(url).enqueue(object : Callback<VtResponse> {
             override fun onResponse(call: Call<VtResponse>, response: Response<VtResponse>) {
                 if (response.isSuccessful && response.body() != null) {
-                    // קיבלנו מזהה סריקה (Analysis ID)
+
                     val analysisId = response.body()!!.data?.id
                     if (analysisId != null) {
-                        // מתחילים לעקוב אחרי הסריקה
+
                         pollAnalysisStatus(analysisId, url)
                     } else {
                         resetButton()
@@ -92,7 +90,6 @@ class SandBoxActivity : BaseActivity() {
         })
     }
 
-    // === שלב 3: בדיקת סטטוס (Polling) בלולאה ===
     private fun pollAnalysisStatus(analysisId: String, originalUrl: String) {
         setLoadingState("Analyzing with 70 engines...")
 
@@ -102,10 +99,10 @@ class SandBoxActivity : BaseActivity() {
                     val status = response.body()?.data?.attributes?.status
 
                     if (status == "completed") {
-                        // === הסריקה הסתיימה! מושכים את התוצאה הסופית ===
+
                         fetchFinalReport(originalUrl)
                     } else {
-                        // עדיין עובד (queued / in-progress) -> בודקים שוב עוד 2 שניות
+
                         handler.postDelayed({
                             pollAnalysisStatus(analysisId, originalUrl)
                         }, 2000)
@@ -117,13 +114,12 @@ class SandBoxActivity : BaseActivity() {
             }
 
             override fun onFailure(call: Call<VtResponse>, t: Throwable) {
-                // במקרה של ניתוק רגעי, ננסה שוב במקום לקרוס
+
                 handler.postDelayed({ pollAnalysisStatus(analysisId, originalUrl) }, 3000)
             }
         })
     }
 
-    // === שלב 4: משיכת הדוח הסופי והצגה ===
     private fun fetchFinalReport(url: String) {
         setLoadingState("Finalizing Report...")
         val urlId = VirusTotalApi.urlToBase64(url)
@@ -145,8 +141,6 @@ class SandBoxActivity : BaseActivity() {
         })
     }
 
-    // === UI Logic ===
-
     private fun setLoadingState(text: String) {
         binding.btnScan.text = text
         binding.btnScan.isEnabled = false
@@ -164,7 +158,6 @@ class SandBoxActivity : BaseActivity() {
         val maliciousCount = attributes.stats?.malicious ?: 0
         val isSafe = maliciousCount == 0
 
-        // עדכון כותרת
         if (!isSafe) {
             SecurityLogger.logEvent(
                 SecurityLogger.TYPE_SCAN_SAFE,
@@ -191,16 +184,14 @@ class SandBoxActivity : BaseActivity() {
             binding.icSafeUnsafe.clearColorFilter()
         }
 
-        // שמירה להיסטוריה
         saveScanToHistory(url, isSafe)
 
-        // הכנת הרשימה למטה
         val resultsList = mutableListOf<ScanResult>()
         val vendorsToShow = listOf("Kaspersky", "Google Safebrowsing", "PhishTank", "OpenPhish", "BitDefender", "ESET", "Sophos", "Microsoft", "McAfee")
 
         attributes.results?.forEach { (engine, data) ->
             val status = data.result ?: "Unknown"
-            // מציגים אם זה ברשימה שלנו או אם זה זיהה וירוס
+
             if (vendorsToShow.contains(data.engineName ?: engine) || (status != "clean" && status != "unrated")) {
                 resultsList.add(ScanResult(data.engineName ?: engine, status))
             }

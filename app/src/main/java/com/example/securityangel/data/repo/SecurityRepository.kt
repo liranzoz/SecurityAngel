@@ -10,14 +10,10 @@ object SecurityRepository {
     private val usersRef = db.collection("users")
     private val logsRef = db.collection("security_logs")
 
-    /**
-     * דיווח על איום חדש (למשל: סיסמה דלפה)
-     * זה מוסיף את האיום לרשימה של המשתמש ומעדכן את ה-riskCount
-     */
     fun reportRisk(userId: String, riskType: String, onSuccess: () -> Unit = {}) {
         usersRef.document(userId).update(
             mapOf(
-                "activeRisks" to FieldValue.arrayUnion(riskType), // הוספה לרשימה (מונע כפילויות)
+                "activeRisks" to FieldValue.arrayUnion(riskType),
                 "lastSecurityUpdate" to System.currentTimeMillis()
             )
         ).addOnSuccessListener {
@@ -26,9 +22,6 @@ object SecurityRepository {
         }
     }
 
-    /**
-     * הסרת איום (כשהמשתמש תיקן את הבעיה, למשל החליף סיסמה)
-     */
     fun resolveRisk(userId: String, riskType: String, onSuccess: () -> Unit = {}) {
         usersRef.document(userId).update(
             mapOf(

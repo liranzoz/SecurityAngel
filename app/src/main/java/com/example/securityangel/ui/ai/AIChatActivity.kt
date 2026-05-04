@@ -61,7 +61,7 @@ class AIChatActivity : BaseActivity() {
         buttonHandler()
         setupRecyclerView()
         loadChatHistory()
-//        addBotMessage("Hello! I am Security Angel AI. How can I help you stay safe today?")
+
     }
 
     private fun setupRecyclerView() {
@@ -94,10 +94,10 @@ class AIChatActivity : BaseActivity() {
                     val prompt = """
                         SYSTEM_CONTEXT:
                         $contextData
-                        
+
                         USER_INPUT:
                         $userText
-                        
+
                         INSTRUCTIONS:
                         If an image is provided, analyze it for phishing, scams, or sensitive data leaks.
                         If it's a screenshot of an email or SMS, check the sender and content for red flags.
@@ -334,4 +334,3 @@ class AIChatActivity : BaseActivity() {
         addBotMessage(finalText)
     }
 }
-

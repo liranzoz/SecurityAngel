@@ -16,16 +16,13 @@ import retrofit2.http.Path
 
 interface VirusTotalApi {
 
-    // 1. קבלת דוח סופי של לינק
     @GET("api/v3/urls/{id}")
     fun scanUrl(@Path("id") urlId: String): Call<VtResponse>
 
-    // 2. שליחת לינק חדש לסריקה -> מחזיר Analysis ID
     @FormUrlEncoded
     @POST("api/v3/urls")
     fun submitUrlForScanning(@Field("url") url: String): Call<VtResponse>
 
-    // 3. בדיקת סטטוס של סריקה שרצה כרגע
     @GET("api/v3/analyses/{id}")
     fun getAnalysisStatus(@Path("id") analysisId: String): Call<VtResponse>
 

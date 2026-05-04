@@ -23,12 +23,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-/**
- * Transient overlay activity launched by SecurityAngelAutofillService when the
- * Android autofill framework detects new login credentials.  Extends
- * AppCompatActivity directly (not BaseActivity) to avoid the biometric app-lock
- * cycle and the navigation drawer.
- */
 class AutofillSaveActivity : AppCompatActivity() {
 
     companion object {
@@ -47,11 +41,8 @@ class AutofillSaveActivity : AppCompatActivity() {
     private lateinit var password: String
     private lateinit var domain: String
 
-    // True when launched by SecurityAngelCredentialProviderService so we know
-    // to signal the result back through PendingIntentHandler on save success.
     private var isFromCredentialProvider = false
 
-    // Guard so the biometric prompt fires exactly once across configuration changes.
     private var hasPromptedBiometrics = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,11 +53,10 @@ class AutofillSaveActivity : AppCompatActivity() {
         isFromCredentialProvider = intent.getBooleanExtra(EXTRA_FROM_CREDENTIAL_PROVIDER, false)
 
         if (isFromCredentialProvider && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-            // Credential Provider path — the OS injects the full CreatePasswordRequest
-            // into the intent via PendingIntentHandler at launch time.
+
             if (!extractFromCredentialProviderIntent()) return
         } else {
-            // Legacy Autofill Service path — credentials arrive as intent extras.
+
             username = intent.getStringExtra(EXTRA_USERNAME) ?: ""
             password = intent.getStringExtra(EXTRA_PASSWORD) ?: ""
             domain   = intent.getStringExtra(EXTRA_DOMAIN)   ?: ""
@@ -79,8 +69,7 @@ class AutofillSaveActivity : AppCompatActivity() {
 
         populateHeader()
         wireButtons()
-        // Biometric prompt is deferred to onResume — calling it here crashes
-        // silently because the Window is not yet fully attached to the manager.
+
     }
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
@@ -107,8 +96,6 @@ class AutofillSaveActivity : AppCompatActivity() {
         }
     }
 
-    // ── UI setup ──────────────────────────────────────────────────────────────
-
     private fun populateHeader() {
         binding.tvDomain.text   = domain.ifEmpty { "Unknown app" }
         binding.tvUsername.text = username.ifEmpty { "Unknown username" }
@@ -126,8 +113,6 @@ class AutofillSaveActivity : AppCompatActivity() {
             saveWithPin(pin)
         }
     }
-
-    // ── Biometric / PIN flow ──────────────────────────────────────────────────
 
     private fun attemptBiometricSave() {
         val biometricEnabled = getSharedPreferences("AppScanSettings", MODE_PRIVATE)
@@ -156,11 +141,8 @@ class AutofillSaveActivity : AppCompatActivity() {
         binding.btnSave.visibility = View.VISIBLE
     }
 
-    // ── Vault save ────────────────────────────────────────────────────────────
-
     private fun saveWithPin(masterPin: String) {
-        // Capture once — the getter hits FirebaseAuth on every call and could
-        // theoretically return null mid-flight if the session is revoked.
+
         val uid = userId
         if (uid == null) {
             toast("Not logged in. Please open Security Angel and sign in first.")
@@ -180,7 +162,6 @@ class AutofillSaveActivity : AppCompatActivity() {
                     return@addOnSuccessListener
                 }
 
-                // PBKDF2 (100k iterations) must run off the main thread.
                 lifecycleScope.launch {
                     val encPass = withContext(Dispatchers.IO) {
                         VaultCryptoManager.encrypt(password, masterPin, salt)
@@ -199,16 +180,11 @@ class AutofillSaveActivity : AppCompatActivity() {
                         "password"  to encPass
                     )
 
-                    // finish() is called ONLY inside the Firestore callbacks so the
-                    // activity stays alive until the network round-trip completes.
-                    // Calling finish() before .add() returns would destroy the process
-                    // and abort the in-flight request before it reaches the server.
                     firestore.collection("users").document(uid)
                         .collection("vault")
                         .add(data)
                         .addOnSuccessListener {
-                            // For the Credential Provider path, signal success back to
-                            // the Credential Manager so it can update its internal state.
+
                             if (isFromCredentialProvider &&
                                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
                             ) {
@@ -241,12 +217,9 @@ class AutofillSaveActivity : AppCompatActivity() {
         binding.btnCancel.isEnabled     = !saving
     }
 
-    // ── Utilities ─────────────────────────────────────────────────────────────
-
     private fun extractSiteName(domain: String): String {
         val parts = domain.split(".")
-        // Package names (e.g. "com.facebook.katana") start with a TLD-like prefix;
-        // take the second segment. For real domains take the second-to-last segment.
+
         val knownTldPrefixes = setOf("com", "org", "net", "io", "app", "dev", "co")
         val name = when {
             parts.size >= 3 && parts.first() in knownTldPrefixes -> parts[1]
@@ -260,7 +233,7 @@ class AutofillSaveActivity : AppCompatActivity() {
         val parts = domain.split(".")
         if (parts.size < 2) return domain
         val knownTldPrefixes = setOf("com", "org", "net", "io", "app", "dev", "co")
-        // Keep package names unchanged; strip subdomains from real domains.
+
         return if (parts.first() in knownTldPrefixes) domain
         else "${parts[parts.size - 2]}.${parts[parts.size - 1]}"
     }

@@ -14,7 +14,7 @@ class RecentScansAdapter(private val scans: List<ScanHistoryItem>) :
     RecyclerView.Adapter<RecentScansAdapter.ViewHolder>() {
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val tvUrl: TextView = view.findViewById(R.id.tvTitle) // וודא שה-ID תואם ל-XML שלך
+        val tvUrl: TextView = view.findViewById(R.id.tvTitle)
         val tvTime: TextView = view.findViewById(R.id.tvTime)
         val tvStatus: TextView = view.findViewById(R.id.tvStatus)
         val imgIcon: ImageView = view.findViewById(R.id.imgIcon)

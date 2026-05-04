@@ -44,7 +44,6 @@ object FamilyRepository {
                 val userDoc = snapshot.documents.first()
                 val userId = userDoc.id
 
-
                 if (userDoc.getString("familyId") != null) {
                     onFailure("User already belongs to a family")
                     return@addOnSuccessListener
@@ -54,7 +53,7 @@ object FamilyRepository {
                     batch.update(familiesRef.document(familyId), "members", FieldValue.arrayUnion(userId))
                     batch.update(usersRef.document(userId), "familyId", familyId)
                 }.addOnSuccessListener {
-                  
+
                     onSuccess()
                 }.addOnFailureListener { e ->
 

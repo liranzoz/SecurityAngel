@@ -11,10 +11,6 @@ import kotlin.math.ceil
 
 object PermissionMonitor {
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Public model
-    // ─────────────────────────────────────────────────────────────────────────
-
     enum class RiskLevel { SAFE, LOW, MEDIUM, HIGH }
 
     data class AppPermissionInfo(
@@ -28,99 +24,91 @@ object PermissionMonitor {
         val riskExplanation: String
     )
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Tier 2 – Trusted vendor prefixes
-    // Any app whose package name starts with one of these belongs to a known
-    // trusted ecosystem and is automatically rated SAFE.
-    // ─────────────────────────────────────────────────────────────────────────
-
     private val TRUSTED_PREFIXES = listOf(
-        "com.android.",        // Core Android / AOSP
-        "com.google.",         // Google ecosystem
-        "com.samsung.",        // Samsung OEM
-        "com.sec.",            // Samsung OEM (secondary namespace)
-        "com.miui.",           // Xiaomi / MIUI
-        "com.xiaomi.",         // Xiaomi
-        "com.microsoft.",      // Microsoft ecosystem
-        "com.facebook.",       // Meta – Facebook
-        "com.whatsapp.",       // Meta – WhatsApp
-        "com.instagram.",      // Meta – Instagram
-        "com.spotify.",        // Spotify
-        "com.netflix.",        // Netflix
-        "com.amazon.",         // Amazon ecosystem
-        "com.adobe.",          // Adobe ecosystem
-        "com.snapchat.",       // Snapchat
-        "com.twitter.",        // Twitter / X
-        "com.linkedin.",       // LinkedIn
-        "org.telegram.",       // Telegram
-        "org.thoughtcrime.",   // Signal
-        "org.mozilla.",        // Mozilla / Firefox
-        "com.discord.",        // Discord
-        "com.dropbox.",        // Dropbox
-        "com.huawei.",         // Huawei OEM
-        "com.oneplus.",        // OnePlus OEM
-        "com.oppo.",           // OPPO OEM
-        "com.vivo.",           // Vivo OEM
-        "com.realme."          // Realme OEM
+        "com.android.",
+        "com.google.",
+        "com.samsung.",
+        "com.sec.",
+        "com.miui.",
+        "com.xiaomi.",
+        "com.microsoft.",
+        "com.facebook.",
+        "com.whatsapp.",
+        "com.instagram.",
+        "com.spotify.",
+        "com.netflix.",
+        "com.amazon.",
+        "com.adobe.",
+        "com.snapchat.",
+        "com.twitter.",
+        "com.linkedin.",
+        "org.telegram.",
+        "org.thoughtcrime.",
+        "org.mozilla.",
+        "com.discord.",
+        "com.dropbox.",
+        "com.huawei.",
+        "com.oneplus.",
+        "com.oppo.",
+        "com.vivo.",
+        "com.realme."
     )
 
-    // Exact-match fallback for well-known apps whose package names are NOT
-    // covered by any prefix above (e.g. com.waze has no sub-package).
     private val TRUSTED_PACKAGES = hashSetOf(
-        // Social / Messaging
+
         "com.waze",
         "com.viber.voip",
 
         "com.tumblr",
         "com.pinterest",
         "com.reddit.frontpage",
-        "com.zhiliaoapp.musically",        // TikTok
-        "com.kwai.video",                  // Kwai
-        // Streaming / Entertainment
+        "com.zhiliaoapp.musically",
+        "com.kwai.video",
+
         "com.hbo.hbonow",
         "com.disneyplus",
         "tv.twitch.android.app",
         "com.twitch.android.app",
         "com.soundcloud.android",
         "com.deezer.android.app",
-        // Navigation & Travel
+
         "com.here.app.maps",
         "com.booking",
         "com.airbnb.android",
         "com.tripadvisor.tripadvisor",
-        // Finance & Payments
+
         "com.paypal.android.p2pmobile",
         "com.venmo",
         "com.squareup.cash",
         "com.coinbase.android",
         "com.robinhood.android",
-        // Productivity & Cloud
+
         "com.evernote",
         "com.box.android",
         "com.github.android",
-        // Password managers
+
         "com.lastpass.lpandroid",
         "com.callpod.android_apps.keeper",
         "com.agilebits.onepassword",
-        // Ride-sharing & Food
+
         "com.ubercab",
         "com.ubercab.eats",
         "com.lyft",
         "com.doordash.consumer",
         "com.grubhub.android",
-        // Communication
+
         "us.zoom.videomeetings",
         "com.Slack",
-        // Browsers not covered by prefix
+
         "com.opera.browser",
         "com.brave.browser",
         "com.kiwibrowser.browser",
-        // Games
+
         "com.mojang.minecraftpe",
         "com.supercell.clashofclans",
         "com.king.candycrushsaga",
         "com.roblox.client",
-        // Misc
+
         "com.duolingo",
         "com.tinder",
         "com.bumble.app",
@@ -131,11 +119,6 @@ object PermissionMonitor {
         "com.calm.android",
         "com.ebay.mobile"
     )
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Category baselines
-    // Permissions that are EXPECTED and LEGITIMATE for each app category.
-    // ─────────────────────────────────────────────────────────────────────────
 
     private val CATEGORY_BASELINES: Map<Int, Set<String>> = mapOf(
         ApplicationInfo.CATEGORY_GAME to setOf(
@@ -265,10 +248,6 @@ object PermissionMonitor {
         "android.permission.WRITE_EXTERNAL_STORAGE"
     )
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // OCP weights
-    // ─────────────────────────────────────────────────────────────────────────
-
     private val OCP_WEIGHTS = mapOf(
         "android.permission.CAMERA"                   to 3,
         "android.permission.RECORD_AUDIO"             to 3,
@@ -300,13 +279,6 @@ object PermissionMonitor {
         "android.permission.READ_CALENDAR"            to 2,
         "android.permission.WRITE_CALENDAR"           to 2
     )
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Malicious combinations engine
-    // requiredInOcp – must be in the OCP set to trigger
-    // requiredInAll – must be anywhere in the app's permissions (covers ubiquitous
-    //                 enablers like INTERNET that are never an OCP)
-    // ─────────────────────────────────────────────────────────────────────────
 
     private data class PermissionCombo(
         val requiredInOcp: Set<String>,
@@ -372,10 +344,6 @@ object PermissionMonitor {
         )
     )
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Trusted installation sources
-    // ─────────────────────────────────────────────────────────────────────────
-
     private val TRUSTED_INSTALLERS = setOf(
         "com.android.vending",
         "com.amazon.venezia",
@@ -386,10 +354,6 @@ object PermissionMonitor {
         "com.bbk.appstore",
         "com.microsoft.windowsstore"
     )
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Human-readable permission labels
-    // ─────────────────────────────────────────────────────────────────────────
 
     private val PERMISSION_LABELS = mapOf(
         "android.permission.CAMERA"                   to "Camera",
@@ -421,10 +385,6 @@ object PermissionMonitor {
         "android.permission.READ_CALENDAR"            to "Calendar",
         "android.permission.WRITE_CALENDAR"           to "Write Calendar"
     )
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // Private helpers
-    // ─────────────────────────────────────────────────────────────────────────
 
     private fun getBaseline(category: Int): Set<String> =
         CATEGORY_BASELINES[category] ?: DEFAULT_BASELINE
@@ -471,10 +431,6 @@ object PermissionMonitor {
         null
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // OCP assessment (only called after all trust tiers pass)
-    // ─────────────────────────────────────────────────────────────────────────
-
     private data class AssessmentResult(
         val riskLevel: RiskLevel,
         val ocps: List<String>,
@@ -501,7 +457,6 @@ object PermissionMonitor {
             combo.requiredInAll.all { it in permSet }
         }
 
-        // null installer = pre-installed by OEM; only explicitly non-store installers are sideloaded
         val installer = getInstallerPackage(pm, packageName)
         val isSideloaded = installer != null && installer !in TRUSTED_INSTALLERS
 
@@ -550,10 +505,6 @@ object PermissionMonitor {
         return parts.joinToString(". ").trimEnd('.') + "."
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Public API
-    // ─────────────────────────────────────────────────────────────────────────
-
     fun openAppPermissionSettings(context: Context, packageName: String) {
         val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
             data = Uri.fromParts("package", packageName, null)
@@ -572,12 +523,11 @@ object PermissionMonitor {
 
         return pm.getInstalledApplications(PackageManager.GET_META_DATA)
             .filter { appInfo ->
-                // ── Tier 1: System / OS-level apps – drop entirely ──────────
+
                 val isSystemApp = (appInfo.flags and
                     (ApplicationInfo.FLAG_SYSTEM or ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0
                 if (isSystemApp) return@filter false
 
-                // Only keep apps the user can see in the launcher
                 appInfo.packageName in launcherPackages
             }
             .map { appInfo ->
@@ -590,10 +540,8 @@ object PermissionMonitor {
                     emptyList()
                 }
 
-                // ── Tier 2: Trusted vendor prefix ───────────────────────────
                 val isTrustedByPrefix = TRUSTED_PREFIXES.any { pkg.startsWith(it) }
 
-                // ── Tier 3: Self-exclusion ───────────────────────────────────
                 val isSelf = pkg == hostPackage
 
                 if (isSelf || isTrustedByPrefix || pkg in TRUSTED_PACKAGES) {

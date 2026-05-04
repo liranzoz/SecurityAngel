@@ -15,7 +15,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.firestore.FirebaseFirestore
 
-
 class SignUpActivity : BaseActivity() {
 
     private lateinit var binding: ActivitySignUpBinding
@@ -32,7 +31,6 @@ class SignUpActivity : BaseActivity() {
         auth = FirebaseAuth.getInstance()
         buttonHandler()
         isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
-//        isGoogleSignIn = intent.getBooleanExtra("IS_GOOGLE_SIGN_IN", false)
 
         if (isGoogleSignIn) { setupGoogleMode() }
         setupTextWatchers()

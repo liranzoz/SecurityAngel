@@ -49,14 +49,14 @@ class SettingsActivity : BaseActivity() {
 
     override fun onResume() {
         super.onResume()
-        // Refresh the autofill status each time the user returns (e.g. from system settings).
+
         refreshAutofillRowStatus()
     }
 
     private fun setupFamilyManagementRow(){
 
         with(binding.rowFamilyManagement) {
-            tvTitle.text = "My Family" // הכותרת
+            tvTitle.text = "My Family"
 
             imgIcon.setImageResource(R.drawable.ic_menu_myplaces)
             imgIcon.setColorFilter(getColor(com.example.securityangel.R.color.primary_green_dark))
@@ -67,7 +67,6 @@ class SettingsActivity : BaseActivity() {
             }
         }
 
-
     }
     private fun setupDarkModeRow() {
         with(binding.rowDarkMode) {
@@ -76,8 +75,6 @@ class SettingsActivity : BaseActivity() {
             imgArrow.visibility = View.GONE
             switchSetting.visibility = View.VISIBLE
 
-            // Silence the listener before restoring state so that programmatically
-            // setting isChecked during onCreate doesn't trigger recreate().
             switchSetting.setOnCheckedChangeListener(null)
             switchSetting.isChecked = sharedPrefs.getBoolean("dark_mode", false)
 
@@ -86,9 +83,7 @@ class SettingsActivity : BaseActivity() {
                 AppCompatDelegate.setDefaultNightMode(
                     if (isChecked) AppCompatDelegate.MODE_NIGHT_YES else AppCompatDelegate.MODE_NIGHT_NO
                 )
-                // setDefaultNightMode() triggers recreation internally via AppCompat.
-                // An explicit recreate() here would cause a second recreation race that
-                // manifests as a black flash followed by a revert to the previous theme.
+
             }
         }
     }
@@ -187,10 +182,6 @@ class SettingsActivity : BaseActivity() {
         refreshAutofillRowStatus()
     }
 
-    // Browsers like Chrome and Edge ignore third-party autofill by default and
-    // rely on Google Password Manager.  The user has to switch the autofill
-    // provider inside the browser too — surfacing this up front avoids the
-    // "I enabled it but it doesn't work in Chrome" support loop.
     private fun showAutofillInfoDialog() {
         MaterialAlertDialogBuilder(this)
             .setTitle("Enable Security Angel Autofill")

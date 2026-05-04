@@ -18,7 +18,6 @@ object VaultCryptoManager {
     private const val IV_BYTES     = 12
     private const val SALT_BYTES   = 16
 
-    // Single-entry cache so PBKDF2 runs at most once per (pin, salt) pair per session.
     private var cachedPin: String = ""
     private var cachedSalt: String = ""
     private var cachedKeyBytes: ByteArray = ByteArray(0)

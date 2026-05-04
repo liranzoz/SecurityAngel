@@ -34,7 +34,6 @@ class AppPermissionAdapter(
             tvAppName.text = item.appName
             tvPackageName.text = item.packageName
 
-            // Risk pill
             val (pillBg, pillText, pillLabel) = when (item.riskLevel) {
                 RiskLevel.HIGH   -> Triple(R.color.status_unsafe_bg,  R.color.status_unsafe_text,      "HIGH")
                 RiskLevel.MEDIUM -> Triple(R.color.status_warning_bg, R.color.status_warning_text_red, "MEDIUM")
@@ -45,7 +44,6 @@ class AppPermissionAdapter(
             tvPermissionCount.setTextColor(ContextCompat.getColor(context, pillText))
             tvPermissionCount.backgroundTintList = ContextCompat.getColorStateList(context, pillBg)
 
-            // Third line: OCP summary for risky apps, "Tap for details" hint for trusted
             when {
                 item.riskLevel != RiskLevel.SAFE && item.sensitivePermissionsSummary.isNotEmpty() -> {
                     tvSensitivePerms.visibility = View.VISIBLE
@@ -62,7 +60,6 @@ class AppPermissionAdapter(
                 else -> tvSensitivePerms.visibility = View.GONE
             }
 
-            // Load real app icon
             try {
                 val icon = context.packageManager.getApplicationIcon(item.packageName)
                 ivAppIcon.setImageDrawable(icon)
@@ -70,7 +67,6 @@ class AppPermissionAdapter(
                 ivAppIcon.setPadding(0, 0, 0, 0)
             } catch (_: Exception) { }
 
-            // Tap row → show explanation dialog; tap gear → open system settings
             root.setOnClickListener { onItemClick(item) }
             btnOpenSettings.setOnClickListener { onSettingsClick(item) }
         }

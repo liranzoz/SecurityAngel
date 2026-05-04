@@ -83,8 +83,6 @@ class FamilySafetyActivity : BaseActivity() {
             }
     }
 
-
-
     private fun updateMembersUI(members: List<User>, adminId: String) {
         binding.membersContainer.removeAllViews()
 
@@ -133,7 +131,6 @@ class FamilySafetyActivity : BaseActivity() {
             startActivity(intent)
         }
     }
-
 
     override fun onDestroy() {
         super.onDestroy()

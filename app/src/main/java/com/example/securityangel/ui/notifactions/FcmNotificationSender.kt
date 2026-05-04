@@ -22,7 +22,7 @@ class FcmNotificationSender {
     }
 
     fun sendPush(userId: String, title: String, message: String) {
-        val topic = "/topics/user_$userId" // שליחה לפי נושא (Topic) ייחודי למשתמש
+        val topic = "/topics/user_$userId"
         val notification = PushNotification(
             to = topic,
             notification = NotificationData(title, message)
@@ -37,7 +37,7 @@ class FcmNotificationSender {
     interface FcmApi {
         @Headers(
             "Content-Type: application/json",
-            "Authorization: key=YOUR_SERVER_KEY_HERE" // שים פה את המפתח הארוך מהמסוף
+            "Authorization: key=YOUR_SERVER_KEY_HERE"
         )
         @POST("fcm/send")
         fun sendNotification(@Body body: PushNotification): Call<Void>
