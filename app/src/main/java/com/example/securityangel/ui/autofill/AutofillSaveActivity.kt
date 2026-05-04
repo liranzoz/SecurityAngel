@@ -189,11 +189,12 @@ class AutofillSaveActivity : AppCompatActivity() {
                         VaultCryptoManager.encrypt(username, masterPin, salt)
                     }
 
+                    val normalizedDomain = normalizeDomain(domain)
                     val siteName = extractSiteName(domain)
                     val data = hashMapOf(
                         "siteName"  to siteName,
                         "searchKey" to siteName.lowercase(),
-                        "domain"    to domain,
+                        "domain"    to normalizedDomain,
                         "email"     to encUser,
                         "password"  to encPass
                     )
@@ -242,12 +243,27 @@ class AutofillSaveActivity : AppCompatActivity() {
 
     // ── Utilities ─────────────────────────────────────────────────────────────
 
-    private fun extractSiteName(domain: String): String =
-        domain.removePrefix("www.")
-            .split(".")
-            .firstOrNull()
-            ?.replaceFirstChar { it.uppercase() }
-            ?: domain
+    private fun extractSiteName(domain: String): String {
+        val parts = domain.split(".")
+        // Package names (e.g. "com.facebook.katana") start with a TLD-like prefix;
+        // take the second segment. For real domains take the second-to-last segment.
+        val knownTldPrefixes = setOf("com", "org", "net", "io", "app", "dev", "co")
+        val name = when {
+            parts.size >= 3 && parts.first() in knownTldPrefixes -> parts[1]
+            parts.size >= 2 -> parts[parts.size - 2]
+            else -> parts.firstOrNull() ?: domain
+        }
+        return name.replaceFirstChar { it.uppercase() }
+    }
+
+    private fun normalizeDomain(domain: String): String {
+        val parts = domain.split(".")
+        if (parts.size < 2) return domain
+        val knownTldPrefixes = setOf("com", "org", "net", "io", "app", "dev", "co")
+        // Keep package names unchanged; strip subdomains from real domains.
+        return if (parts.first() in knownTldPrefixes) domain
+        else "${parts[parts.size - 2]}.${parts[parts.size - 1]}"
+    }
 
     private fun toast(msg: String) =
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
