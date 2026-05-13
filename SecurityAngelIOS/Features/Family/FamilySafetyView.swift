@@ -60,11 +60,8 @@ struct FamilySafetyView: View {
     private var summaryCard: some View {
         GlassCard {
             HStack(spacing: 16) {
-                Image(systemName: "person.3.fill")
-                    .font(.system(size: 36))
-                    .foregroundStyle(Brand.primary)
-                    .padding(14)
-                    .liquidGlass(in: Circle(), tint: Brand.primary.opacity(0.15))
+                LottieAnimation(animation: .familyAvatar)
+                    .frame(width: 84, height: 84)
                 VStack(alignment: .leading, spacing: 4) {
                     Text(family?.name ?? "Family")
                         .font(Typography.title)
@@ -110,11 +107,7 @@ struct FamilySafetyView: View {
             SectionHeader("Family Members").padding(.horizontal, 24)
             ForEach(members) { member in
                 HStack(spacing: 14) {
-                    Image(systemName: member.avatarSymbol)
-                        .font(.title)
-                        .foregroundStyle(Brand.primary)
-                        .frame(width: 48, height: 48)
-                        .liquidGlass(in: Circle())
+                    LottieAvatar(gender: member.gender, size: 52)
                     VStack(alignment: .leading, spacing: 2) {
                         HStack(spacing: 6) {
                             Text(member.fullName)

@@ -101,11 +101,7 @@ struct FamilyManagementView: View {
             SectionHeader("Members").padding(.horizontal, 24)
             ForEach(members) { member in
                 HStack(spacing: 14) {
-                    Image(systemName: member.avatarSymbol)
-                        .font(.title)
-                        .foregroundStyle(Brand.primary)
-                        .frame(width: 44, height: 44)
-                        .liquidGlass(in: Circle())
+                    LottieAvatar(gender: member.gender, size: 48)
                     VStack(alignment: .leading) {
                         HStack(spacing: 6) {
                             Text(member.fullName + (member.id == currentUserId ? " (You)" : ""))

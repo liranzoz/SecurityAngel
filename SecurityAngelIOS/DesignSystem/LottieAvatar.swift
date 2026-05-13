@@ -4,13 +4,14 @@ import Lottie
 /// Catalogue of the Lottie animations shipped with the app. Matches the
 /// JSON filenames copied across from the Android `res/raw/` folder.
 enum LottieAnim: String {
-    case vault       = "anim_vault"
-    case family      = "anim_family"
-    case familyBold  = "anim_family_bold"
-    case maleAvatar  = "anim_male_avater"
-    case femaleAvatar = "anim_female_avater"
-    case elseAvatar  = "anim_else_avatar"
-    case loading     = "anim_loading"
+    case vault         = "anim_vault"
+    case family        = "anim_family"
+    case familyBold    = "anim_family_bold"
+    case familyAvatar  = "anim_family_avatar"
+    case maleAvatar    = "anim_male_avater"
+    case femaleAvatar  = "anim_female_avater"
+    case elseAvatar    = "anim_else_avatar"
+    case loading       = "anim_loading"
 
     static func avatar(for gender: String) -> LottieAnim {
         switch gender {

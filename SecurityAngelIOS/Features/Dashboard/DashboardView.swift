@@ -91,7 +91,8 @@ struct DashboardView: View {
                 TileCard {
                     VStack(alignment: .leading, spacing: 8) {
                         LottieAnimation(animation: .vault, speed: 1.0)
-                            .frame(width: 56, height: 56)
+                            .frame(width: 92, height: 92)
+                            .padding(.leading, -6)
                         Spacer()
                         Text("My Vault").font(Typography.sectionTitle)
                         Text(vaultSubtitle).font(.caption).foregroundStyle(vaultSubtitleColor)
@@ -104,7 +105,7 @@ struct DashboardView: View {
                 TileCard {
                     VStack(alignment: .leading, spacing: 8) {
                         LottieAnimation(animation: .familyBold, speed: appState.familyAlertCount > 0 ? 1.2 : 0.5)
-                            .frame(width: 56, height: 56)
+                            .frame(width: 72, height: 72)
                         Spacer()
                         Text("Family Safety").font(Typography.sectionTitle)
                         Text(familySubtitle).font(.caption).foregroundStyle(familySubtitleColor)

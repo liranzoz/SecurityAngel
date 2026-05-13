@@ -36,8 +36,8 @@ struct MenuSheet: View {
 
     private var profileHeader: some View {
         GlassCard {
-            HStack(spacing: 14) {
-                LottieAvatar(gender: user?.gender ?? "", size: 56)
+            HStack(spacing: 16) {
+                LottieAvatar(gender: user?.gender ?? "", size: 80)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(user?.fullName ?? "Signed in")
                         .font(Typography.sectionTitle)

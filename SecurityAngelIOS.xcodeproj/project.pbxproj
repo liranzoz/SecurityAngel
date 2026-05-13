@@ -71,6 +71,7 @@
 		F00000000000000000000044 /* anim_female_avater.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000034 /* anim_female_avater.json */; };
 		F00000000000000000000045 /* anim_else_avatar.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000035 /* anim_else_avatar.json */; };
 		F00000000000000000000046 /* anim_loading.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000036 /* anim_loading.json */; };
+		F00000000000000000000047 /* anim_family_avatar.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000037 /* anim_family_avatar.json */; };
 		F00000000000000000000050 /* LottieAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000020 /* LottieAvatar.swift */; };
 /* End PBXBuildFile section */
 
@@ -139,6 +140,7 @@
 		F00000000000000000000034 /* anim_female_avater.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_female_avater.json; sourceTree = "<group>"; };
 		F00000000000000000000035 /* anim_else_avatar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_else_avatar.json; sourceTree = "<group>"; };
 		F00000000000000000000036 /* anim_loading.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_loading.json; sourceTree = "<group>"; };
+		F00000000000000000000037 /* anim_family_avatar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_family_avatar.json; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -296,6 +298,7 @@
 				F00000000000000000000030 /* anim_vault.json */,
 				F00000000000000000000031 /* anim_family.json */,
 				F00000000000000000000032 /* anim_family_bold.json */,
+				F00000000000000000000037 /* anim_family_avatar.json */,
 				F00000000000000000000033 /* anim_male_avater.json */,
 				F00000000000000000000034 /* anim_female_avater.json */,
 				F00000000000000000000035 /* anim_else_avatar.json */,
@@ -502,6 +505,7 @@
 				F00000000000000000000044 /* anim_female_avater.json in Resources */,
 				F00000000000000000000045 /* anim_else_avatar.json in Resources */,
 				F00000000000000000000046 /* anim_loading.json in Resources */,
+				F00000000000000000000047 /* anim_family_avatar.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
