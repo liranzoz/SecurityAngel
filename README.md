@@ -6,37 +6,49 @@ Liquid-Glass SwiftUI port of the Android `SecurityAngel` app.
 |---|---|
 | 1 — Static UI (all screens, mock data) | ✅ done |
 | 2 — Core logic (crypto, posture, API clients) | ✅ done |
-| 3 — Firebase Auth + Firestore repositories | ⏳ next |
+| 3 — Firebase Auth + Firestore repositories + wired views | ✅ done |
 | 4 — AutoFill Credential Provider extension | ⏳ later |
 | 5 — Push notifications (APNs + FCM) | ⏳ later |
+| 6 — Google Sign-In | ⏳ later |
 
 ## Requirements
 
 - Xcode 26.0+
 - iOS 18.0+ deployment target (Liquid Glass renders natively on iOS 26+; older iOS gets a `.regularMaterial` fallback)
+- Firebase project — see setup below
+
+## First-run setup
+
+### 1. Drop in `GoogleService-Info.plist`
+
+1. Open your existing Firebase project in the [Firebase console](https://console.firebase.google.com/).
+2. **Add app → iOS**, enter bundle id **`com.zoz.SecurityAngelIOS`**.
+3. Download **`GoogleService-Info.plist`**.
+4. Drop it into `SecurityAngelIOS/SecurityAngelIOS/` (next to the `App/` folder).
+5. In Xcode's Project Navigator, drag the file into the `SecurityAngelIOS` group — check "Copy items if needed" + the SecurityAngelIOS target.
+
+Without this file the app launches into a setup-instructions screen and stays out of Firebase calls; the build itself still succeeds.
+
+### 2. Set API keys for VirusTotal + Gemini
+
+`Secrets.swift` reads env vars. Set them on the **Run** action of the scheme:
+
+> Product → Scheme → Edit Scheme… → **Run → Arguments → Environment Variables**
+
+| Name | Value |
+|---|---|
+| `GEMINI_API_KEY` | your Gemini key (same as Android `local.properties`) |
+| `VIRUSTOTAL_API_KEY` | your VirusTotal key |
+
+### 3. ⌘R
+
+Sign up (email verification required, same as Android), or sign in with an existing Firestore account.
 
 ## How to open
 
 ```bash
 open SecurityAngelIOS.xcodeproj
 ```
-
-Pick an iPhone 16 / 17 simulator and hit ⌘R.
-
-## API keys (Gemini + VirusTotal)
-
-`Secrets.swift` reads from environment variables by default. Set them on the **Run** action of the scheme:
-
-> Product → Scheme → Edit Scheme… → **Run** → **Arguments** → **Environment Variables**
-
-Add:
-
-| Name | Value |
-|---|---|
-| `GEMINI_API_KEY` | your Gemini key (same one Android uses) |
-| `VIRUSTOTAL_API_KEY` | your VirusTotal key |
-
-Or, for local dev only, hardcode them in `State/Secrets.swift` and add `Secrets.swift` to `.gitignore`.
 
 ## Layout
 
@@ -49,30 +61,41 @@ SecurityAngelIOS/
 │   ├── VaultCryptoManager.swift  (AES-GCM + PBKDF2 — byte-compatible with Android)
 │   └── KeychainHelper.swift      (biometric-wrapped PIN, .biometryCurrentSet)
 ├── Services/
-│   ├── JailbreakDetector.swift   (iOS analogue of RootDetector)
+│   ├── JailbreakDetector.swift
 │   ├── DevicePostureService.swift
-│   ├── VirusTotalAPI.swift       (URLSession, full scan flow)
-│   ├── HaveIBeenPwnedAPI.swift   (k-anonymity password breach check)
-│   └── GeminiAPI.swift           (REST, multimodal, system-context builder)
+│   ├── VirusTotalAPI.swift
+│   ├── HaveIBeenPwnedAPI.swift
+│   ├── GeminiAPI.swift
+│   ├── AuthRepository.swift           (FirebaseAuth)
+│   ├── UserRepository.swift           (users/{uid})
+│   ├── FamilyRepository.swift         (families + members)
+│   ├── InvitationRepository.swift     (invitations/{email})
+│   ├── VaultRepository.swift          (encrypted vault CRUD)
+│   ├── ScanHistoryRepository.swift
+│   ├── ChatHistoryRepository.swift
+│   └── SecurityLogger.swift           (security_logs + risk-count updates)
 ├── Logic/
-│   ├── ScoreCalculator.swift     (personal + family + permissions blend)
+│   ├── ScoreCalculator.swift
 │   ├── DomainMatcher.swift
 │   └── SecurityConstants.swift
 ├── State/
-│   └── Secrets.swift             (API key lookup)
+│   ├── FirebaseSupport.swift          (guarded FirebaseApp.configure())
+│   ├── AppState.swift                 (@Observable root — owns repos + listeners)
+│   ├── VaultSession.swift             (in-memory PIN + salt cache)
+│   └── Secrets.swift                  (API key lookup)
 ├── Features/
-│   ├── Auth/      LoginView · SignUpView
-│   ├── Dashboard/ DashboardView
-│   ├── Scanner/   URLScannerView (real VirusTotal calls)
-│   ├── AI/        AIChatView (real Gemini multimodal) · ChatBubble
-│   ├── Vault/     PasswordVaultView (real Face ID unlock) · Row · AddSheet
+│   ├── Auth/      LoginView · SignUpView                        (Firebase Auth)
+│   ├── Dashboard/ DashboardView                                 (real score)
+│   ├── Scanner/   URLScannerView                                (VirusTotal → Firestore)
+│   ├── AI/        AIChatView (Gemini + real RAG context)         · ChatBubble
+│   ├── Vault/     PasswordVaultView (Firestore + crypto)         · Row · AddSheet
 │   ├── Generator/ PasswordGeneratorView
-│   ├── Family/    Safety · Management · AddMember · JoinFamily
+│   ├── Family/    Safety · Management · AddMember (invites) · JoinFamily
 │   ├── Posture/   DevicePostureView (real jailbreak detection)
-│   ├── Logs/      SecurityLogView
-│   ├── Settings/  SettingsView
+│   ├── Logs/      SecurityLogView (admin-only family timeline)
+│   ├── Settings/  SettingsView (real sign out)
 │   └── Menu/      MenuSheet
-└── Mock/          MockData (still used by Vault/Family/Logs until Firebase lands)
+└── Mock/          MockData (preview-only fixtures)
 ```
 
 ## Navigation
@@ -87,32 +110,40 @@ Five-tab `TabView`:
 | Vault  | PasswordVaultView     |
 | Family | FamilySafetyView      |
 
-The hamburger button in any header opens `MenuSheet` for: Family Management, Password Generator, Device Posture, Activity Log, Settings.
+The hamburger button in any header opens `MenuSheet` (Family Management, Password Generator, Device Posture, Activity Log, Settings).
+
+## Cross-platform parity
+
+- **Same Firebase project** — sign in with an existing Android user, see the same `users/{uid}` doc, family membership, vault, scans, chat history, security logs.
+- **Vault crypto is byte-for-byte compatible with Android**: PBKDF2-HMAC-SHA256, 100,000 iterations, 256-bit key, AES-256-GCM with 12-byte IV + 16-byte tag, base64. Decrypt-from-Android works without any transformation.
+- **Same Firestore schema** — `users/{uid}/vault/{id}`, `users/{uid}/scans/{id}`, `users/{uid}/chat_history/{id}`, `families/{familyId}`, `invitations/{email}`, `security_logs/{id}`. Field names match Android exactly.
+- **Same Gemini prompt format** — `SYSTEM_CONTEXT` block with vault/family/scan/posture stats, then user input. `[ACTION:CODE]` tag parsing works.
 
 ## Differences from Android
 
-- **No hamburger drawer** — replaced with `TabView` + an overflow `MenuSheet`, per Apple HIG.
+- **TabView + MenuSheet** instead of a hamburger drawer (Apple HIG).
 - **No Permission Monitor** — iOS sandboxes other apps' permissions. Replaced by `DevicePostureView` (jailbreak, passcode set, biometrics, sandbox integrity, Lockdown Mode).
-- **Root Check** → folded into `DevicePostureView`.
-- **Vault crypto is byte-for-byte compatible with Android**: PBKDF2-HMAC-SHA256, 100,000 iterations, 256-bit key, AES-256-GCM with 12-byte IV + 16-byte tag, base64 wire format. Vault docs encrypted on either platform decrypt on the other.
-- **Gemini** via REST (no SDK dependency). System-context prompt and `[ACTION:CODE]` tag parsing match Android exactly.
-- **Glide favicons** → SwiftUI `AsyncImage` from `google.com/s2/favicons`.
-- **Lottie** → SF Symbols for now; can adopt Lottie-iOS later.
+- **Root Check** folded into `DevicePostureView`.
+- **AI chat action deep-links**: the alert confirmation appears but actual navigation will be wired in a follow-up (needs tab + sheet bindings exposed to AIChatView).
+- **Email verification flow**: same as Android.
+- **No Google Sign-In yet** — needs `REVERSED_CLIENT_ID` URL scheme in Info.plist.
+- **No push notifications yet** — Android's legacy FCM HTTP API was deprecated mid-2024; iOS path is APNs + a Cloud Function.
 
-## What works right now without Firebase
+## What works now
 
-- ✅ URL scanner with real VirusTotal lookup → submit → poll → final report.
-- ✅ AI chat with real Gemini multimodal (text + photo).
-- ✅ Device posture with real jailbreak detection.
-- ✅ Vault Face ID unlock via Keychain biometric-wrapped PIN (the PIN itself is set up next phase, with sign-in).
-- ✅ Password generator.
+- ✅ Sign up + email verification + sign in (Firebase Auth).
+- ✅ Per-user Firestore document with realtime listener.
+- ✅ Family create / invite (6-digit code + share sheet) / join / remove member.
+- ✅ Password vault: encrypted CRUD with Android-compatible crypto, search, Face ID unlock, "scan for leaks" via HIBP, leak flagging persisted to Firestore.
+- ✅ URL scanner persists results to `users/{uid}/scans` and logs to `security_logs`.
+- ✅ AI chat with real RAG context (vault counts, family status, last scan, jailbreak), persisted to `chat_history`.
+- ✅ Dashboard shows real personal score (or family-blended for admins), real recent scans, real family alert count.
+- ✅ Activity log: admin-only view of `security_logs` with snapshot listener + clear-all.
+- ✅ Settings sign-out clears Keychain PIN + vault session + Firebase Auth.
 
-## What's coming next phase
+## Next phase ideas
 
-- Firebase Auth (email + Google sign-in) → real Login/SignUp.
-- Firestore repositories for users, families, vault, scans, chat history, security logs, invitations.
-- Vault wired to Firestore using the byte-compatible crypto.
-- Real per-user security score on Dashboard (admin gets family-blended score).
-- Family Safety with live snapshot listeners.
-- Activity log (admin-only).
-- Real settings (dark mode, screenshot block via `FLAG_SECURE` equivalent, sign out).
+- AutoFill extension (`ASCredentialProviderViewController`) sharing the Keychain access group + vault Firestore reads.
+- Google Sign-In + URL scheme.
+- APNs + Cloud Function for family admin alerts.
+- Hook the AI's `[ACTION:OPEN_VAULT]` etc. into actual tab + sheet navigation.
