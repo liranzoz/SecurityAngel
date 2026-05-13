@@ -27,9 +27,9 @@ extension SecurityUser {
 
     var avatarSymbol: String {
         switch gender {
-        case "Male":   return "person.crop.circle.fill"
-        case "Female": return "person.crop.circle.badge.heart"
-        default:       return "person.crop.circle"
+        case "Male":   return "figure.stand"
+        case "Female": return "figure.dress"
+        default:       return "person.crop.circle.fill"
         }
     }
 }
