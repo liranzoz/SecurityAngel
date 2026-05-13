@@ -14,8 +14,13 @@ final class ScanHistoryRepository {
         scans(for: uid)
             .order(by: "timestamp", descending: true)
             .limit(to: limit)
-            .addSnapshotListener { snapshot, _ in
-                let items = snapshot?.documents.compactMap { try? $0.data(as: ScanHistoryItem.self) } ?? []
+            .addSnapshotListener { snapshot, error in
+                if let error {
+                    print("⚠️ ScanHistoryRepository.observe error: \(error.localizedDescription)")
+                    onChange([])
+                    return
+                }
+                let items = snapshot?.documents.compactMap(Self.decode(_:)) ?? []
                 onChange(items)
             }
     }
@@ -25,16 +30,26 @@ final class ScanHistoryRepository {
             .order(by: "timestamp", descending: true)
             .limit(to: 1)
             .getDocuments()
-        return try snapshot.documents.first?.data(as: ScanHistoryItem.self)
+        return snapshot.documents.first.flatMap(Self.decode(_:))
     }
 
     func save(uid: String, url: String, isSafe: Bool) async throws {
-        let item = ScanHistoryItem(
-            id: UUID().uuidString,
-            url: url,
-            status: isSafe ? "safe" : "unsafe",
-            timestamp: Int64(Date().timeIntervalSince1970 * 1000)
+        let data: [String: Any] = [
+            "url":       url,
+            "status":    isSafe ? "safe" : "unsafe",
+            "timestamp": Int64(Date().timeIntervalSince1970 * 1000)
+        ]
+        _ = try await scans(for: uid).addDocument(data: data)
+    }
+
+    private static func decode(_ doc: QueryDocumentSnapshot) -> ScanHistoryItem? {
+        let d = doc.data()
+        let ts = (d["timestamp"] as? Int64) ?? Int64((d["timestamp"] as? Int) ?? 0)
+        return ScanHistoryItem(
+            id:        doc.documentID,
+            url:       d["url"]    as? String ?? "",
+            status:    d["status"] as? String ?? "",
+            timestamp: ts
         )
-        _ = try scans(for: uid).addDocument(from: item)
     }
 }

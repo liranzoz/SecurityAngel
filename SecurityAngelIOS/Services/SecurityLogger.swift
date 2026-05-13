@@ -20,12 +20,13 @@ final class SecurityLogger {
     func observeFamilyLogs(familyId: String, onChange: @escaping ([SecurityLogDoc]) -> Void) -> ListenerRegistration {
         logs.whereField("familyId", isEqualTo: familyId)
             .order(by: "timestamp", descending: true)
-            .addSnapshotListener { snapshot, _ in
-                let entries = snapshot?.documents.compactMap { snap -> SecurityLogDoc? in
-                    guard var log = try? snap.data(as: SecurityLogDoc.self) else { return nil }
-                    log.id = snap.documentID
-                    return log
-                } ?? []
+            .addSnapshotListener { snapshot, error in
+                if let error {
+                    print("⚠️ SecurityLogger.observe error: \(error.localizedDescription)")
+                    onChange([])
+                    return
+                }
+                let entries = snapshot?.documents.compactMap(Self.decode(_:)) ?? []
                 onChange(entries)
             }
     }
@@ -39,8 +40,6 @@ final class SecurityLogger {
 
     // MARK: - Write
 
-    /// Resolve the current user, then drop a log entry into `security_logs`.
-    /// No-ops if the user isn't part of a family.
     func logEvent(uid: String, eventType: EventType, description: String) async throws {
         let userSnap = try await users.document(uid).getDocument()
         guard let familyId = userSnap.get("familyId") as? String, !familyId.isEmpty else { return }
@@ -49,16 +48,16 @@ final class SecurityLogger {
         let userName  = "\(firstName) \(lastName)".trimmingCharacters(in: .whitespaces)
 
         let ref = logs.document()
-        let log = SecurityLogDoc(
-            id: ref.documentID,
-            familyId: familyId,
-            userId: uid,
-            userName: userName,
-            eventType: eventType.rawValue,
-            description: description,
-            timestamp: Int64(Date().timeIntervalSince1970 * 1000)
-        )
-        try ref.setData(from: log)
+        let data: [String: Any] = [
+            "id":          ref.documentID,
+            "familyId":    familyId,
+            "userId":      uid,
+            "userName":    userName,
+            "eventType":   eventType.rawValue,
+            "description": description,
+            "timestamp":   Int64(Date().timeIntervalSince1970 * 1000)
+        ]
+        try await ref.setData(data)
     }
 
     // MARK: - Risk score
@@ -85,5 +84,21 @@ final class SecurityLogger {
         let snap = try await users.document(uid).getDocument()
         let risks = snap.get("activeRisks") as? [String] ?? []
         try await users.document(uid).updateData(["riskCount": risks.count])
+    }
+
+    // MARK: - Decode
+
+    private static func decode(_ doc: QueryDocumentSnapshot) -> SecurityLogDoc? {
+        let d = doc.data()
+        let ts = (d["timestamp"] as? Int64) ?? Int64((d["timestamp"] as? Int) ?? 0)
+        return SecurityLogDoc(
+            id:          doc.documentID,
+            familyId:    d["familyId"]    as? String ?? "",
+            userId:      d["userId"]      as? String ?? "",
+            userName:    d["userName"]    as? String ?? "",
+            eventType:   d["eventType"]   as? String ?? "",
+            description: d["description"] as? String ?? "",
+            timestamp:   ts
+        )
     }
 }

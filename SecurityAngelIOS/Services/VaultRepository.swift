@@ -6,6 +6,13 @@ import FirebaseFirestore
 /// All plaintext encryption happens here before writing to Firestore.
 /// All decryption happens at read time on the caller's side via the
 /// `decrypt(_:pin:salt:)` helper.
+///
+/// Documents are decoded manually from the raw dictionary rather than
+/// through `Codable`. Swift's synthesized `Codable.init(from:)` throws
+/// `keyNotFound` for any non-Optional field that is absent from the
+/// document — and `id` is never present in Firestore docs (it lives as
+/// the doc id). Manual decoding lets us fall back to defaults for any
+/// missing field and never silently drops a row.
 final class VaultRepository {
 
     private var db: Firestore { Firestore.firestore() }
@@ -17,14 +24,35 @@ final class VaultRepository {
     // MARK: - Read
 
     func observe(uid: String, onChange: @escaping ([VaultEntry]) -> Void) -> ListenerRegistration {
-        vault(for: uid).addSnapshotListener { snapshot, _ in
-            let entries = snapshot?.documents.compactMap { doc -> VaultEntry? in
-                guard var entry = try? doc.data(as: VaultEntry.self) else { return nil }
-                entry.id = doc.documentID
-                return entry
-            } ?? []
+        vault(for: uid).addSnapshotListener { snapshot, error in
+            if let error {
+                print("⚠️ VaultRepository.observe error: \(error.localizedDescription)")
+                onChange([])
+                return
+            }
+            guard let snapshot else {
+                onChange([])
+                return
+            }
+            let entries = snapshot.documents.compactMap(Self.decode(_:))
             onChange(entries)
         }
+    }
+
+    /// Manual decode. Robust to missing or extra fields.
+    private static func decode(_ doc: QueryDocumentSnapshot) -> VaultEntry? {
+        let d = doc.data()
+        let entry = VaultEntry(
+            id:        doc.documentID,
+            searchKey: d["searchKey"] as? String ?? "",
+            siteName:  d["siteName"]  as? String ?? "",
+            email:     d["email"]     as? String ?? "",
+            domain:    d["domain"]    as? String ?? "",
+            password:  d["password"]  as? String ?? "",
+            isLeaked:  d["isLeaked"]  as? Bool   ?? false
+        )
+        guard !entry.siteName.isEmpty || !entry.password.isEmpty else { return nil }
+        return entry
     }
 
     /// In-place decrypt of one entry. Caller supplies the active PIN + salt.

@@ -26,14 +26,14 @@ final class FamilyRepository {
 
     func createFamily(admin: SecurityUser, name: String) async throws -> String {
         let ref = families.document()
-        let family = SecurityFamily(
-            id: ref.documentID,
-            adminId: admin.id,
-            name: name,
-            members: [admin.id]
-        )
+        let data: [String: Any] = [
+            "id":      ref.documentID,
+            "adminId": admin.id,
+            "name":    name,
+            "members": [admin.id]
+        ]
         let batch = db.batch()
-        try batch.setData(from: family, forDocument: ref)
+        batch.setData(data, forDocument: ref)
         batch.updateData(["familyId": ref.documentID], forDocument: users.document(admin.id))
         try await batch.commit()
         return ref.documentID
@@ -71,26 +71,23 @@ final class FamilyRepository {
 
     func get(id: String) async throws -> SecurityFamily? {
         let snapshot = try await families.document(id).getDocument()
-        guard snapshot.exists else { return nil }
-        var family = try snapshot.data(as: SecurityFamily.self)
-        family.id = snapshot.documentID
-        return family
+        return Self.decode(snapshot)
     }
 
     func observeMembers(familyId: String, onChange: @escaping ([SecurityUser]) -> Void) -> ListenerRegistration {
-        users.whereField("familyId", isEqualTo: familyId).addSnapshotListener { snapshot, _ in
-            let members = snapshot?.documents.compactMap { snap -> SecurityUser? in
-                guard var u = try? snap.data(as: SecurityUser.self) else { return nil }
-                u.id = snap.documentID
-                return u
-            } ?? []
+        users.whereField("familyId", isEqualTo: familyId).addSnapshotListener { snapshot, error in
+            if let error {
+                print("⚠️ FamilyRepository.observeMembers error: \(error.localizedDescription)")
+                onChange([])
+                return
+            }
+            let members = snapshot?.documents.compactMap { UserRepository.decode($0) } ?? []
             onChange(members)
         }
     }
 
     // MARK: - Join via invitation
 
-    /// Atomically attach `userId` to `familyId` and remove the invitation.
     func joinFamily(userId: String, familyId: String, invitationEmail: String) async throws {
         let batch = db.batch()
         batch.updateData(["familyId": familyId], forDocument: users.document(userId))
@@ -100,5 +97,17 @@ final class FamilyRepository {
         )
         batch.deleteDocument(db.collection("invitations").document(invitationEmail))
         try await batch.commit()
+    }
+
+    // MARK: - Decode
+
+    private static func decode(_ snapshot: DocumentSnapshot?) -> SecurityFamily? {
+        guard let snapshot, snapshot.exists, let d = snapshot.data() else { return nil }
+        return SecurityFamily(
+            id:      snapshot.documentID,
+            adminId: d["adminId"] as? String ?? "",
+            name:    d["name"]    as? String ?? "",
+            members: d["members"] as? [String] ?? []
+        )
     }
 }
