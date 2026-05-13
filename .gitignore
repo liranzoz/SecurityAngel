@@ -12,11 +12,14 @@ DerivedData/
 ## Swift Package Manager
 .swiftpm/
 .build/
-Package.resolved
+# Package.resolved is kept in git so SPM pins are reproducible.
 
 ## CocoaPods (if used later)
 Pods/
-*.xcworkspace
+# Don't blanket-ignore .xcworkspace — Xcode requires
+# .xcodeproj/project.xcworkspace/contents.xcworkspacedata to wire SPM
+# products into targets. Ignore only top-level / Pods workspaces.
+/*.xcworkspace
 
 ## fastlane
 fastlane/report.xml
