@@ -1,4 +1,5 @@
 import SwiftUI
+import FirebaseAuth
 
 @main
 struct SecurityAngelIOSApp: App {
@@ -7,6 +8,12 @@ struct SecurityAngelIOSApp: App {
 
     init() {
         _ = FirebaseSupport.isConfigured
+        // Make the Firebase Auth session live in the shared keychain group
+        // so the AutoFill extension sees the same currentUser without
+        // requiring a second sign-in.
+        if let group = SharedKeychain.fullGroupID {
+            try? Auth.auth().useUserAccessGroup(group)
+        }
     }
 
     var body: some Scene {

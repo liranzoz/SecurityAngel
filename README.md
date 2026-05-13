@@ -7,9 +7,41 @@ Liquid-Glass SwiftUI port of the Android `SecurityAngel` app.
 | 1 — Static UI (all screens, mock data) | ✅ done |
 | 2 — Core logic (crypto, posture, API clients) | ✅ done |
 | 3 — Firebase Auth + Firestore repositories + wired views | ✅ done |
-| 4 — AutoFill Credential Provider extension | ⏳ later |
+| 4 — AutoFill Credential Provider extension | ✅ done |
 | 5 — Push notifications (APNs + FCM) | ⏳ later |
 | 6 — Google Sign-In | ⏳ later |
+
+## Enabling AutoFill
+
+The build produces a second target, `SecurityAngelAutoFill`, embedded in
+the main app as a Credential Provider extension. To wire it into iOS:
+
+1. Run the app on the simulator at least once and sign in.
+2. On the simulator: **Settings → General → AutoFill & Passwords**.
+3. Under "AutoFill From", turn on **Security Angel**.
+4. Focus a password field in another app or Safari — Security Angel
+   appears above the keyboard, taps in unlock the vault with Face ID
+   (or master PIN), then fills the matching credential.
+
+### How it shares state with the main app
+
+- **Keychain Access Group** `com.zoz.SecurityAngelIOS` (declared in both
+  targets' entitlements) is the rendezvous point.
+- `Auth.auth().useUserAccessGroup(…)` puts the Firebase Auth session in
+  the shared group, so the extension's `Auth.auth().currentUser` is the
+  same user that's signed in inside the app.
+- `KeychainHelper` reads/writes the master vault PIN through the same
+  shared group, so Face ID unlock works inside the extension.
+- Firestore in the extension reads `users/{uid}/vault` and filters by
+  `domain` before decryption.
+
+### One-time signing setup (real devices)
+
+The simulator works with "Sign to Run Locally". For a physical device
+you need an Apple Developer Team selected in **Signing & Capabilities**
+for both targets — same team for app + extension so the keychain access
+group resolves to the same `TEAMID.com.zoz.SecurityAngelIOS` string in
+both processes.
 
 ## Requirements
 

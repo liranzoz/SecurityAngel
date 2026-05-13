@@ -8,6 +8,9 @@ import Security
 /// - The Keychain entry's access control requires `.biometryCurrentSet`, so
 ///   it can only be read after Face/Touch ID succeeds and the PIN is
 ///   automatically invalidated when the user re-enrolls biometrics.
+/// - All read/write queries are scoped to the **shared keychain access
+///   group** so the AutoFill extension can read the same PIN after the
+///   user authenticates with Face ID inside the extension.
 enum KeychainHelper {
 
     private static let service = "com.zoz.SecurityAngelIOS.vaultPIN"
@@ -20,6 +23,18 @@ enum KeychainHelper {
         case noStoredPIN
     }
 
+    /// Mix the shared keychain access group into every query when we can
+    /// resolve it. On simulator builds without a team prefix the helper
+    /// falls back to the app's default group — the main app still works,
+    /// the extension just can't share until signing is configured.
+    private static func scoped(_ query: [String: Any]) -> [String: Any] {
+        var q = query
+        if let group = SharedKeychain.fullGroupID {
+            q[kSecAttrAccessGroup as String] = group
+        }
+        return q
+    }
+
     // MARK: - Capability
 
     static var biometricsAvailable: Bool {
@@ -29,14 +44,14 @@ enum KeychainHelper {
     }
 
     static var hasStoredPIN: Bool {
-        var query: [String: Any] = [
+        let query: [String: Any] = scoped([
             kSecClass as String:       kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account,
             kSecMatchLimit as String:  kSecMatchLimitOne,
             kSecReturnAttributes as String: false,
             kSecUseAuthenticationUI as String: kSecUseAuthenticationUIFail
-        ]
+        ])
         var dataTypeRef: AnyObject?
         let status = SecItemCopyMatching(query as CFDictionary, &dataTypeRef)
         return status == errSecSuccess || status == errSecInteractionNotAllowed
@@ -59,19 +74,19 @@ enum KeychainHelper {
             throw KeychainError.accessControlCreationFailed
         }
 
-        let attributes: [String: Any] = [
+        let attributes: [String: Any] = scoped([
             kSecClass as String:           kSecClassGenericPassword,
             kSecAttrService as String:     service,
             kSecAttrAccount as String:     account,
             kSecValueData as String:       pinData,
             kSecAttrAccessControl as String: access
-        ]
+        ])
 
-        SecItemDelete([
+        SecItemDelete(scoped([
             kSecClass as String:       kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account
-        ] as CFDictionary)
+        ]) as CFDictionary)
 
         let status = SecItemAdd(attributes as CFDictionary, nil)
         guard status == errSecSuccess else { throw KeychainError.unexpectedStatus(status) }
@@ -86,14 +101,14 @@ enum KeychainHelper {
         context.localizedReason = promptReason
         context.touchIDAuthenticationAllowableReuseDuration = 10
 
-        let query: [String: Any] = [
+        let query: [String: Any] = scoped([
             kSecClass as String:           kSecClassGenericPassword,
             kSecAttrService as String:     service,
             kSecAttrAccount as String:     account,
             kSecReturnData as String:      true,
             kSecMatchLimit as String:      kSecMatchLimitOne,
             kSecUseAuthenticationContext as String: context
-        ]
+        ])
 
         return try await withCheckedThrowingContinuation { (cont: CheckedContinuation<String, Error>) in
             DispatchQueue.global(qos: .userInitiated).async {
@@ -120,10 +135,10 @@ enum KeychainHelper {
     // MARK: - Delete
 
     static func clear() {
-        SecItemDelete([
+        SecItemDelete(scoped([
             kSecClass as String:       kSecClassGenericPassword,
             kSecAttrService as String: service,
             kSecAttrAccount as String: account
-        ] as CFDictionary)
+        ]) as CFDictionary)
     }
 }
