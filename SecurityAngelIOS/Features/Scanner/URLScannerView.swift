@@ -10,6 +10,8 @@ enum ScanState {
 
 struct URLScannerView: View {
     @Binding var showMenu: Bool
+    @Environment(AppState.self) private var appState
+
     @State private var url: String = ""
     @State private var state: ScanState = .idle
     @State private var engineResults: [VTEngineResult] = []
@@ -186,14 +188,25 @@ struct URLScannerView: View {
     @MainActor
     private func applyResult(_ attrs: VTAttributes) {
         let malicious = attrs.maliciousCount
-        state = malicious == 0 ? .safe(maliciousCount: 0) : .unsafe(maliciousCount: malicious)
+        let isSafe = malicious == 0
+        state = isSafe ? .safe(maliciousCount: 0) : .unsafe(maliciousCount: malicious)
         engineResults = (attrs.lastAnalysisResults ?? [:]).values
             .sorted { lhs, rhs in
-                let lc = lhs.isClean
-                let rc = rhs.isClean
-                if lc != rc { return !lc }
+                if lhs.isClean != rhs.isClean { return !lhs.isClean }
                 return (lhs.engineName ?? "") < (rhs.engineName ?? "")
             }
+
+        if let uid = appState.firebaseUserId {
+            let urlCopy = url
+            Task {
+                try? await appState.scanRepo.save(uid: uid, url: urlCopy, isSafe: isSafe)
+                try? await appState.logger.logEvent(
+                    uid: uid,
+                    eventType: isSafe ? .scanSafe : .malware,
+                    description: "Website \(urlCopy) is \(isSafe ? "safe" : "not safe!")"
+                )
+            }
+        }
     }
 
     private var displayEngines: [VTEngineResult] {
@@ -256,4 +269,5 @@ struct URLScannerView: View {
 
 #Preview {
     URLScannerView(showMenu: .constant(false))
+        .environment(AppState())
 }

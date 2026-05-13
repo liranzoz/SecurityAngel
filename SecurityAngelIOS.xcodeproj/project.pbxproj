@@ -49,6 +49,19 @@
 		D00000000000000000000029 /* DomainMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000029 /* DomainMatcher.swift */; };
 		D0000000000000000000002A /* SecurityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000002A /* SecurityConstants.swift */; };
 		D0000000000000000000002B /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000002B /* Secrets.swift */; };
+		E00000000000000000000020 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000010 /* FirebaseAuth */; };
+		E00000000000000000000021 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000011 /* FirebaseFirestore */; };
+		D00000000000000000000030 /* FirebaseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000030 /* FirebaseSupport.swift */; };
+		D00000000000000000000031 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000031 /* AppState.swift */; };
+		D00000000000000000000032 /* VaultSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000032 /* VaultSession.swift */; };
+		D00000000000000000000033 /* AuthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000033 /* AuthRepository.swift */; };
+		D00000000000000000000034 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000034 /* UserRepository.swift */; };
+		D00000000000000000000035 /* FamilyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000035 /* FamilyRepository.swift */; };
+		D00000000000000000000036 /* VaultRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000036 /* VaultRepository.swift */; };
+		D00000000000000000000037 /* ScanHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000037 /* ScanHistoryRepository.swift */; };
+		D00000000000000000000038 /* ChatHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000038 /* ChatHistoryRepository.swift */; };
+		D00000000000000000000039 /* SecurityLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000039 /* SecurityLogger.swift */; };
+		D0000000000000000000003A /* InvitationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000003A /* InvitationRepository.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -96,6 +109,17 @@
 		C00000000000000000000029 /* DomainMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainMatcher.swift; sourceTree = "<group>"; };
 		C0000000000000000000002A /* SecurityConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityConstants.swift; sourceTree = "<group>"; };
 		C0000000000000000000002B /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		C00000000000000000000030 /* FirebaseSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseSupport.swift; sourceTree = "<group>"; };
+		C00000000000000000000031 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		C00000000000000000000032 /* VaultSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultSession.swift; sourceTree = "<group>"; };
+		C00000000000000000000033 /* AuthRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000034 /* UserRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000035 /* FamilyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000036 /* VaultRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000037 /* ScanHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanHistoryRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000038 /* ChatHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000039 /* SecurityLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityLogger.swift; sourceTree = "<group>"; };
+		C0000000000000000000003A /* InvitationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationRepository.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -103,6 +127,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E00000000000000000000020 /* FirebaseAuth in Frameworks */,
+				E00000000000000000000021 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -168,6 +194,14 @@
 				C00000000000000000000025 /* VirusTotalAPI.swift */,
 				C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */,
 				C00000000000000000000027 /* GeminiAPI.swift */,
+				C00000000000000000000033 /* AuthRepository.swift */,
+				C00000000000000000000034 /* UserRepository.swift */,
+				C00000000000000000000035 /* FamilyRepository.swift */,
+				C0000000000000000000003A /* InvitationRepository.swift */,
+				C00000000000000000000036 /* VaultRepository.swift */,
+				C00000000000000000000037 /* ScanHistoryRepository.swift */,
+				C00000000000000000000038 /* ChatHistoryRepository.swift */,
+				C00000000000000000000039 /* SecurityLogger.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -186,6 +220,9 @@
 			isa = PBXGroup;
 			children = (
 				C0000000000000000000002B /* Secrets.swift */,
+				C00000000000000000000030 /* FirebaseSupport.swift */,
+				C00000000000000000000031 /* AppState.swift */,
+				C00000000000000000000032 /* VaultSession.swift */,
 			);
 			path = State;
 			sourceTree = "<group>";
@@ -360,6 +397,8 @@
 			);
 			name = SecurityAngelIOS;
 			packageProductDependencies = (
+				E00000000000000000000010 /* FirebaseAuth */,
+				E00000000000000000000011 /* FirebaseFirestore */,
 			);
 			productName = SecurityAngelIOS;
 			productReference = A19999999999999999999999 /* SecurityAngelIOS.app */;
@@ -391,6 +430,9 @@
 			mainGroup = A0BBBBBBBBBBBBBBBBBBBBBB;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
+			packageReferences = (
+				E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+			);
 			productRefGroup = A0CCCCCCCCCCCCCCCCCCCCCC /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -399,6 +441,30 @@
 			);
 		};
 /* End PBXProject section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		E00000000000000000000010 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		E00000000000000000000011 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin PBXResourcesBuildPhase section */
 		A18888888888888888888888 /* Resources */ = {
@@ -457,6 +523,17 @@
 				D00000000000000000000029 /* DomainMatcher.swift in Sources */,
 				D0000000000000000000002A /* SecurityConstants.swift in Sources */,
 				D0000000000000000000002B /* Secrets.swift in Sources */,
+				D00000000000000000000030 /* FirebaseSupport.swift in Sources */,
+				D00000000000000000000031 /* AppState.swift in Sources */,
+				D00000000000000000000032 /* VaultSession.swift in Sources */,
+				D00000000000000000000033 /* AuthRepository.swift in Sources */,
+				D00000000000000000000034 /* UserRepository.swift in Sources */,
+				D00000000000000000000035 /* FamilyRepository.swift in Sources */,
+				D0000000000000000000003A /* InvitationRepository.swift in Sources */,
+				D00000000000000000000036 /* VaultRepository.swift in Sources */,
+				D00000000000000000000037 /* ScanHistoryRepository.swift in Sources */,
+				D00000000000000000000038 /* ChatHistoryRepository.swift in Sources */,
+				D00000000000000000000039 /* SecurityLogger.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

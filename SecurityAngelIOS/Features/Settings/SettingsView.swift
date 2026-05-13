@@ -3,11 +3,11 @@ import SwiftUI
 struct SettingsView: View {
     var onSignOut: () -> Void
 
+    @Environment(AppState.self) private var appState
     @AppStorage("dark_mode") private var darkMode = false
     @AppStorage("biometric_enabled") private var biometricEnabled = true
-    @AppStorage("prevent_screenshots") private var preventScreenshots = false
 
-    private let user = MockData.currentUser
+    private var user: SecurityUser? { appState.currentUser }
 
     var body: some View {
         ZStack {
@@ -17,7 +17,12 @@ struct SettingsView: View {
                     profileCard
                     settingsCard
                     aboutCard
-                    Button(role: .destructive, action: onSignOut) {
+                    Button(role: .destructive) {
+                        appState.vaultSession.clear()
+                        KeychainHelper.clear()
+                        appState.signOut()
+                        onSignOut()
+                    } label: {
                         HStack {
                             Image(systemName: "rectangle.portrait.and.arrow.right")
                             Text("Sign Out").bold()
@@ -45,14 +50,14 @@ struct SettingsView: View {
     private var profileCard: some View {
         GlassCard(padding: 20, tint: Brand.primary.opacity(0.12)) {
             HStack(spacing: 14) {
-                Image(systemName: user.avatar)
+                Image(systemName: user?.avatarSymbol ?? "person.crop.circle")
                     .font(.system(size: 36))
                     .foregroundStyle(.white)
                     .frame(width: 60, height: 60)
                     .background(Brand.headerGradient, in: Circle())
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(user.fullName).font(Typography.title)
-                    Text(user.email).font(.caption).foregroundStyle(.secondary)
+                    Text(user?.fullName ?? "Signed in").font(Typography.title)
+                    Text(user?.email ?? "").font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
             }
@@ -67,8 +72,6 @@ struct SettingsView: View {
                 settingsRow(icon: "moon.fill", title: "Dark Mode", isOn: $darkMode)
                 Divider().opacity(0.3)
                 settingsRow(icon: "faceid", title: "Biometric Unlock", isOn: $biometricEnabled)
-                Divider().opacity(0.3)
-                settingsRow(icon: "camera.fill", title: "Prevent Screenshots", isOn: $preventScreenshots)
                 Divider().opacity(0.3)
                 NavigationLink {
                     FamilyManagementView()
@@ -152,4 +155,5 @@ struct SettingsView: View {
 
 #Preview {
     NavigationStack { SettingsView(onSignOut: {}) }
+        .environment(AppState())
 }

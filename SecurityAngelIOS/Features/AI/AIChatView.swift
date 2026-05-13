@@ -3,11 +3,15 @@ import PhotosUI
 
 struct AIChatView: View {
     @Binding var showMenu: Bool
-    @State private var messages: [MockChatMessage] = MockData.chatHistory
+    @Environment(AppState.self) private var appState
+
+    @State private var messages: [ChatMessageDoc] = []
     @State private var draft: String = ""
     @State private var selectedPhoto: PhotosPickerItem? = nil
     @State private var selectedImage: UIImage? = nil
     @State private var pendingTask: Task<Void, Never>? = nil
+    @State private var pendingAction: String? = nil
+    @State private var didLoad = false
 
     private let gemini = GeminiAPI()
 
@@ -37,8 +41,26 @@ struct AIChatView: View {
         }
         .toolbar(.hidden, for: .navigationBar)
         .onChange(of: selectedPhoto) { _, newItem in loadPhoto(newItem) }
+        .onAppear { loadHistory() }
         .onDisappear { pendingTask?.cancel() }
+        .alert(actionAlertTitle, isPresented: Binding(get: { pendingAction != nil }, set: { if !$0 { pendingAction = nil } })) {
+            Button("Take me", role: .none) { pendingAction = nil /* deep-link wiring next phase */ }
+            Button("Stay here", role: .cancel) { pendingAction = nil }
+        }
     }
+
+    private var actionAlertTitle: String {
+        switch pendingAction {
+        case "OPEN_VAULT":    return "Open the password vault?"
+        case "OPEN_FAMILY":   return "Open Family Safety?"
+        case "OPEN_SCANNER":  return "Open the URL scanner?"
+        case "GENERATE_PASS": return "Open the password generator?"
+        case "OPEN_LOGS":     return "Open the activity log?"
+        default:              return "Take action?"
+        }
+    }
+
+    // MARK: - Header
 
     private var header: some View {
         HStack(spacing: 10) {
@@ -118,7 +140,7 @@ struct AIChatView: View {
                     .background(Brand.primary, in: Circle())
                     .shadow(color: Brand.primary.opacity(0.4), radius: 8, y: 4)
             }
-            .disabled(draft.trimmingCharacters(in: .whitespaces).isEmpty && selectedImage == nil)
+            .disabled(!canSend)
             .opacity(canSend ? 1 : 0.5)
         }
         .padding()
@@ -128,49 +150,93 @@ struct AIChatView: View {
         !draft.trimmingCharacters(in: .whitespaces).isEmpty || selectedImage != nil
     }
 
+    // MARK: - History
+
+    private func loadHistory() {
+        guard !didLoad, let uid = appState.firebaseUserId else { return }
+        didLoad = true
+        Task {
+            let stored = (try? await appState.chatRepo.load(uid: uid)) ?? []
+            await MainActor.run {
+                if stored.isEmpty {
+                    messages = [ChatMessageDoc(text: "Hello! I'm Security Angel AI. How can I help you stay safe today?", isUser: false)]
+                } else {
+                    messages = stored.filter { !$0.isLoading }
+                }
+            }
+        }
+    }
+
     // MARK: - Send
 
     private func send() {
         let text = draft.trimmingCharacters(in: .whitespaces)
         let image = selectedImage
         guard !text.isEmpty || image != nil else { return }
+        guard let uid = appState.firebaseUserId else { return }
 
-        messages.append(MockChatMessage(text: text, isUser: true, isLoading: false, hasImage: image != nil))
+        let userMsg = ChatMessageDoc(text: text, isUser: true, imageUri: image == nil ? nil : "<inline>")
+        messages.append(userMsg)
+        Task { try? await appState.chatRepo.add(uid: uid, message: userMsg) }
+
         draft = ""
         selectedImage = nil
         selectedPhoto = nil
 
-        messages.append(MockChatMessage(text: "", isUser: false, isLoading: true, hasImage: false))
+        let loadingId = UUID().uuidString
+        messages.append(ChatMessageDoc(id: loadingId, isUser: false, isLoading: true))
 
         pendingTask = Task {
             do {
-                // No real Firestore context yet — pass placeholders this turn.
-                let prompt = GeminiPromptBuilder.buildPrompt(
-                    userName: MockData.currentUser.firstName,
-                    totalPasswords: MockData.passwords.count,
-                    leakedPasswords: MockData.passwords.filter(\.isLeaked).count,
-                    familyStatus: "Safe",
-                    lastScan: "No recent scans",
-                    rootStatus: JailbreakDetector.evaluate().isJailbroken ? "JAILBROKEN" : "Healthy",
-                    riskyAppsText: "None enumerable on iOS",
-                    userMessage: text
-                )
+                let prompt = await buildPrompt(userText: text)
                 let reply = try await gemini.generate(prompt: prompt, image: image)
-                await applyReply(reply)
+                await applyReply(reply, removingLoadingId: loadingId, uid: uid)
             } catch {
-                await applyReply("⚠️ \(error.localizedDescription)")
+                await applyReply("⚠️ \(error.localizedDescription)", removingLoadingId: loadingId, uid: uid)
             }
         }
     }
 
+    private func buildPrompt(userText: String) async -> String {
+        let user = appState.currentUser
+        let familyStatus: String = {
+            if appState.family == nil { return "Not in a family yet." }
+            return appState.familyAlertCount == 0 ? "Safe" : "At Risk (\(appState.familyAlertCount) alerts)"
+        }()
+        let lastScan: String = {
+            guard let scan = appState.recentScans.first else { return "No scans yet" }
+            return "\(scan.url) - \(scan.isSafe ? "Safe" : "Malicious")"
+        }()
+        let postureSummary: String = {
+            let p = appState.devicePosture
+            if p.jailbreak.isJailbroken { return "JAILBROKEN — device appears to be compromised" }
+            return "Healthy (passcode \(p.passcodeSet ? "on" : "off"), biometrics \(p.biometricsEnrolled ? "on" : "off"))"
+        }()
+
+        return GeminiPromptBuilder.buildPrompt(
+            userName: user?.firstName ?? "user",
+            totalPasswords: appState.totalPasswordCount,
+            leakedPasswords: appState.leakedPasswordCount,
+            familyStatus: familyStatus,
+            lastScan: lastScan,
+            rootStatus: postureSummary,
+            riskyAppsText: "Not enumerable on iOS",
+            userMessage: userText
+        )
+    }
+
     @MainActor
-    private func applyReply(_ raw: String) {
-        let (text, action) = GeminiPromptBuilder.extractAction(from: raw)
-        if let idx = messages.firstIndex(where: { $0.isLoading }) {
-            messages.remove(at: idx)
+    private func applyReply(_ raw: String, removingLoadingId: String, uid: String) {
+        let (cleaned, action) = GeminiPromptBuilder.extractAction(from: raw)
+        messages.removeAll { $0.id == removingLoadingId }
+        let botMsg = ChatMessageDoc(text: cleaned, isUser: false)
+        messages.append(botMsg)
+        Task { try? await appState.chatRepo.add(uid: uid, message: botMsg) }
+        if let action {
+            // Surface a confirmation; navigation deep-link wiring lives in
+            // RootView next phase (needs tab + sheet bindings).
+            pendingAction = action
         }
-        messages.append(MockChatMessage(text: text, isUser: false, isLoading: false, hasImage: false))
-        _ = action  // wiring deep-link actions comes with AppState next turn
     }
 
     private func loadPhoto(_ item: PhotosPickerItem?) {
@@ -186,4 +252,5 @@ struct AIChatView: View {
 
 #Preview {
     AIChatView(showMenu: .constant(false))
+        .environment(AppState())
 }

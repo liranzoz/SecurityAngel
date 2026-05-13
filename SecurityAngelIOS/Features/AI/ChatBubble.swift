@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct ChatBubble: View {
-    let message: MockChatMessage
+    let message: ChatMessageDoc
 
     var body: some View {
         HStack {
@@ -15,15 +15,10 @@ struct ChatBubble: View {
     private var bubble: some View {
         if message.isLoading {
             HStack(spacing: 6) {
-                ForEach(0..<3) { i in
+                ForEach(0..<3) { _ in
                     Circle()
                         .fill(Brand.primary.opacity(0.6))
                         .frame(width: 8, height: 8)
-                        .scaleEffect(animationScale(for: i))
-                        .animation(
-                            .easeInOut(duration: 0.6).repeatForever().delay(Double(i) * 0.15),
-                            value: UUID()
-                        )
                 }
             }
             .padding(.horizontal, 14)
@@ -31,7 +26,7 @@ struct ChatBubble: View {
             .liquidGlassCard(cornerRadius: 18)
         } else {
             VStack(alignment: message.isUser ? .trailing : .leading, spacing: 6) {
-                if message.hasImage {
+                if message.imageUri != nil {
                     RoundedRectangle(cornerRadius: 14, style: .continuous)
                         .fill(.gray.opacity(0.2))
                         .frame(height: 140)
@@ -50,19 +45,16 @@ struct ChatBubble: View {
                         .shadow(color: Brand.primary.opacity(0.3), radius: 8, y: 4)
                 }
             }
-            .liquidGlassCard(cornerRadius: 18, tint: message.isUser ? nil : nil)
+            .liquidGlassCard(cornerRadius: 18)
         }
     }
-
-    private func animationScale(for index: Int) -> CGFloat { 1.0 }
 }
 
 #Preview {
     VStack(spacing: 8) {
-        ChatBubble(message: MockData.chatHistory[0])
-        ChatBubble(message: MockData.chatHistory[1])
-        ChatBubble(message: MockData.chatHistory[2])
-        ChatBubble(message: MockChatMessage(text: "", isUser: false, isLoading: true, hasImage: false))
+        ChatBubble(message: ChatMessageDoc(text: "Hi there!", isUser: false))
+        ChatBubble(message: ChatMessageDoc(text: "Check my vault.", isUser: true))
+        ChatBubble(message: ChatMessageDoc(text: "", isUser: false, isLoading: true))
     }
     .padding()
     .background(Brand.backgroundGradient)

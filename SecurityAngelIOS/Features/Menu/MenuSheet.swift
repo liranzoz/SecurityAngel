@@ -4,6 +4,10 @@ struct MenuSheet: View {
     var onSelectGenerator: () -> Void
     var onSignOut: () -> Void
 
+    @Environment(AppState.self) private var appState
+
+    private var user: SecurityUser? { appState.currentUser }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -33,15 +37,15 @@ struct MenuSheet: View {
     private var profileHeader: some View {
         GlassCard {
             HStack(spacing: 14) {
-                Image(systemName: MockData.currentUser.avatar)
+                Image(systemName: user?.avatarSymbol ?? "person.crop.circle")
                     .font(.system(size: 36))
                     .foregroundStyle(.white)
                     .frame(width: 56, height: 56)
                     .background(Brand.headerGradient, in: Circle())
                 VStack(alignment: .leading, spacing: 2) {
-                    Text(MockData.currentUser.fullName)
+                    Text(user?.fullName ?? "Signed in")
                         .font(Typography.sectionTitle)
-                    Text(MockData.currentUser.email)
+                    Text(user?.email ?? "")
                         .font(.caption).foregroundStyle(.secondary)
                 }
                 Spacer()
@@ -52,22 +56,12 @@ struct MenuSheet: View {
 
     private var quickActions: some View {
         HStack(spacing: 12) {
-            quickAction(icon: "wand.and.stars", title: "Generator") {
-                NavigationLink { PasswordGeneratorView() } label: { quickTile(icon: "wand.and.stars", title: "Generator") }
-            }
-            quickAction(icon: "shield.lefthalf.filled", title: "Posture") {
-                NavigationLink { DevicePostureView() } label: { quickTile(icon: "shield.lefthalf.filled", title: "Posture") }
-            }
-            quickAction(icon: "list.bullet.rectangle", title: "Logs") {
-                NavigationLink { SecurityLogView() } label: { quickTile(icon: "list.bullet.rectangle", title: "Logs") }
-            }
+            NavigationLink { PasswordGeneratorView() } label: { quickTile(icon: "wand.and.stars", title: "Generator") }
+            NavigationLink { DevicePostureView() } label: { quickTile(icon: "shield.lefthalf.filled", title: "Posture") }
+            NavigationLink { SecurityLogView() } label: { quickTile(icon: "list.bullet.rectangle", title: "Logs") }
         }
         .padding(.horizontal)
-    }
-
-    @ViewBuilder
-    private func quickAction<Content: View>(icon: String, title: String, @ViewBuilder content: () -> Content) -> some View {
-        content().buttonStyle(.plain)
+        .buttonStyle(.plain)
     }
 
     private func quickTile(icon: String, title: String) -> some View {
@@ -109,4 +103,5 @@ struct MenuSheet: View {
 
 #Preview {
     MenuSheet(onSelectGenerator: {}, onSignOut: {})
+        .environment(AppState())
 }

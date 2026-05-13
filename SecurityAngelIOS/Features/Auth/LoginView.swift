@@ -1,12 +1,13 @@
 import SwiftUI
 
 struct LoginView: View {
-    let onAuthenticated: () -> Void
+    @Environment(AppState.self) private var appState
 
     @State private var email = ""
     @State private var password = ""
     @State private var isLoading = false
     @State private var showSignUp = false
+    @State private var errorMessage: String?
 
     var body: some View {
         ZStack {
@@ -48,32 +49,18 @@ struct LoginView: View {
                                 contentType: .password
                             )
 
+                            if let errorMessage {
+                                Text(errorMessage)
+                                    .font(.caption)
+                                    .foregroundStyle(.red)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                            }
+
                             PrimaryButton(title: "Sign In", icon: "arrow.right", isLoading: isLoading) {
-                                isLoading = true
-                                DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-                                    isLoading = false
-                                    onAuthenticated()
-                                }
+                                signIn()
                             }
-
-                            HStack {
-                                Rectangle().fill(.white.opacity(0.25)).frame(height: 1)
-                                Text("or").font(.caption).foregroundStyle(.secondary)
-                                Rectangle().fill(.white.opacity(0.25)).frame(height: 1)
-                            }
-
-                            Button {
-                                onAuthenticated()
-                            } label: {
-                                HStack(spacing: 10) {
-                                    Image(systemName: "g.circle.fill").foregroundStyle(.red)
-                                    Text("Continue with Google").font(.headline)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
-                                .foregroundStyle(.primary)
-                                .liquidGlassCapsule()
-                            }
+                            .disabled(email.isEmpty || password.isEmpty || isLoading)
+                            .opacity((email.isEmpty || password.isEmpty) ? 0.5 : 1)
                         }
                     }
                     .padding(.horizontal, 20)
@@ -93,15 +80,30 @@ struct LoginView: View {
             }
         }
         .sheet(isPresented: $showSignUp) {
-            SignUpView(onCompleted: {
-                showSignUp = false
-                onAuthenticated()
-            })
-            .presentationBackground(.regularMaterial)
+            SignUpView()
+                .environment(appState)
+                .presentationBackground(.regularMaterial)
+        }
+    }
+
+    private func signIn() {
+        errorMessage = nil
+        isLoading = true
+        Task {
+            do {
+                _ = try await appState.authRepo.signIn(email: email, password: password)
+                // AppState's auth listener will fire on success and flip the root view.
+            } catch let error as AuthRepoError {
+                errorMessage = error.localizedDescription
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+            isLoading = false
         }
     }
 }
 
 #Preview {
-    LoginView(onAuthenticated: {})
+    LoginView()
+        .environment(AppState())
 }

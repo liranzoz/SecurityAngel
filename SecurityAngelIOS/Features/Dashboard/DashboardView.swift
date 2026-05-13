@@ -2,47 +2,38 @@ import SwiftUI
 
 struct DashboardView: View {
     @Binding var showMenu: Bool
-    @State private var score: Int = 92
-    private let user = MockData.currentUser
-    private let recentScans = MockData.recentScans
+    @Environment(AppState.self) private var appState
+
+    private var user: SecurityUser? { appState.currentUser }
+    private var score: Int { appState.dashboardScore.finalScore }
+    private var familyAlertCount: Int { appState.familyAlertCount }
+    private var recentScans: [ScanHistoryItem] { appState.recentScans }
 
     var body: some View {
-        ZStack(alignment: .top) {
+        ZStack {
             Brand.backgroundGradient.ignoresSafeArea()
-
-            Brand.headerGradient
-                .frame(height: 380)
-                .clipShape(.rect(bottomLeadingRadius: 36, bottomTrailingRadius: 36))
-                .overlay(alignment: .topLeading) {
-                    Circle()
-                        .fill(.white.opacity(0.08))
-                        .frame(width: 200, height: 200)
-                        .offset(x: -50, y: -40)
-                }
-                .overlay(alignment: .topTrailing) {
-                    Circle()
-                        .fill(.white.opacity(0.06))
-                        .frame(width: 140, height: 140)
-                        .offset(x: 40, y: 100)
-                }
-                .ignoresSafeArea(edges: .top)
 
             ScrollView {
                 VStack(spacing: 0) {
                     header
                     tilesRow
-                    recentScansSection
+                    if !recentScans.isEmpty {
+                        recentScansSection
+                    } else {
+                        emptyScansSection
+                    }
                     Spacer(minLength: 80)
                 }
             }
         }
         .toolbar(.hidden, for: .navigationBar)
-        .toolbarBackground(.hidden, for: .navigationBar)
-        .statusBarHidden(false)
+        .onAppear {
+            appState.devicePosture = DevicePostureService.evaluate()
+        }
     }
 
     private var header: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: 12) {
             HStack {
                 Button { showMenu = true } label: {
                     Image(systemName: "line.3.horizontal")
@@ -56,7 +47,7 @@ struct DashboardView: View {
                     Text("Welcome back")
                         .font(.caption)
                         .foregroundStyle(.white.opacity(0.85))
-                    Text(user.firstName)
+                    Text(user?.firstName ?? "")
                         .font(.headline)
                         .foregroundStyle(.white)
                 }
@@ -70,45 +61,86 @@ struct DashboardView: View {
             .padding(.horizontal)
 
             ScoreRing(score: score, size: 220)
-                .padding(.top, 12)
         }
-        .padding(.top, 8)
-        .frame(height: 380)
+        .padding(.top, 4)
+        .padding(.bottom, 56)
+        .frame(maxWidth: .infinity)
+        .background {
+            Brand.headerGradient
+                .overlay(alignment: .topLeading) {
+                    Circle()
+                        .fill(.white.opacity(0.08))
+                        .frame(width: 200, height: 200)
+                        .offset(x: -50, y: -40)
+                }
+                .overlay(alignment: .topTrailing) {
+                    Circle()
+                        .fill(.white.opacity(0.06))
+                        .frame(width: 140, height: 140)
+                        .offset(x: 40, y: 100)
+                }
+                .clipShape(.rect(bottomLeadingRadius: 36, bottomTrailingRadius: 36))
+                .ignoresSafeArea(edges: .top)
+        }
     }
 
     private var tilesRow: some View {
         HStack(spacing: 14) {
-            tile(title: "My Vault", subtitle: "Manage Passwords", icon: "lock.shield.fill", tint: Brand.primary)
-            tile(title: "Family Safety", subtitle: "Safe", icon: "person.3.fill", tint: Brand.accent)
+            TileCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(systemName: "lock.shield.fill")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(Brand.primary)
+                        .padding(12)
+                        .liquidGlass(in: Circle(), tint: Brand.primary.opacity(0.15))
+                    Spacer()
+                    Text("My Vault").font(Typography.sectionTitle)
+                    Text(vaultSubtitle).font(.caption).foregroundStyle(vaultSubtitleColor)
+                }
+            }
+            TileCard {
+                VStack(alignment: .leading, spacing: 8) {
+                    Image(systemName: "person.3.fill")
+                        .font(.system(size: 34, weight: .semibold))
+                        .foregroundStyle(Brand.accent)
+                        .padding(12)
+                        .liquidGlass(in: Circle(), tint: Brand.accent.opacity(0.15))
+                    Spacer()
+                    Text("Family Safety").font(Typography.sectionTitle)
+                    Text(familySubtitle).font(.caption).foregroundStyle(familySubtitleColor)
+                }
+            }
         }
         .padding(.horizontal)
         .offset(y: -50)
         .padding(.bottom, -50)
     }
 
-    private func tile(title: String, subtitle: String, icon: String, tint: Color) -> some View {
-        TileCard {
-            VStack(alignment: .leading, spacing: 8) {
-                Image(systemName: icon)
-                    .font(.system(size: 34, weight: .semibold))
-                    .foregroundStyle(tint)
-                    .padding(12)
-                    .liquidGlass(in: Circle(), tint: tint.opacity(0.15))
-                Spacer()
-                Text(title)
-                    .font(Typography.sectionTitle)
-                Text(subtitle)
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
-            }
-        }
+    private var vaultSubtitle: String {
+        if appState.totalPasswordCount == 0 { return "Add your first password" }
+        let leaks = appState.leakedPasswordCount
+        return leaks == 0
+            ? "\(appState.totalPasswordCount) safe"
+            : "\(leaks) compromised"
+    }
+
+    private var vaultSubtitleColor: Color {
+        appState.leakedPasswordCount > 0 ? Brand.unsafe : .secondary
+    }
+
+    private var familySubtitle: String {
+        if appState.family == nil { return "Not in a family yet" }
+        return familyAlertCount == 0 ? "All safe" : "\(familyAlertCount) alert\(familyAlertCount == 1 ? "" : "s")"
+    }
+
+    private var familySubtitleColor: Color {
+        familyAlertCount > 0 ? Brand.unsafe : .secondary
     }
 
     private var recentScansSection: some View {
         VStack(spacing: 12) {
             SectionHeader("Recent Scans")
                 .padding(.horizontal)
-
             VStack(spacing: 10) {
                 ForEach(recentScans) { scan in
                     HStack(spacing: 12) {
@@ -137,8 +169,31 @@ struct DashboardView: View {
         }
         .padding(.top, 24)
     }
+
+    private var emptyScansSection: some View {
+        VStack(spacing: 10) {
+            SectionHeader("Recent Scans").padding(.horizontal)
+            GlassCard {
+                HStack(spacing: 12) {
+                    Image(systemName: "magnifyingglass.circle.fill")
+                        .font(.title2)
+                        .foregroundStyle(Brand.primary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("No scans yet").font(.subheadline.weight(.semibold))
+                        Text("Try the Scanner tab to check a URL.")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                }
+            }
+            .padding(.horizontal)
+        }
+        .padding(.top, 24)
+    }
 }
 
 #Preview {
     DashboardView(showMenu: .constant(false))
+        .environment(AppState())
 }

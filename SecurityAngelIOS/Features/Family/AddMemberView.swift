@@ -1,10 +1,26 @@
 import SwiftUI
 
 struct AddMemberView: View {
+    @Environment(AppState.self) private var appState
     @Environment(\.dismiss) private var dismiss
+
     @State private var email = ""
     @State private var generatedCode = ""
+    @State private var isWorking = false
+    @State private var errorMessage: String?
     @State private var showShare = false
+
+    private var shareText: String {
+        """
+        Hey! I want to add you to my family in Security Angel.
+
+        1. Download the app.
+        2. Register with email: \(email)
+        3. Use this secure code to join: *\(generatedCode)*
+
+        Stay safe!
+        """
+    }
 
     var body: some View {
         NavigationStack {
@@ -28,7 +44,12 @@ struct AddMemberView: View {
 
                     GlassCard {
                         VStack(spacing: 14) {
-                            GlassTextField(placeholder: "Email", text: $email, icon: "envelope.fill", keyboardType: .emailAddress, contentType: .emailAddress)
+                            GlassTextField(
+                                placeholder: "Email", text: $email,
+                                icon: "envelope.fill",
+                                keyboardType: .emailAddress,
+                                contentType: .emailAddress
+                            )
                             if !generatedCode.isEmpty {
                                 HStack(spacing: 10) {
                                     ForEach(Array(generatedCode), id: \.self) { ch in
@@ -39,14 +60,21 @@ struct AddMemberView: View {
                                     }
                                 }
                             }
-                            PrimaryButton(title: generatedCode.isEmpty ? "Generate Code" : "Share Invitation", icon: generatedCode.isEmpty ? "wand.and.stars" : "square.and.arrow.up") {
+                            if let errorMessage {
+                                Text(errorMessage).font(.caption).foregroundStyle(.red)
+                            }
+                            PrimaryButton(
+                                title: generatedCode.isEmpty ? "Send Invitation" : "Share",
+                                icon: generatedCode.isEmpty ? "paperplane.fill" : "square.and.arrow.up",
+                                isLoading: isWorking
+                            ) {
                                 if generatedCode.isEmpty {
-                                    generatedCode = String((0..<6).map { _ in "0123456789".randomElement()! })
+                                    createInvitation()
                                 } else {
                                     showShare = true
                                 }
                             }
-                            .disabled(email.isEmpty)
+                            .disabled(email.isEmpty || isWorking)
                             .opacity(email.isEmpty ? 0.5 : 1)
                         }
                     }
@@ -63,16 +91,76 @@ struct AddMemberView: View {
                 }
             }
             .sheet(isPresented: $showShare) {
-                ShareLink(item: "Join my family on Security Angel. Use email \(email) and code \(generatedCode).") {
+                ShareLink(item: shareText) {
                     Label("Share Invitation", systemImage: "square.and.arrow.up")
                 }
                 .padding()
-                .presentationDetents([.height(180)])
+                .presentationDetents([.height(200)])
             }
+        }
+    }
+
+    private func createInvitation() {
+        errorMessage = nil
+        isWorking = true
+        Task {
+            do {
+                guard let currentUser = appState.currentUser else {
+                    errorMessage = "Not signed in"
+                    isWorking = false
+                    return
+                }
+                let familyId: String
+                if let existing = currentUser.familyId, !existing.isEmpty {
+                    familyId = existing
+                    // Best-effort link the invitee to the existing family
+                    try? await appState.familyRepo.addMember(familyId: existing, byEmail: email)
+                } else {
+                    let newId = try await appState.familyRepo.createFamily(
+                        admin: currentUser,
+                        name: "\(currentUser.lastName.isEmpty ? "My" : currentUser.lastName) Family"
+                    )
+                    familyId = newId
+                    try? await appState.familyRepo.addMember(familyId: newId, byEmail: email)
+                }
+                let code = try await appState.invitationRepo.create(email: email, familyId: familyId)
+                generatedCode = code
+                try? await appState.logger.logEvent(
+                    uid: currentUser.id, eventType: .memberAdded,
+                    description: "Invited \(email) to the family."
+                )
+            } catch {
+                if case FamilyRepository.FamilyError.alreadyInFamily = error {
+                    errorMessage = "User already belongs to another family."
+                } else if case FamilyRepository.FamilyError.userNotFound = error {
+                    // It's OK — they may not have an account yet. The invitation
+                    // will still be created so they can use the code on signup.
+                    do {
+                        guard let currentUser = appState.currentUser else { return }
+                        let familyId: String
+                        if let existing = currentUser.familyId, !existing.isEmpty {
+                            familyId = existing
+                        } else {
+                            familyId = try await appState.familyRepo.createFamily(
+                                admin: currentUser,
+                                name: "\(currentUser.lastName.isEmpty ? "My" : currentUser.lastName) Family"
+                            )
+                        }
+                        let code = try await appState.invitationRepo.create(email: email, familyId: familyId)
+                        generatedCode = code
+                    } catch {
+                        errorMessage = error.localizedDescription
+                    }
+                } else {
+                    errorMessage = error.localizedDescription
+                }
+            }
+            isWorking = false
         }
     }
 }
 
 #Preview {
     AddMemberView()
+        .environment(AppState())
 }
