@@ -8,6 +8,9 @@ struct LoginView: View {
     @State private var isLoading = false
     @State private var showSignUp = false
     @State private var errorMessage: String?
+    @State private var resetSentForEmail: String?
+    @State private var showResetPrompt = false
+    @State private var resetEmail = ""
 
     var body: some View {
         ZStack {
@@ -56,11 +59,27 @@ struct LoginView: View {
                                     .frame(maxWidth: .infinity, alignment: .leading)
                             }
 
+                            if let resetSentForEmail {
+                                Label("Reset link sent to \(resetSentForEmail).", systemImage: "envelope.badge.fill")
+                                    .font(.caption)
+                                    .foregroundStyle(.white)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(Brand.primary.opacity(0.6), in: Capsule())
+                            }
+
                             PrimaryButton(title: "Sign In", icon: "arrow.right", isLoading: isLoading) {
                                 signIn()
                             }
                             .disabled(email.isEmpty || password.isEmpty || isLoading)
                             .opacity((email.isEmpty || password.isEmpty) ? 0.5 : 1)
+
+                            Button("Forgot password?") {
+                                resetEmail = email
+                                showResetPrompt = true
+                            }
+                            .font(.footnote)
+                            .foregroundStyle(Brand.primaryDark)
                         }
                     }
                     .padding(.horizontal, 20)
@@ -84,21 +103,43 @@ struct LoginView: View {
                 .environment(appState)
                 .presentationBackground(.regularMaterial)
         }
+        .alert("Send password reset email?", isPresented: $showResetPrompt) {
+            TextField("Email", text: $resetEmail)
+                .keyboardType(.emailAddress)
+                .textContentType(.emailAddress)
+                .textInputAutocapitalization(.never)
+            Button("Send") { sendReset() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("We'll email a link to reset your password.")
+        }
     }
 
     private func signIn() {
         errorMessage = nil
+        resetSentForEmail = nil
         isLoading = true
         Task {
             do {
                 _ = try await appState.authRepo.signIn(email: email, password: password)
-                // AppState's auth listener will fire on success and flip the root view.
-            } catch let error as AuthRepoError {
-                errorMessage = error.localizedDescription
             } catch {
                 errorMessage = error.localizedDescription
             }
             isLoading = false
+        }
+    }
+
+    private func sendReset() {
+        let target = resetEmail.trimmingCharacters(in: .whitespaces)
+        guard !target.isEmpty else { return }
+        errorMessage = nil
+        Task {
+            do {
+                try await appState.authRepo.sendPasswordReset(email: target)
+                resetSentForEmail = target
+            } catch {
+                errorMessage = error.localizedDescription
+            }
         }
     }
 }
