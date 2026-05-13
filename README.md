@@ -14,16 +14,43 @@ Liquid-Glass SwiftUI port of the Android `SecurityAngel` app.
 ## Enabling AutoFill
 
 The build produces a second target, `SecurityAngelAutoFill`, embedded in
-the main app as a Credential Provider extension. To wire it into iOS:
+the main app as a Credential Provider extension. **The code is complete
+and correct, but Apple gates this feature behind a paid developer
+account** — the simulator alone is not enough.
 
-1. Run the app on the simulator at least once and sign in.
-2. On the simulator: **Settings → General → AutoFill & Passwords**.
-3. Under "AutoFill From", turn on **Security Angel**.
-4. Focus a password field in another app or Safari — Security Angel
-   appears above the keyboard, taps in unlock the vault with Face ID
-   (or master PIN), then fills the matching credential.
+### Why "Sign to Run Locally" doesn't show the extension
 
-### How it shares state with the main app
+iOS requires the entitlement
+`com.apple.developer.authentication-services.autofill-credential-provider`
+on the extension. That entitlement must be allowlisted by a provisioning
+profile, which is only issued to **paid Apple Developer Program members**
+($99/year). With "Sign to Run Locally" the build succeeds and the
+extension is bundled — pluginkit registers it — but at sign time the
+entitlement is **stripped from the binary** (visible via
+`codesign -d --entitlements -` returning `<dict></dict>`). Without the
+entitlement, iOS refuses to surface the extension in the AutoFill picker.
+
+That's why the toggle never appeared on the simulator. It isn't a bug
+in our code — it's an Apple platform requirement.
+
+### To actually use it
+
+1. Enroll in the [Apple Developer Program](https://developer.apple.com/programs/)
+   if you haven't ($99/year).
+2. In Xcode, select **both** the `SecurityAngelIOS` target and the
+   `SecurityAngelAutoFill` target → **Signing & Capabilities** →
+   pick your Apple Developer Team.
+3. Add the **"AutoFill Credential Provider"** capability on the
+   `SecurityAngelAutoFill` target (Xcode → Signing & Capabilities →
+   `+ Capability` → AutoFill Credential Provider). Xcode will provision
+   a profile that includes the required entitlement.
+4. Build & run.
+5. On the simulator/device: **Settings → General → AutoFill & Passwords →
+   AutoFill From** → toggle on **Security Angel**.
+6. Focus a password field in Safari — the QuickType bar shows Security
+   Angel. Tap → Face ID → fills the matching credential from your vault.
+
+### How it shares state with the main app (when the entitlement is granted)
 
 - **Keychain Access Group** `com.zoz.SecurityAngelIOS` (declared in both
   targets' entitlements) is the rendezvous point.
@@ -34,14 +61,6 @@ the main app as a Credential Provider extension. To wire it into iOS:
   shared group, so Face ID unlock works inside the extension.
 - Firestore in the extension reads `users/{uid}/vault` and filters by
   `domain` before decryption.
-
-### One-time signing setup (real devices)
-
-The simulator works with "Sign to Run Locally". For a physical device
-you need an Apple Developer Team selected in **Signing & Capabilities**
-for both targets — same team for app + extension so the keychain access
-group resolves to the same `TEAMID.com.zoz.SecurityAngelIOS` string in
-both processes.
 
 ## Requirements
 
