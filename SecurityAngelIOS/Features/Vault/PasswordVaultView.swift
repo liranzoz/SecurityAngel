@@ -159,7 +159,7 @@ struct PasswordVaultView: View {
                     .shadow(color: Brand.primary.opacity(0.45), radius: 14, y: 8)
             }
             .padding(.trailing, 24)
-            .padding(.bottom, 90)
+            .padding(.bottom, 24)
         }
     }
 

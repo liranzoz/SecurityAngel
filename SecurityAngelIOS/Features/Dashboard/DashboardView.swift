@@ -2,6 +2,7 @@ import SwiftUI
 
 struct DashboardView: View {
     @Binding var showMenu: Bool
+    var onSelectTab: (AppTab) -> Void = { _ in }
     @Environment(AppState.self) private var appState
 
     private var user: SecurityUser? { appState.currentUser }
@@ -86,30 +87,31 @@ struct DashboardView: View {
 
     private var tilesRow: some View {
         HStack(spacing: 14) {
-            TileCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: "lock.shield.fill")
-                        .font(.system(size: 34, weight: .semibold))
-                        .foregroundStyle(Brand.primary)
-                        .padding(12)
-                        .liquidGlass(in: Circle(), tint: Brand.primary.opacity(0.15))
-                    Spacer()
-                    Text("My Vault").font(Typography.sectionTitle)
-                    Text(vaultSubtitle).font(.caption).foregroundStyle(vaultSubtitleColor)
+            Button { onSelectTab(.vault) } label: {
+                TileCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        LottieAnimation(animation: .vault, speed: 1.0)
+                            .frame(width: 56, height: 56)
+                        Spacer()
+                        Text("My Vault").font(Typography.sectionTitle)
+                        Text(vaultSubtitle).font(.caption).foregroundStyle(vaultSubtitleColor)
+                    }
                 }
             }
-            TileCard {
-                VStack(alignment: .leading, spacing: 8) {
-                    Image(systemName: "person.3.fill")
-                        .font(.system(size: 34, weight: .semibold))
-                        .foregroundStyle(Brand.accent)
-                        .padding(12)
-                        .liquidGlass(in: Circle(), tint: Brand.accent.opacity(0.15))
-                    Spacer()
-                    Text("Family Safety").font(Typography.sectionTitle)
-                    Text(familySubtitle).font(.caption).foregroundStyle(familySubtitleColor)
+            .buttonStyle(.plain)
+
+            Button { onSelectTab(.family) } label: {
+                TileCard {
+                    VStack(alignment: .leading, spacing: 8) {
+                        LottieAnimation(animation: .familyBold, speed: appState.familyAlertCount > 0 ? 1.2 : 0.5)
+                            .frame(width: 56, height: 56)
+                        Spacer()
+                        Text("Family Safety").font(Typography.sectionTitle)
+                        Text(familySubtitle).font(.caption).foregroundStyle(familySubtitleColor)
+                    }
                 }
             }
+            .buttonStyle(.plain)
         }
         .padding(.horizontal)
         .offset(y: -50)

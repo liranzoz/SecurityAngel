@@ -50,11 +50,7 @@ struct SettingsView: View {
     private var profileCard: some View {
         GlassCard(padding: 20, tint: Brand.primary.opacity(0.12)) {
             HStack(spacing: 14) {
-                Image(systemName: user?.avatarSymbol ?? "person.crop.circle")
-                    .font(.system(size: 36))
-                    .foregroundStyle(.white)
-                    .frame(width: 60, height: 60)
-                    .background(Brand.headerGradient, in: Circle())
+                LottieAvatar(gender: user?.gender ?? "", size: 64)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(user?.fullName ?? "Signed in").font(Typography.title)
                     Text(user?.email ?? "").font(.caption).foregroundStyle(.secondary)

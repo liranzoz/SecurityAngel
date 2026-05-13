@@ -26,7 +26,9 @@ struct RootView: View {
     private var mainTabs: some View {
         TabView(selection: $selectedTab) {
             Tab("Home", systemImage: "house.fill", value: AppTab.home) {
-                NavigationStack { DashboardView(showMenu: $showMenu) }
+                NavigationStack {
+                    DashboardView(showMenu: $showMenu, onSelectTab: { selectedTab = $0 })
+                }
             }
             Tab("Scanner", systemImage: "shield.lefthalf.filled", value: AppTab.scanner) {
                 NavigationStack { URLScannerView(showMenu: $showMenu) }
