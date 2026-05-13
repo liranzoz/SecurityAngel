@@ -72,6 +72,7 @@
 		F00000000000000000000045 /* anim_else_avatar.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000035 /* anim_else_avatar.json */; };
 		F00000000000000000000046 /* anim_loading.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000036 /* anim_loading.json */; };
 		F00000000000000000000047 /* anim_family_avatar.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000037 /* anim_family_avatar.json */; };
+		F00000000000000000000048 /* anim_google_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000038 /* anim_google_logo.json */; };
 		F00000000000000000000050 /* LottieAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000020 /* LottieAvatar.swift */; };
 		F00000000000000000000051 /* SharedKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000021 /* SharedKeychain.swift */; };
 		0E0000000000000000000050 /* CredentialProviderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0000000000000000000040 /* CredentialProviderViewController.swift */; };
@@ -156,6 +157,7 @@
 		F00000000000000000000035 /* anim_else_avatar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_else_avatar.json; sourceTree = "<group>"; };
 		F00000000000000000000036 /* anim_loading.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_loading.json; sourceTree = "<group>"; };
 		F00000000000000000000037 /* anim_family_avatar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_family_avatar.json; sourceTree = "<group>"; };
+		F00000000000000000000038 /* anim_google_logo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_google_logo.json; sourceTree = "<group>"; };
 		F00000000000000000000021 /* SharedKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedKeychain.swift; sourceTree = "<group>"; };
 		0E0000000000000000000002 /* SecurityAngelAutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SecurityAngelAutoFill.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		0E0000000000000000000040 /* CredentialProviderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialProviderViewController.swift; sourceTree = "<group>"; };
@@ -355,6 +357,7 @@
 				F00000000000000000000034 /* anim_female_avater.json */,
 				F00000000000000000000035 /* anim_else_avatar.json */,
 				F00000000000000000000036 /* anim_loading.json */,
+				F00000000000000000000038 /* anim_google_logo.json */,
 			);
 			path = Lottie;
 			sourceTree = "<group>";
@@ -617,6 +620,7 @@
 				F00000000000000000000045 /* anim_else_avatar.json in Resources */,
 				F00000000000000000000046 /* anim_loading.json in Resources */,
 				F00000000000000000000047 /* anim_family_avatar.json in Resources */,
+				F00000000000000000000048 /* anim_google_logo.json in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

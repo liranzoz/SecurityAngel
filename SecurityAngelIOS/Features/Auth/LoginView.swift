@@ -31,7 +31,7 @@ struct LoginView: View {
                             .foregroundStyle(.white.opacity(0.85))
                     }
 
-                    GlassCard(padding: 24) {
+                    GlassCard(padding: 24, tint: .white.opacity(0.85)) {
                         VStack(spacing: 16) {
                             GlassTextField(
                                 placeholder: "Email",
@@ -82,15 +82,17 @@ struct LoginView: View {
                                 HStack(spacing: 10) {
                                     if isGoogleLoading {
                                         ProgressView().tint(.primary)
+                                            .frame(width: 26, height: 26)
                                     } else {
-                                        Image(systemName: "g.circle.fill").foregroundStyle(.red)
+                                        LottieAnimation(animation: .googleLogo, loop: .playOnce)
+                                            .frame(width: 26, height: 26)
                                     }
                                     Text(isGoogleLoading ? "Signing in…" : "Continue with Google").font(.headline)
                                 }
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 14)
+                                .padding(.vertical, 12)
                                 .foregroundStyle(.primary)
-                                .liquidGlassCapsule()
+                                .liquidGlassCapsule(tint: .white.opacity(0.6))
                             }
                             .disabled(isGoogleLoading)
 

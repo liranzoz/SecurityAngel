@@ -12,6 +12,7 @@ enum LottieAnim: String {
     case femaleAvatar  = "anim_female_avater"
     case elseAvatar    = "anim_else_avatar"
     case loading       = "anim_loading"
+    case googleLogo    = "anim_google_logo"
 
     static func avatar(for gender: String) -> LottieAnim {
         switch gender {
