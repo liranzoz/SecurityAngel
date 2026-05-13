@@ -84,6 +84,10 @@
 		0E0000000000000000000081 /* FirebaseFirestore in Frameworks (Ext) */ = {isa = PBXBuildFile; productRef = 0E0000000000000000000091 /* FirebaseFirestore (Ext) */; };
 		0E0000000000000000000063 /* GoogleService-Info.plist in Resources (Ext) */ = {isa = PBXBuildFile; fileRef = E743D2512FB4624300A3E8B7 /* GoogleService-Info.plist */; };
 		0E0000000000000000000064 /* SecurityAngelAutoFill.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0E0000000000000000000002 /* SecurityAngelAutoFill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E00000000000000000000023 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000013 /* GoogleSignIn */; };
+		E00000000000000000000024 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000014 /* GoogleSignInSwift */; };
+		F00000000000000000000052 /* GoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000022 /* GoogleSignInService.swift */; };
+		F00000000000000000000053 /* AppLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000023 /* AppLogo.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -158,6 +162,9 @@
 		0E0000000000000000000060 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0E0000000000000000000061 /* SecurityAngelAutoFill.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SecurityAngelAutoFill.entitlements; sourceTree = "<group>"; };
 		0E0000000000000000000062 /* SecurityAngelIOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SecurityAngelIOS.entitlements; sourceTree = "<group>"; };
+		F00000000000000000000022 /* GoogleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInService.swift; sourceTree = "<group>"; };
+		F00000000000000000000023 /* AppLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogo.swift; sourceTree = "<group>"; };
+		F00000000000000000000070 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -168,6 +175,8 @@
 				E00000000000000000000020 /* FirebaseAuth in Frameworks */,
 				E00000000000000000000021 /* FirebaseFirestore in Frameworks */,
 				E00000000000000000000022 /* Lottie in Frameworks */,
+				E00000000000000000000023 /* GoogleSignIn in Frameworks */,
+				E00000000000000000000024 /* GoogleSignInSwift in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +231,7 @@
 				B00000000000000000000023 /* Logic */,
 				B00000000000000000000024 /* State */,
 				F00000000000000000000010 /* Resources */,
+				F00000000000000000000070 /* Info.plist */,
 				0E0000000000000000000062 /* SecurityAngelIOS.entitlements */,
 				B0000000000000000000004A /* Features */,
 				B0000000000000000000003A /* Mock */,
@@ -283,6 +293,7 @@
 				C00000000000000000000037 /* ScanHistoryRepository.swift */,
 				C00000000000000000000038 /* ChatHistoryRepository.swift */,
 				C00000000000000000000039 /* SecurityLogger.swift */,
+				F00000000000000000000022 /* GoogleSignInService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -320,6 +331,7 @@
 				C00000000000000000000009 /* GlassTextField.swift */,
 				C0000000000000000000000A /* SectionHeader.swift */,
 				F00000000000000000000020 /* LottieAvatar.swift */,
+				F00000000000000000000023 /* AppLogo.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -490,6 +502,8 @@
 				E00000000000000000000010 /* FirebaseAuth */,
 				E00000000000000000000011 /* FirebaseFirestore */,
 				E00000000000000000000012 /* Lottie */,
+				E00000000000000000000013 /* GoogleSignIn */,
+				E00000000000000000000014 /* GoogleSignInSwift */,
 			);
 			productName = SecurityAngelIOS;
 			productReference = A19999999999999999999999 /* SecurityAngelIOS.app */;
@@ -544,6 +558,7 @@
 			packageReferences = (
 				E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 				E00000000000000000000002 /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
 			);
 			productRefGroup = A0CCCCCCCCCCCCCCCCCCCCCC /* Products */;
 			projectDirPath = "";
@@ -674,6 +689,8 @@
 				D00000000000000000000039 /* SecurityLogger.swift in Sources */,
 				F00000000000000000000050 /* LottieAvatar.swift in Sources */,
 				F00000000000000000000051 /* SharedKeychain.swift in Sources */,
+				F00000000000000000000052 /* GoogleSignInService.swift in Sources */,
+				F00000000000000000000053 /* AppLogo.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -703,13 +720,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SecurityAngelIOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Security Angel";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SecurityAngelIOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -734,13 +746,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_ASSET_PATHS = "\"SecurityAngelIOS/Preview Content\"";
 				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Security Angel";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SecurityAngelIOS/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -971,6 +978,14 @@
 				minimumVersion = 4.0.0;
 			};
 		};
+		E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -988,6 +1003,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E00000000000000000000002 /* XCRemoteSwiftPackageReference "lottie-spm" */;
 			productName = Lottie;
+		};
+		E00000000000000000000013 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		E00000000000000000000014 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
 		};
 		0E0000000000000000000090 /* FirebaseAuth (Ext) */ = {
 			isa = XCSwiftPackageProductDependency;

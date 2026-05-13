@@ -14,6 +14,7 @@ struct SecurityAngelIOSApp: App {
         if let group = SharedKeychain.fullGroupID {
             try? Auth.auth().useUserAccessGroup(group)
         }
+        GoogleSignInService.configure()
     }
 
     var body: some Scene {
@@ -22,6 +23,7 @@ struct SecurityAngelIOSApp: App {
                 .environment(appState)
                 .preferredColorScheme(darkMode ? .dark : nil)
                 .tint(Brand.primary)
+                .onOpenURL { url in GoogleSignInService.handle(url: url) }
         }
     }
 }

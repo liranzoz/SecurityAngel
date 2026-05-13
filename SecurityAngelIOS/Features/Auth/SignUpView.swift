@@ -42,6 +42,8 @@ struct SignUpView: View {
 
     private var formContent: some View {
         VStack(spacing: 16) {
+            AppLogo()
+                .padding(.top, 8)
             GlassCard(padding: 24) {
                 VStack(spacing: 14) {
                     HStack(spacing: 12) {
