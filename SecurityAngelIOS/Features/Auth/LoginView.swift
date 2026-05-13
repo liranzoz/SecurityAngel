@@ -31,79 +31,82 @@ struct LoginView: View {
                             .foregroundStyle(.white.opacity(0.85))
                     }
 
-                    GlassCard(padding: 24, tint: .white.opacity(0.85)) {
-                        VStack(spacing: 16) {
-                            GlassTextField(
-                                placeholder: "Email",
-                                text: $email,
-                                icon: "envelope.fill",
-                                keyboardType: .emailAddress,
-                                contentType: .emailAddress
-                            )
-                            GlassTextField(
-                                placeholder: "Password",
-                                text: $password,
-                                icon: "lock.fill",
-                                isSecure: true,
-                                contentType: .password
-                            )
+                    VStack(spacing: 16) {
+                        GlassTextField(
+                            placeholder: "Email",
+                            text: $email,
+                            icon: "envelope.fill",
+                            keyboardType: .emailAddress,
+                            contentType: .emailAddress
+                        )
+                        GlassTextField(
+                            placeholder: "Password",
+                            text: $password,
+                            icon: "lock.fill",
+                            isSecure: true,
+                            contentType: .password
+                        )
 
-                            if let errorMessage {
-                                Text(errorMessage)
-                                    .font(.caption)
-                                    .foregroundStyle(.red)
-                                    .frame(maxWidth: .infinity, alignment: .leading)
-                            }
-
-                            if let resetSentForEmail {
-                                Label("Reset link sent to \(resetSentForEmail).", systemImage: "envelope.badge.fill")
-                                    .font(.caption)
-                                    .foregroundStyle(.white)
-                                    .padding(.horizontal, 10)
-                                    .padding(.vertical, 6)
-                                    .background(Brand.primary.opacity(0.6), in: Capsule())
-                            }
-
-                            PrimaryButton(title: "Sign In", icon: "arrow.right", isLoading: isLoading) {
-                                signIn()
-                            }
-                            .disabled(email.isEmpty || password.isEmpty || isLoading)
-                            .opacity((email.isEmpty || password.isEmpty) ? 0.5 : 1)
-
-                            HStack {
-                                Rectangle().fill(.white.opacity(0.25)).frame(height: 1)
-                                Text("or").font(.caption).foregroundStyle(.secondary)
-                                Rectangle().fill(.white.opacity(0.25)).frame(height: 1)
-                            }
-
-                            Button {
-                                signInWithGoogle()
-                            } label: {
-                                HStack(spacing: 10) {
-                                    if isGoogleLoading {
-                                        ProgressView().tint(.primary)
-                                            .frame(width: 26, height: 26)
-                                    } else {
-                                        LottieAnimation(animation: .googleLogo, loop: .playOnce)
-                                            .frame(width: 26, height: 26)
-                                    }
-                                    Text(isGoogleLoading ? "Signing in…" : "Continue with Google").font(.headline)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .padding(.vertical, 12)
-                                .foregroundStyle(.primary)
-                                .liquidGlassCapsule(tint: .white.opacity(0.6))
-                            }
-                            .disabled(isGoogleLoading)
-
-                            Button("Forgot password?") {
-                                resetEmail = email
-                                showResetPrompt = true
-                            }
-                            .font(.footnote)
-                            .foregroundStyle(Brand.primaryDark)
+                        if let errorMessage {
+                            Text(errorMessage)
+                                .font(.caption)
+                                .foregroundStyle(.red)
+                                .frame(maxWidth: .infinity, alignment: .leading)
                         }
+
+                        if let resetSentForEmail {
+                            Label("Reset link sent to \(resetSentForEmail).", systemImage: "envelope.badge.fill")
+                                .font(.caption)
+                                .foregroundStyle(.white)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(Brand.primary.opacity(0.6), in: Capsule())
+                        }
+
+                        PrimaryButton(title: "Sign In", icon: "arrow.right", isLoading: isLoading) {
+                            signIn()
+                        }
+                        .disabled(email.isEmpty || password.isEmpty || isLoading)
+                        .opacity((email.isEmpty || password.isEmpty) ? 0.5 : 1)
+
+                        HStack {
+                            Rectangle().fill(.gray.opacity(0.25)).frame(height: 1)
+                            Text("or").font(.caption).foregroundStyle(.secondary)
+                            Rectangle().fill(.gray.opacity(0.25)).frame(height: 1)
+                        }
+
+                        Button {
+                            signInWithGoogle()
+                        } label: {
+                            HStack(spacing: 10) {
+                                if isGoogleLoading {
+                                    ProgressView().tint(.primary)
+                                        .frame(width: 26, height: 26)
+                                } else {
+                                    LottieAnimation(animation: .googleLogo, loop: .loop)
+                                        .frame(width: 26, height: 26)
+                                }
+                                Text(isGoogleLoading ? "Signing in…" : "Continue with Google").font(.headline)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .foregroundStyle(.primary)
+                            .background(Color(white: 0.97), in: Capsule())
+                            .overlay(Capsule().stroke(.gray.opacity(0.18), lineWidth: 0.5))
+                        }
+                        .disabled(isGoogleLoading)
+
+                        Button("Forgot password?") {
+                            resetEmail = email
+                            showResetPrompt = true
+                        }
+                        .font(.footnote)
+                        .foregroundStyle(Brand.primaryDark)
                     }
+                    .padding(24)
+                    .frame(maxWidth: .infinity)
+                    .background(.white, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+                    .shadow(color: .black.opacity(0.08), radius: 20, y: 6)
                     .padding(.horizontal, 20)
 
                     Button {

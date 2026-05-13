@@ -44,31 +44,33 @@ struct SignUpView: View {
         VStack(spacing: 16) {
             AppLogo()
                 .padding(.top, 8)
-            GlassCard(padding: 24, tint: .white.opacity(0.85)) {
-                VStack(spacing: 14) {
-                    HStack(spacing: 12) {
-                        GlassTextField(placeholder: "First name", text: $firstName, icon: "person.fill")
-                        GlassTextField(placeholder: "Last name",  text: $lastName,  icon: "person.fill")
-                    }
-                    GlassTextField(placeholder: "Phone", text: $phone, icon: "phone.fill", keyboardType: .phonePad, contentType: .telephoneNumber)
-                    GlassTextField(placeholder: "Email", text: $email, icon: "envelope.fill", keyboardType: .emailAddress, contentType: .emailAddress)
-                    GlassTextField(placeholder: "Password (6+ chars)", text: $password, icon: "lock.fill", isSecure: true, contentType: .newPassword)
+            VStack(spacing: 14) {
+                HStack(spacing: 12) {
+                    GlassTextField(placeholder: "First name", text: $firstName, icon: "person.fill")
+                    GlassTextField(placeholder: "Last name",  text: $lastName,  icon: "person.fill")
+                }
+                GlassTextField(placeholder: "Phone", text: $phone, icon: "phone.fill", keyboardType: .phonePad, contentType: .telephoneNumber)
+                GlassTextField(placeholder: "Email", text: $email, icon: "envelope.fill", keyboardType: .emailAddress, contentType: .emailAddress)
+                GlassTextField(placeholder: "Password (6+ chars)", text: $password, icon: "lock.fill", isSecure: true, contentType: .newPassword)
 
-                    Picker("Gender", selection: $gender) {
-                        Text("Male").tag("Male")
-                        Text("Female").tag("Female")
-                        Text("Other").tag("Other")
-                    }
-                    .pickerStyle(.segmented)
+                Picker("Gender", selection: $gender) {
+                    Text("Male").tag("Male")
+                    Text("Female").tag("Female")
+                    Text("Other").tag("Other")
+                }
+                .pickerStyle(.segmented)
 
-                    if let errorMessage {
-                        Text(errorMessage)
-                            .font(.caption)
-                            .foregroundStyle(.red)
-                            .frame(maxWidth: .infinity, alignment: .leading)
-                    }
+                if let errorMessage {
+                    Text(errorMessage)
+                        .font(.caption)
+                        .foregroundStyle(.red)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
             }
+            .padding(24)
+            .frame(maxWidth: .infinity)
+            .background(.white, in: RoundedRectangle(cornerRadius: 24, style: .continuous))
+            .shadow(color: .black.opacity(0.08), radius: 20, y: 6)
 
             PrimaryButton(title: "Create Account", icon: "checkmark.circle.fill", isLoading: isSubmitting) {
                 signUp()
