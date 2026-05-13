@@ -28,5 +28,7 @@ fastlane/test_output
 .DS_Store
 
 ## Secrets
-Secrets.swift
+# Secrets.swift defaults to reading env vars — safe to commit. If you switch
+# to hardcoded keys for local dev, uncomment the next line.
+# Secrets.swift
 GoogleService-Info.plist

@@ -1,12 +1,8 @@
 import SwiftUI
 
 struct DevicePostureView: View {
-    @State private var lastScan: Date = .now
-    @State private var jailbroken: Bool = false
-    @State private var passcodeSet: Bool = true
-    @State private var biometricsEnabled: Bool = true
-    @State private var iCloudKeychainOn: Bool = true
-    @State private var screenLockTimeout: Int = 60
+    @State private var posture: DevicePosture = DevicePostureService.evaluate()
+    @State private var isRefreshing: Bool = false
 
     var body: some View {
         ZStack {
@@ -16,25 +12,51 @@ struct DevicePostureView: View {
                     summaryCard
                     SectionHeader("Device Checks").padding(.horizontal, 24)
                     VStack(spacing: 10) {
-                        checkRow("Jailbreak Detection", isSafe: !jailbroken, detail: jailbroken ? "Suspicious files detected" : "No jailbreak detected", icon: "lock.iphone")
-                        checkRow("Passcode Set", isSafe: passcodeSet, detail: passcodeSet ? "Device passcode is enabled" : "No passcode set", icon: "key.fill")
-                        checkRow("Biometrics", isSafe: biometricsEnabled, detail: biometricsEnabled ? "Face ID enabled" : "Not configured", icon: "faceid")
-                        checkRow("iCloud Keychain", isSafe: iCloudKeychainOn, detail: iCloudKeychainOn ? "Synced & enabled" : "Disabled", icon: "icloud.fill")
-                        checkRow("Auto-Lock", isSafe: screenLockTimeout <= 120, detail: "Locks after \(screenLockTimeout) seconds", icon: "moon.fill")
+                        checkRow(
+                            "Jailbreak Detection",
+                            isSafe: !posture.jailbreak.isJailbroken,
+                            detail: posture.jailbreak.isJailbroken
+                                ? jailbreakReason
+                                : "No jailbreak signals detected",
+                            icon: "lock.iphone"
+                        )
+                        checkRow(
+                            "Passcode Set",
+                            isSafe: posture.passcodeSet,
+                            detail: posture.passcodeSet ? "Device passcode is enabled" : "No passcode set",
+                            icon: "key.fill"
+                        )
+                        checkRow(
+                            biometricTitle,
+                            isSafe: posture.biometricsEnrolled,
+                            detail: posture.biometricsEnrolled ? "Enrolled and active" : "Not configured",
+                            icon: biometricIcon
+                        )
+                        checkRow(
+                            "Sandbox Integrity",
+                            isSafe: !posture.jailbreak.canEscapeSandbox,
+                            detail: posture.jailbreak.canEscapeSandbox
+                                ? "Sandbox escape possible — device is compromised"
+                                : "App sandbox is intact",
+                            icon: "shippingbox.fill"
+                        )
+                        checkRow(
+                            "Lockdown Mode",
+                            isSafe: !posture.isOnLockdownMode,
+                            detail: posture.isOnLockdownMode
+                                ? "Lockdown Mode active — some features restricted"
+                                : "Standard mode",
+                            icon: "shield.lefthalf.filled"
+                        )
                     }.padding(.horizontal)
 
-                    SectionHeader("Risky Apps")
+                    SectionHeader("Notes")
                         .padding(.horizontal, 24)
                         .padding(.top, 8)
-                    Text("On iOS, third-party apps' permissions are not enumerable. This list shows apps you've granted system-level capabilities to.")
+                    Text("On iOS, third-party apps' permissions are sandboxed and cannot be enumerated by another app. This view shows device-level signals instead — they are the closest analogue to Android's Permission Monitor.")
                         .font(.caption)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal)
-                    VStack(spacing: 10) {
-                        ForEach(MockData.riskyApps) { app in
-                            riskyAppRow(app)
-                        }
-                    }.padding(.horizontal)
 
                     Spacer(minLength: 60)
                 }
@@ -46,30 +68,29 @@ struct DevicePostureView: View {
         .toolbar {
             ToolbarItem(placement: .topBarTrailing) {
                 Button {
-                    withAnimation { lastScan = .now }
-                } label: { Image(systemName: "arrow.clockwise") }
+                    refresh()
+                } label: { Image(systemName: isRefreshing ? "arrow.clockwise.circle.fill" : "arrow.clockwise") }
+                .disabled(isRefreshing)
             }
         }
     }
 
     private var summaryCard: some View {
         GlassCard {
-            VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 12) {
-                    Image(systemName: jailbroken ? "exclamationmark.shield.fill" : "checkmark.shield.fill")
-                        .font(.system(size: 32))
-                        .foregroundStyle(jailbroken ? Brand.unsafe : Brand.safe)
-                        .padding(12)
-                        .liquidGlass(in: Circle(), tint: (jailbroken ? Brand.unsafe : Brand.safe).opacity(0.15))
-                    VStack(alignment: .leading) {
-                        Text(jailbroken ? "Device At Risk" : "Device Healthy")
-                            .font(Typography.title)
-                        Text("Last scan: \(lastScan.relativeString)")
-                            .font(.caption)
-                            .foregroundStyle(.secondary)
-                    }
-                    Spacer()
+            HStack(spacing: 12) {
+                Image(systemName: posture.isHealthy ? "checkmark.shield.fill" : "exclamationmark.shield.fill")
+                    .font(.system(size: 32))
+                    .foregroundStyle(posture.isHealthy ? Brand.safe : Brand.unsafe)
+                    .padding(12)
+                    .liquidGlass(in: Circle(), tint: (posture.isHealthy ? Brand.safe : Brand.unsafe).opacity(0.15))
+                VStack(alignment: .leading) {
+                    Text(posture.isHealthy ? "Device Healthy" : "Device At Risk")
+                        .font(Typography.title)
+                    Text("Last check: \(posture.lastEvaluated.relativeString)")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
                 }
+                Spacer()
             }
         }
         .padding(.horizontal)
@@ -93,22 +114,42 @@ struct DevicePostureView: View {
         .liquidGlassCard(cornerRadius: 16)
     }
 
-    private func riskyAppRow(_ app: MockRiskyApp) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: "app.fill")
-                .font(.title3)
-                .foregroundStyle(Brand.primary)
-                .frame(width: 40, height: 40)
-                .liquidGlass(in: Circle())
-            VStack(alignment: .leading, spacing: 2) {
-                Text(app.appName).font(.subheadline.weight(.semibold))
-                Text(app.permissions).font(.caption2).foregroundStyle(.secondary)
-            }
-            Spacer()
-            StatusPill(text: app.riskLabel, kind: .forRiskLabel(app.riskLabel))
+    private var jailbreakReason: String {
+        var parts: [String] = []
+        if posture.jailbreak.suspiciousFilesFound { parts.append("suspicious files") }
+        if posture.jailbreak.canEscapeSandbox     { parts.append("sandbox writable") }
+        if posture.jailbreak.canFork              { parts.append("fork() succeeds") }
+        if posture.jailbreak.cydiaURLOpenable     { parts.append("cydia:// scheme") }
+        return parts.isEmpty ? "Heuristic match" : parts.joined(separator: ", ")
+    }
+
+    private var biometricTitle: String {
+        switch posture.biometricKind {
+        case .faceID:  return "Face ID"
+        case .touchID: return "Touch ID"
+        case .opticID: return "Optic ID"
+        case .none:    return "Biometrics"
         }
-        .padding(12)
-        .liquidGlassCard(cornerRadius: 16)
+    }
+
+    private var biometricIcon: String {
+        switch posture.biometricKind {
+        case .faceID:  return "faceid"
+        case .touchID: return "touchid"
+        case .opticID: return "opticid"
+        case .none:    return "lock"
+        }
+    }
+
+    private func refresh() {
+        isRefreshing = true
+        Task {
+            try? await Task.sleep(for: .milliseconds(400))
+            await MainActor.run {
+                posture = DevicePostureService.evaluate()
+                isRefreshing = false
+            }
+        }
     }
 }
 

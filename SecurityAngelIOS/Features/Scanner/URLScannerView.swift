@@ -5,14 +5,22 @@ enum ScanState {
     case scanning(String)
     case safe(maliciousCount: Int)
     case unsafe(maliciousCount: Int)
+    case failed(String)
 }
 
 struct URLScannerView: View {
     @Binding var showMenu: Bool
     @State private var url: String = ""
     @State private var state: ScanState = .idle
+    @State private var engineResults: [VTEngineResult] = []
     @State private var showInfo: Bool = false
-    private let results = MockData.engineResults
+    @State private var currentTask: Task<Void, Never>? = nil
+
+    private let vt = VirusTotalAPI()
+    private let vendorsToShow: Set<String> = [
+        "Kaspersky", "Google Safebrowsing", "PhishTank", "OpenPhish",
+        "BitDefender", "ESET", "Sophos", "Microsoft", "McAfee"
+    ]
 
     var body: some View {
         ZStack {
@@ -37,7 +45,7 @@ struct URLScannerView: View {
 
                     inputCard
                     resultCard
-                    if shouldShowEngines { enginesCard }
+                    if !engineResults.isEmpty { enginesCard }
                     Spacer(minLength: 80)
                 }
                 .padding(.bottom)
@@ -49,6 +57,7 @@ struct URLScannerView: View {
                 .presentationDetents([.medium])
                 .presentationBackground(.regularMaterial)
         }
+        .onDisappear { currentTask?.cancel() }
     }
 
     private var inputCard: some View {
@@ -72,7 +81,7 @@ struct URLScannerView: View {
                     icon: "magnifyingglass",
                     isLoading: isScanning
                 ) {
-                    runMockScan()
+                    runScan()
                 }
                 .disabled(url.isEmpty || isScanning)
                 .opacity(url.isEmpty ? 0.5 : 1)
@@ -108,13 +117,13 @@ struct URLScannerView: View {
             SectionHeader("Engine Results")
                 .padding(.horizontal, 24)
             VStack(spacing: 6) {
-                ForEach(results) { r in
+                ForEach(displayEngines, id: \.engineName) { r in
                     HStack {
                         Image(systemName: r.isClean ? "checkmark.shield.fill" : "exclamationmark.triangle.fill")
                             .foregroundStyle(r.isClean ? Brand.safe : Brand.unsafe)
-                        Text(r.name)
+                        Text(r.engineName ?? "Unknown")
                         Spacer()
-                        Text(r.status.capitalized)
+                        Text((r.result ?? "—").capitalized)
                             .font(.caption.bold())
                             .foregroundStyle(r.isClean ? Brand.safe : Brand.unsafe)
                     }
@@ -131,7 +140,7 @@ struct URLScannerView: View {
         VStack(alignment: .leading, spacing: 16) {
             Capsule().fill(.gray.opacity(0.3)).frame(width: 40, height: 4).frame(maxWidth: .infinity)
             Text("How it works").font(Typography.title)
-            Text("Our scanner analyzes URLs using over 70 antivirus engines to detect malware, phishing, and other threats.")
+            Text("Our scanner analyzes URLs using over 70 antivirus engines (VirusTotal) to detect malware, phishing, and other threats.")
                 .font(.body)
             Label("Green check — the site is safe.", systemImage: "checkmark.shield.fill")
                 .foregroundStyle(Brand.safe)
@@ -144,7 +153,57 @@ struct URLScannerView: View {
         .padding()
     }
 
-    // MARK: helpers
+    // MARK: - Scan
+
+    private func runScan() {
+        currentTask?.cancel()
+        engineResults = []
+        state = .scanning("Checking Database…")
+
+        currentTask = Task {
+            do {
+                if let attrs = try await vt.lookup(url: url) {
+                    await applyResult(attrs)
+                    return
+                }
+                await MainActor.run { state = .scanning("Submitting URL…") }
+                let id = try await vt.submit(url: url)
+                await MainActor.run { state = .scanning("Analyzing with 70 engines…") }
+                try await vt.pollUntilComplete(analysisId: id)
+                await MainActor.run { state = .scanning("Finalizing report…") }
+                if let final = try await vt.lookup(url: url) {
+                    await applyResult(final)
+                } else {
+                    await MainActor.run { state = .failed("VirusTotal returned no final report") }
+                }
+            } catch {
+                if Task.isCancelled { return }
+                await MainActor.run { state = .failed(error.localizedDescription) }
+            }
+        }
+    }
+
+    @MainActor
+    private func applyResult(_ attrs: VTAttributes) {
+        let malicious = attrs.maliciousCount
+        state = malicious == 0 ? .safe(maliciousCount: 0) : .unsafe(maliciousCount: malicious)
+        engineResults = (attrs.lastAnalysisResults ?? [:]).values
+            .sorted { lhs, rhs in
+                let lc = lhs.isClean
+                let rc = rhs.isClean
+                if lc != rc { return !lc }
+                return (lhs.engineName ?? "") < (rhs.engineName ?? "")
+            }
+    }
+
+    private var displayEngines: [VTEngineResult] {
+        engineResults.filter { r in
+            guard let name = r.engineName else { return false }
+            return vendorsToShow.contains(name) || !r.isClean
+        }
+    }
+
+    // MARK: - View helpers
 
     private var isScanning: Bool {
         if case .scanning = state { return true } else { return false }
@@ -155,19 +214,13 @@ struct URLScannerView: View {
         return "Scan"
     }
 
-    private var shouldShowEngines: Bool {
-        switch state {
-        case .safe, .unsafe: return true
-        default: return false
-        }
-    }
-
     private var resultIcon: String {
         switch state {
         case .idle:     return "shield.lefthalf.filled"
         case .scanning: return "hourglass"
         case .safe:     return "checkmark.shield.fill"
         case .unsafe:   return "exclamationmark.triangle.fill"
+        case .failed:   return "wifi.exclamationmark"
         }
     }
 
@@ -176,35 +229,27 @@ struct URLScannerView: View {
         case .idle, .scanning: return Brand.primary
         case .safe:            return Brand.safe
         case .unsafe:          return Brand.unsafe
+        case .failed:          return Brand.warning
         }
     }
 
     private var resultTitle: String {
         switch state {
-        case .idle:     return "Ready"
+        case .idle:           return "Ready"
         case .scanning(let s): return s
-        case .safe:     return "Safe"
-        case .unsafe(let n): return "Unsafe!"
+        case .safe:           return "Safe"
+        case .unsafe:         return "Unsafe!"
+        case .failed:         return "Error"
         }
     }
 
     private var resultSubtitle: String {
         switch state {
-        case .idle:     return "Paste a URL and tap Scan."
-        case .scanning: return "Querying VirusTotal…"
-        case .safe:     return "No threats detected by any of 70+ engines."
-        case .unsafe(let n): return "Found \(n) threats."
-        }
-    }
-
-    private func runMockScan() {
-        state = .scanning("Checking Database…")
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.7) {
-            state = .scanning("Analyzing with 70 engines…")
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.4) {
-                let isSafe = url.contains("github") || url.contains("apple") || url.contains("news")
-                state = isSafe ? .safe(maliciousCount: 0) : .unsafe(maliciousCount: 3)
-            }
+        case .idle:           return "Paste a URL and tap Scan."
+        case .scanning:       return "Querying VirusTotal…"
+        case .safe:           return "No threats detected by any of 70+ engines."
+        case .unsafe(let n):  return "Found \(n) threat\(n == 1 ? "" : "s")."
+        case .failed(let m):  return m
         }
     }
 }

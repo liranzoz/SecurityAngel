@@ -1,10 +1,15 @@
 import SwiftUI
+import PhotosUI
 
 struct AIChatView: View {
     @Binding var showMenu: Bool
     @State private var messages: [MockChatMessage] = MockData.chatHistory
     @State private var draft: String = ""
-    @State private var showImagePreview: Bool = false
+    @State private var selectedPhoto: PhotosPickerItem? = nil
+    @State private var selectedImage: UIImage? = nil
+    @State private var pendingTask: Task<Void, Never>? = nil
+
+    private let gemini = GeminiAPI()
 
     var body: some View {
         ZStack {
@@ -26,11 +31,13 @@ struct AIChatView: View {
                         withAnimation { proxy.scrollTo(messages.last?.id, anchor: .bottom) }
                     }
                 }
-                if showImagePreview { previewBar }
+                if selectedImage != nil { previewBar }
                 inputBar
             }
         }
         .toolbar(.hidden, for: .navigationBar)
+        .onChange(of: selectedPhoto) { _, newItem in loadPhoto(newItem) }
+        .onDisappear { pendingTask?.cancel() }
     }
 
     private var header: some View {
@@ -60,16 +67,22 @@ struct AIChatView: View {
 
     private var previewBar: some View {
         HStack {
-            ZStack(alignment: .topTrailing) {
-                RoundedRectangle(cornerRadius: 12, style: .continuous)
-                    .fill(.gray.opacity(0.2))
+            if let img = selectedImage {
+                Image(uiImage: img)
+                    .resizable()
+                    .scaledToFill()
                     .frame(width: 80, height: 80)
-                    .overlay(Image(systemName: "photo").foregroundStyle(.secondary))
-                Button { showImagePreview = false } label: {
-                    Image(systemName: "xmark.circle.fill")
-                        .foregroundStyle(.white, .black)
-                }
-                .offset(x: 8, y: -8)
+                    .clipShape(.rect(cornerRadius: 12))
+                    .overlay(alignment: .topTrailing) {
+                        Button {
+                            selectedImage = nil
+                            selectedPhoto = nil
+                        } label: {
+                            Image(systemName: "xmark.circle.fill")
+                                .foregroundStyle(.white, .black)
+                        }
+                        .offset(x: 8, y: -8)
+                    }
             }
             Text("Photo attached for analysis")
                 .font(.caption)
@@ -81,7 +94,7 @@ struct AIChatView: View {
 
     private var inputBar: some View {
         HStack(spacing: 10) {
-            Button { showImagePreview = true } label: {
+            PhotosPicker(selection: $selectedPhoto, matching: .images, photoLibrary: .shared()) {
                 Image(systemName: "photo.badge.plus")
                     .font(.title3.weight(.semibold))
                     .foregroundStyle(Brand.primary)
@@ -105,28 +118,68 @@ struct AIChatView: View {
                     .background(Brand.primary, in: Circle())
                     .shadow(color: Brand.primary.opacity(0.4), radius: 8, y: 4)
             }
-            .disabled(draft.trimmingCharacters(in: .whitespaces).isEmpty)
-            .opacity(draft.trimmingCharacters(in: .whitespaces).isEmpty ? 0.5 : 1)
+            .disabled(draft.trimmingCharacters(in: .whitespaces).isEmpty && selectedImage == nil)
+            .opacity(canSend ? 1 : 0.5)
         }
         .padding()
     }
 
+    private var canSend: Bool {
+        !draft.trimmingCharacters(in: .whitespaces).isEmpty || selectedImage != nil
+    }
+
+    // MARK: - Send
+
     private func send() {
         let text = draft.trimmingCharacters(in: .whitespaces)
-        guard !text.isEmpty else { return }
-        messages.append(MockChatMessage(text: text, isUser: true, isLoading: false, hasImage: showImagePreview))
+        let image = selectedImage
+        guard !text.isEmpty || image != nil else { return }
+
+        messages.append(MockChatMessage(text: text, isUser: true, isLoading: false, hasImage: image != nil))
         draft = ""
-        showImagePreview = false
+        selectedImage = nil
+        selectedPhoto = nil
 
         messages.append(MockChatMessage(text: "", isUser: false, isLoading: true, hasImage: false))
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-            if let idx = messages.firstIndex(where: { $0.isLoading }) {
-                messages.remove(at: idx)
+
+        pendingTask = Task {
+            do {
+                // No real Firestore context yet — pass placeholders this turn.
+                let prompt = GeminiPromptBuilder.buildPrompt(
+                    userName: MockData.currentUser.firstName,
+                    totalPasswords: MockData.passwords.count,
+                    leakedPasswords: MockData.passwords.filter(\.isLeaked).count,
+                    familyStatus: "Safe",
+                    lastScan: "No recent scans",
+                    rootStatus: JailbreakDetector.evaluate().isJailbroken ? "JAILBROKEN" : "Healthy",
+                    riskyAppsText: "None enumerable on iOS",
+                    userMessage: text
+                )
+                let reply = try await gemini.generate(prompt: prompt, image: image)
+                await applyReply(reply)
+            } catch {
+                await applyReply("⚠️ \(error.localizedDescription)")
             }
-            messages.append(MockChatMessage(
-                text: "I'm just a static placeholder for now — wiring Gemini next phase. ✨",
-                isUser: false, isLoading: false, hasImage: false
-            ))
+        }
+    }
+
+    @MainActor
+    private func applyReply(_ raw: String) {
+        let (text, action) = GeminiPromptBuilder.extractAction(from: raw)
+        if let idx = messages.firstIndex(where: { $0.isLoading }) {
+            messages.remove(at: idx)
+        }
+        messages.append(MockChatMessage(text: text, isUser: false, isLoading: false, hasImage: false))
+        _ = action  // wiring deep-link actions comes with AppState next turn
+    }
+
+    private func loadPhoto(_ item: PhotosPickerItem?) {
+        guard let item else { return }
+        Task {
+            if let data = try? await item.loadTransferable(type: Data.self),
+               let img = UIImage(data: data) {
+                await MainActor.run { selectedImage = img }
+            }
         }
     }
 }

@@ -7,28 +7,12 @@ struct DashboardView: View {
     private let recentScans = MockData.recentScans
 
     var body: some View {
-        ZStack {
+        ZStack(alignment: .top) {
             Brand.backgroundGradient.ignoresSafeArea()
 
-            ScrollView {
-                VStack(spacing: 0) {
-                    header
-                    tilesRow
-                    recentScansSection
-                    Spacer(minLength: 80)
-                }
-            }
-        }
-        .toolbar(.hidden, for: .navigationBar)
-    }
-
-    private var header: some View {
-        ZStack(alignment: .top) {
-            RoundedRectangle(cornerRadius: 0, style: .continuous)
-                .fill(Brand.headerGradient)
-                .frame(height: 360)
+            Brand.headerGradient
+                .frame(height: 380)
                 .clipShape(.rect(bottomLeadingRadius: 36, bottomTrailingRadius: 36))
-                .ignoresSafeArea(edges: .top)
                 .overlay(alignment: .topLeading) {
                     Circle()
                         .fill(.white.opacity(0.08))
@@ -41,40 +25,55 @@ struct DashboardView: View {
                         .frame(width: 140, height: 140)
                         .offset(x: 40, y: 100)
                 }
+                .ignoresSafeArea(edges: .top)
 
-            VStack(spacing: 16) {
-                HStack {
-                    Button { showMenu = true } label: {
-                        Image(systemName: "line.3.horizontal")
-                            .font(.title3.weight(.semibold))
-                            .foregroundStyle(.white)
-                            .frame(width: 44, height: 44)
-                            .liquidGlass(in: Circle())
-                    }
-                    Spacer()
-                    VStack(spacing: 2) {
-                        Text("Welcome back")
-                            .font(.caption)
-                            .foregroundStyle(.white.opacity(0.85))
-                        Text(user.firstName)
-                            .font(.headline)
-                            .foregroundStyle(.white)
-                    }
-                    Spacer()
-                    Image(systemName: "bell.fill")
+            ScrollView {
+                VStack(spacing: 0) {
+                    header
+                    tilesRow
+                    recentScansSection
+                    Spacer(minLength: 80)
+                }
+            }
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .toolbarBackground(.hidden, for: .navigationBar)
+        .statusBarHidden(false)
+    }
+
+    private var header: some View {
+        VStack(spacing: 16) {
+            HStack {
+                Button { showMenu = true } label: {
+                    Image(systemName: "line.3.horizontal")
                         .font(.title3.weight(.semibold))
                         .foregroundStyle(.white)
                         .frame(width: 44, height: 44)
                         .liquidGlass(in: Circle())
                 }
-                .padding(.horizontal)
-                .padding(.top, 8)
-
-                ScoreRing(score: score, size: 220)
-                    .padding(.top, 12)
+                Spacer()
+                VStack(spacing: 2) {
+                    Text("Welcome back")
+                        .font(.caption)
+                        .foregroundStyle(.white.opacity(0.85))
+                    Text(user.firstName)
+                        .font(.headline)
+                        .foregroundStyle(.white)
+                }
+                Spacer()
+                Image(systemName: "bell.fill")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 44, height: 44)
+                    .liquidGlass(in: Circle())
             }
+            .padding(.horizontal)
+
+            ScoreRing(score: score, size: 220)
+                .padding(.top, 12)
         }
-        .frame(height: 360)
+        .padding(.top, 8)
+        .frame(height: 380)
     }
 
     private var tilesRow: some View {

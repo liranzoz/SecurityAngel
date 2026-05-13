@@ -37,6 +37,18 @@
 		D0000000000000000000001C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000001C /* SettingsView.swift */; };
 		D0000000000000000000001D /* MenuSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000001D /* MenuSheet.swift */; };
 		A22222222222222222222222 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A21111111111111111111111 /* Assets.xcassets */; };
+		D00000000000000000000020 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000020 /* Models.swift */; };
+		D00000000000000000000021 /* VaultCryptoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000021 /* VaultCryptoManager.swift */; };
+		D00000000000000000000022 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000022 /* KeychainHelper.swift */; };
+		D00000000000000000000023 /* JailbreakDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000023 /* JailbreakDetector.swift */; };
+		D00000000000000000000024 /* DevicePostureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000024 /* DevicePostureService.swift */; };
+		D00000000000000000000025 /* VirusTotalAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000025 /* VirusTotalAPI.swift */; };
+		D00000000000000000000026 /* HaveIBeenPwnedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */; };
+		D00000000000000000000027 /* GeminiAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000027 /* GeminiAPI.swift */; };
+		D00000000000000000000028 /* ScoreCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000028 /* ScoreCalculator.swift */; };
+		D00000000000000000000029 /* DomainMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000029 /* DomainMatcher.swift */; };
+		D0000000000000000000002A /* SecurityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000002A /* SecurityConstants.swift */; };
+		D0000000000000000000002B /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000002B /* Secrets.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +84,18 @@
 		C0000000000000000000001B /* SecurityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityLogView.swift; sourceTree = "<group>"; };
 		C0000000000000000000001C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		C0000000000000000000001D /* MenuSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSheet.swift; sourceTree = "<group>"; };
+		C00000000000000000000020 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		C00000000000000000000021 /* VaultCryptoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultCryptoManager.swift; sourceTree = "<group>"; };
+		C00000000000000000000022 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		C00000000000000000000023 /* JailbreakDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetector.swift; sourceTree = "<group>"; };
+		C00000000000000000000024 /* DevicePostureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePostureService.swift; sourceTree = "<group>"; };
+		C00000000000000000000025 /* VirusTotalAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirusTotalAPI.swift; sourceTree = "<group>"; };
+		C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaveIBeenPwnedAPI.swift; sourceTree = "<group>"; };
+		C00000000000000000000027 /* GeminiAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiAPI.swift; sourceTree = "<group>"; };
+		C00000000000000000000028 /* ScoreCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCalculator.swift; sourceTree = "<group>"; };
+		C00000000000000000000029 /* DomainMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainMatcher.swift; sourceTree = "<group>"; };
+		C0000000000000000000002A /* SecurityConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityConstants.swift; sourceTree = "<group>"; };
+		C0000000000000000000002B /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -106,12 +130,64 @@
 			children = (
 				B0000000000000000000001A /* App */,
 				B0000000000000000000002A /* DesignSystem */,
+				B00000000000000000000020 /* Models */,
+				B00000000000000000000021 /* Crypto */,
+				B00000000000000000000022 /* Services */,
+				B00000000000000000000023 /* Logic */,
+				B00000000000000000000024 /* State */,
 				B0000000000000000000004A /* Features */,
 				B0000000000000000000003A /* Mock */,
 				A21111111111111111111111 /* Assets.xcassets */,
 				B00000000000000000000010 /* Preview Content */,
 			);
 			path = SecurityAngelIOS;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000020 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000020 /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000021 /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000021 /* VaultCryptoManager.swift */,
+				C00000000000000000000022 /* KeychainHelper.swift */,
+			);
+			path = Crypto;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000022 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000023 /* JailbreakDetector.swift */,
+				C00000000000000000000024 /* DevicePostureService.swift */,
+				C00000000000000000000025 /* VirusTotalAPI.swift */,
+				C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */,
+				C00000000000000000000027 /* GeminiAPI.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000023 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000028 /* ScoreCalculator.swift */,
+				C00000000000000000000029 /* DomainMatcher.swift */,
+				C0000000000000000000002A /* SecurityConstants.swift */,
+			);
+			path = Logic;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000024 /* State */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000002B /* Secrets.swift */,
+			);
+			path = State;
 			sourceTree = "<group>";
 		};
 		B0000000000000000000001A /* App */ = {
@@ -369,6 +445,18 @@
 				D0000000000000000000001B /* SecurityLogView.swift in Sources */,
 				D0000000000000000000001C /* SettingsView.swift in Sources */,
 				D0000000000000000000001D /* MenuSheet.swift in Sources */,
+				D00000000000000000000020 /* Models.swift in Sources */,
+				D00000000000000000000021 /* VaultCryptoManager.swift in Sources */,
+				D00000000000000000000022 /* KeychainHelper.swift in Sources */,
+				D00000000000000000000023 /* JailbreakDetector.swift in Sources */,
+				D00000000000000000000024 /* DevicePostureService.swift in Sources */,
+				D00000000000000000000025 /* VirusTotalAPI.swift in Sources */,
+				D00000000000000000000026 /* HaveIBeenPwnedAPI.swift in Sources */,
+				D00000000000000000000027 /* GeminiAPI.swift in Sources */,
+				D00000000000000000000028 /* ScoreCalculator.swift in Sources */,
+				D00000000000000000000029 /* DomainMatcher.swift in Sources */,
+				D0000000000000000000002A /* SecurityConstants.swift in Sources */,
+				D0000000000000000000002B /* Secrets.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

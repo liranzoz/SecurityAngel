@@ -7,6 +7,7 @@ struct PasswordVaultView: View {
     @State private var showAddSheet = false
     @State private var revealedIDs: Set<String> = []
     @State private var isLocked: Bool = true
+    @State private var lockError: String? = nil
 
     private var filtered: [MockPasswordAccount] {
         guard !query.isEmpty else { return accounts }
@@ -47,15 +48,53 @@ struct PasswordVaultView: View {
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.secondary)
                 .padding(.horizontal, 40)
-            PrimaryButton(title: "Unlock with Face ID", icon: "faceid") {
-                withAnimation(.spring) { isLocked = false }
+            if let lockError {
+                Text(lockError)
+                    .font(.caption)
+                    .foregroundStyle(.red)
+                    .padding(.horizontal, 32)
+            }
+            PrimaryButton(title: biometricButtonTitle, icon: biometricIcon) {
+                unlockWithBiometric()
             }
             .padding(.horizontal, 32)
+            .disabled(!KeychainHelper.biometricsAvailable)
+            .opacity(KeychainHelper.biometricsAvailable ? 1 : 0.4)
+
             Button("Use PIN instead") {
                 withAnimation(.spring) { isLocked = false }
             }
             .foregroundStyle(Brand.primary)
             Spacer()
+        }
+    }
+
+    private var biometricButtonTitle: String {
+        KeychainHelper.biometricsAvailable
+            ? (KeychainHelper.hasStoredPIN ? "Unlock with Face ID" : "Face ID not configured")
+            : "Biometrics unavailable"
+    }
+
+    private var biometricIcon: String {
+        DevicePostureService.evaluate().biometricKind == .touchID ? "touchid" : "faceid"
+    }
+
+    private func unlockWithBiometric() {
+        lockError = nil
+        guard KeychainHelper.hasStoredPIN else {
+            lockError = "No PIN stored yet — set one up after sign-in."
+            withAnimation(.spring) { isLocked = false }
+            return
+        }
+        Task {
+            do {
+                _ = try await KeychainHelper.readPIN()
+                await MainActor.run {
+                    withAnimation(.spring) { isLocked = false }
+                }
+            } catch {
+                await MainActor.run { lockError = "Authentication failed. Try the PIN." }
+            }
         }
     }
 
