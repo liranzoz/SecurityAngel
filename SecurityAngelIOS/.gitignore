@@ -35,3 +35,8 @@ fastlane/test_output
 # to hardcoded keys for local dev, uncomment the next line.
 # Secrets.swift
 GoogleService-Info.plist
+
+# Schemes contain runtime EnvironmentVariables which may include API keys.
+# Use xcuserdata schemes for local dev; never commit a shared scheme that
+# carries secrets. If you need a shared scheme, strip EnvironmentVariables first.
+SecurityAngelIOS.xcodeproj/xcshareddata/xcschemes/*.xcscheme
