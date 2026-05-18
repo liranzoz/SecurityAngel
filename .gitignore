@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Outputs folder is workspace-specific, never check it in
+outputs/
