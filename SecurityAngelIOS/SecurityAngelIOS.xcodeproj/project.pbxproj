@@ -1,0 +1,1038 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 71;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0E0000000000000000000050 /* CredentialProviderViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0E0000000000000000000040 /* CredentialProviderViewController.swift */; };
+		0E0000000000000000000063 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E743D2512FB4624300A3E8B7 /* GoogleService-Info.plist */; };
+		0E0000000000000000000064 /* SecurityAngelAutoFill.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 0E0000000000000000000002 /* SecurityAngelAutoFill.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		0E0000000000000000000070 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000020 /* Models.swift */; };
+		0E0000000000000000000071 /* VaultCryptoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000021 /* VaultCryptoManager.swift */; };
+		0E0000000000000000000072 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000022 /* KeychainHelper.swift */; };
+		0E0000000000000000000073 /* DomainMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000029 /* DomainMatcher.swift */; };
+		0E0000000000000000000074 /* SharedKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000021 /* SharedKeychain.swift */; };
+		0E0000000000000000000080 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0000000000000000000090 /* FirebaseAuth */; };
+		0E0000000000000000000081 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = 0E0000000000000000000091 /* FirebaseFirestore */; };
+		A22222222222222222222222 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A21111111111111111111111 /* Assets.xcassets */; };
+		D00000000000000000000001 /* SecurityAngelIOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000001 /* SecurityAngelIOSApp.swift */; };
+		D00000000000000000000002 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000002 /* RootView.swift */; };
+		D00000000000000000000003 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000003 /* Theme.swift */; };
+		D00000000000000000000004 /* LiquidGlass.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000004 /* LiquidGlass.swift */; };
+		D00000000000000000000005 /* GlassCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000005 /* GlassCard.swift */; };
+		D00000000000000000000006 /* ScoreRing.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000006 /* ScoreRing.swift */; };
+		D00000000000000000000007 /* StatusPill.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000007 /* StatusPill.swift */; };
+		D00000000000000000000008 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000008 /* PrimaryButton.swift */; };
+		D00000000000000000000009 /* GlassTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000009 /* GlassTextField.swift */; };
+		D0000000000000000000000A /* SectionHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000000A /* SectionHeader.swift */; };
+		D0000000000000000000000B /* MockData.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000000B /* MockData.swift */; };
+		D0000000000000000000000C /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000000C /* LoginView.swift */; };
+		D0000000000000000000000D /* SignUpView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000000D /* SignUpView.swift */; };
+		D0000000000000000000000E /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000000E /* DashboardView.swift */; };
+		D0000000000000000000000F /* URLScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000000F /* URLScannerView.swift */; };
+		D00000000000000000000010 /* AIChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000010 /* AIChatView.swift */; };
+		D00000000000000000000011 /* ChatBubble.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000011 /* ChatBubble.swift */; };
+		D00000000000000000000012 /* PasswordVaultView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000012 /* PasswordVaultView.swift */; };
+		D00000000000000000000013 /* PasswordRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000013 /* PasswordRow.swift */; };
+		D00000000000000000000014 /* AddPasswordSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000014 /* AddPasswordSheet.swift */; };
+		D00000000000000000000015 /* PasswordGeneratorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000015 /* PasswordGeneratorView.swift */; };
+		D00000000000000000000016 /* FamilySafetyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000016 /* FamilySafetyView.swift */; };
+		D00000000000000000000017 /* FamilyManagementView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000017 /* FamilyManagementView.swift */; };
+		D00000000000000000000018 /* AddMemberView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000018 /* AddMemberView.swift */; };
+		D00000000000000000000019 /* JoinFamilyView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000019 /* JoinFamilyView.swift */; };
+		D0000000000000000000001A /* DevicePostureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000001A /* DevicePostureView.swift */; };
+		D0000000000000000000001B /* SecurityLogView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000001B /* SecurityLogView.swift */; };
+		D0000000000000000000001C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000001C /* SettingsView.swift */; };
+		D0000000000000000000001D /* MenuSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000001D /* MenuSheet.swift */; };
+		D00000000000000000000020 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000020 /* Models.swift */; };
+		D00000000000000000000021 /* VaultCryptoManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000021 /* VaultCryptoManager.swift */; };
+		D00000000000000000000022 /* KeychainHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000022 /* KeychainHelper.swift */; };
+		D00000000000000000000023 /* JailbreakDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000023 /* JailbreakDetector.swift */; };
+		D00000000000000000000024 /* DevicePostureService.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000024 /* DevicePostureService.swift */; };
+		D00000000000000000000025 /* VirusTotalAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000025 /* VirusTotalAPI.swift */; };
+		D00000000000000000000026 /* HaveIBeenPwnedAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */; };
+		D00000000000000000000027 /* GeminiAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000027 /* GeminiAPI.swift */; };
+		D00000000000000000000028 /* ScoreCalculator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000028 /* ScoreCalculator.swift */; };
+		D00000000000000000000029 /* DomainMatcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000029 /* DomainMatcher.swift */; };
+		D0000000000000000000002A /* SecurityConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000002A /* SecurityConstants.swift */; };
+		D0000000000000000000002B /* Secrets.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000002B /* Secrets.swift */; };
+		D00000000000000000000030 /* FirebaseSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000030 /* FirebaseSupport.swift */; };
+		D00000000000000000000031 /* AppState.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000031 /* AppState.swift */; };
+		D00000000000000000000032 /* VaultSession.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000032 /* VaultSession.swift */; };
+		D00000000000000000000033 /* AuthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000033 /* AuthRepository.swift */; };
+		D00000000000000000000034 /* UserRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000034 /* UserRepository.swift */; };
+		D00000000000000000000035 /* FamilyRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000035 /* FamilyRepository.swift */; };
+		D00000000000000000000036 /* VaultRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000036 /* VaultRepository.swift */; };
+		D00000000000000000000037 /* ScanHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000037 /* ScanHistoryRepository.swift */; };
+		D00000000000000000000038 /* ChatHistoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000038 /* ChatHistoryRepository.swift */; };
+		D00000000000000000000039 /* SecurityLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = C00000000000000000000039 /* SecurityLogger.swift */; };
+		D0000000000000000000003A /* InvitationRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = C0000000000000000000003A /* InvitationRepository.swift */; };
+		E00000000000000000000020 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000010 /* FirebaseAuth */; };
+		E00000000000000000000021 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000011 /* FirebaseFirestore */; };
+		E00000000000000000000022 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000012 /* Lottie */; };
+		E00000000000000000000023 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000013 /* GoogleSignIn */; };
+		E00000000000000000000024 /* GoogleSignInSwift in Frameworks */ = {isa = PBXBuildFile; productRef = E00000000000000000000014 /* GoogleSignInSwift */; };
+		E743D2522FB4624300A3E8B7 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = E743D2512FB4624300A3E8B7 /* GoogleService-Info.plist */; };
+		F00000000000000000000040 /* anim_vault.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000030 /* anim_vault.json */; };
+		F00000000000000000000041 /* anim_family.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000031 /* anim_family.json */; };
+		F00000000000000000000042 /* anim_family_bold.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000032 /* anim_family_bold.json */; };
+		F00000000000000000000043 /* anim_male_avater.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000033 /* anim_male_avater.json */; };
+		F00000000000000000000044 /* anim_female_avater.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000034 /* anim_female_avater.json */; };
+		F00000000000000000000045 /* anim_else_avatar.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000035 /* anim_else_avatar.json */; };
+		F00000000000000000000046 /* anim_loading.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000036 /* anim_loading.json */; };
+		F00000000000000000000047 /* anim_family_avatar.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000037 /* anim_family_avatar.json */; };
+		F00000000000000000000048 /* anim_google_logo.json in Resources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000038 /* anim_google_logo.json */; };
+		F00000000000000000000050 /* LottieAvatar.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000020 /* LottieAvatar.swift */; };
+		F00000000000000000000051 /* SharedKeychain.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000021 /* SharedKeychain.swift */; };
+		F00000000000000000000052 /* GoogleSignInService.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000022 /* GoogleSignInService.swift */; };
+		F00000000000000000000053 /* AppLogo.swift in Sources */ = {isa = PBXBuildFile; fileRef = F00000000000000000000023 /* AppLogo.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0E0000000000000000000025 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = A0AAAAAAAAAAAAAAAAAAAAAA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0E0000000000000000000001;
+			remoteInfo = SecurityAngelAutoFill;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0E0000000000000000000023 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0E0000000000000000000064 /* SecurityAngelAutoFill.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0E0000000000000000000002 /* SecurityAngelAutoFill.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = SecurityAngelAutoFill.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		0E0000000000000000000040 /* CredentialProviderViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CredentialProviderViewController.swift; sourceTree = "<group>"; };
+		0E0000000000000000000060 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0E0000000000000000000061 /* SecurityAngelAutoFill.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SecurityAngelAutoFill.entitlements; sourceTree = "<group>"; };
+		0E0000000000000000000062 /* SecurityAngelIOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = SecurityAngelIOS.entitlements; sourceTree = "<group>"; };
+		A19999999999999999999999 /* SecurityAngelIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SecurityAngelIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A21111111111111111111111 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		A23333333333333333333333 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		C00000000000000000000001 /* SecurityAngelIOSApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityAngelIOSApp.swift; sourceTree = "<group>"; };
+		C00000000000000000000002 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
+		C00000000000000000000003 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		C00000000000000000000004 /* LiquidGlass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LiquidGlass.swift; sourceTree = "<group>"; };
+		C00000000000000000000005 /* GlassCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassCard.swift; sourceTree = "<group>"; };
+		C00000000000000000000006 /* ScoreRing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreRing.swift; sourceTree = "<group>"; };
+		C00000000000000000000007 /* StatusPill.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusPill.swift; sourceTree = "<group>"; };
+		C00000000000000000000008 /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
+		C00000000000000000000009 /* GlassTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GlassTextField.swift; sourceTree = "<group>"; };
+		C0000000000000000000000A /* SectionHeader.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SectionHeader.swift; sourceTree = "<group>"; };
+		C0000000000000000000000B /* MockData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MockData.swift; sourceTree = "<group>"; };
+		C0000000000000000000000C /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		C0000000000000000000000D /* SignUpView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SignUpView.swift; sourceTree = "<group>"; };
+		C0000000000000000000000E /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		C0000000000000000000000F /* URLScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLScannerView.swift; sourceTree = "<group>"; };
+		C00000000000000000000010 /* AIChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIChatView.swift; sourceTree = "<group>"; };
+		C00000000000000000000011 /* ChatBubble.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatBubble.swift; sourceTree = "<group>"; };
+		C00000000000000000000012 /* PasswordVaultView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordVaultView.swift; sourceTree = "<group>"; };
+		C00000000000000000000013 /* PasswordRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordRow.swift; sourceTree = "<group>"; };
+		C00000000000000000000014 /* AddPasswordSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPasswordSheet.swift; sourceTree = "<group>"; };
+		C00000000000000000000015 /* PasswordGeneratorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordGeneratorView.swift; sourceTree = "<group>"; };
+		C00000000000000000000016 /* FamilySafetyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilySafetyView.swift; sourceTree = "<group>"; };
+		C00000000000000000000017 /* FamilyManagementView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyManagementView.swift; sourceTree = "<group>"; };
+		C00000000000000000000018 /* AddMemberView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddMemberView.swift; sourceTree = "<group>"; };
+		C00000000000000000000019 /* JoinFamilyView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JoinFamilyView.swift; sourceTree = "<group>"; };
+		C0000000000000000000001A /* DevicePostureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePostureView.swift; sourceTree = "<group>"; };
+		C0000000000000000000001B /* SecurityLogView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityLogView.swift; sourceTree = "<group>"; };
+		C0000000000000000000001C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		C0000000000000000000001D /* MenuSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuSheet.swift; sourceTree = "<group>"; };
+		C00000000000000000000020 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		C00000000000000000000021 /* VaultCryptoManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultCryptoManager.swift; sourceTree = "<group>"; };
+		C00000000000000000000022 /* KeychainHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeychainHelper.swift; sourceTree = "<group>"; };
+		C00000000000000000000023 /* JailbreakDetector.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JailbreakDetector.swift; sourceTree = "<group>"; };
+		C00000000000000000000024 /* DevicePostureService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DevicePostureService.swift; sourceTree = "<group>"; };
+		C00000000000000000000025 /* VirusTotalAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VirusTotalAPI.swift; sourceTree = "<group>"; };
+		C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HaveIBeenPwnedAPI.swift; sourceTree = "<group>"; };
+		C00000000000000000000027 /* GeminiAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GeminiAPI.swift; sourceTree = "<group>"; };
+		C00000000000000000000028 /* ScoreCalculator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreCalculator.swift; sourceTree = "<group>"; };
+		C00000000000000000000029 /* DomainMatcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DomainMatcher.swift; sourceTree = "<group>"; };
+		C0000000000000000000002A /* SecurityConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityConstants.swift; sourceTree = "<group>"; };
+		C0000000000000000000002B /* Secrets.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Secrets.swift; sourceTree = "<group>"; };
+		C00000000000000000000030 /* FirebaseSupport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseSupport.swift; sourceTree = "<group>"; };
+		C00000000000000000000031 /* AppState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppState.swift; sourceTree = "<group>"; };
+		C00000000000000000000032 /* VaultSession.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultSession.swift; sourceTree = "<group>"; };
+		C00000000000000000000033 /* AuthRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000034 /* UserRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000035 /* FamilyRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FamilyRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000036 /* VaultRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VaultRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000037 /* ScanHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanHistoryRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000038 /* ChatHistoryRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChatHistoryRepository.swift; sourceTree = "<group>"; };
+		C00000000000000000000039 /* SecurityLogger.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecurityLogger.swift; sourceTree = "<group>"; };
+		C0000000000000000000003A /* InvitationRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InvitationRepository.swift; sourceTree = "<group>"; };
+		E743D2512FB4624300A3E8B7 /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		F00000000000000000000020 /* LottieAvatar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LottieAvatar.swift; sourceTree = "<group>"; };
+		F00000000000000000000021 /* SharedKeychain.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SharedKeychain.swift; sourceTree = "<group>"; };
+		F00000000000000000000022 /* GoogleSignInService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GoogleSignInService.swift; sourceTree = "<group>"; };
+		F00000000000000000000023 /* AppLogo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppLogo.swift; sourceTree = "<group>"; };
+		F00000000000000000000030 /* anim_vault.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_vault.json; sourceTree = "<group>"; };
+		F00000000000000000000031 /* anim_family.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_family.json; sourceTree = "<group>"; };
+		F00000000000000000000032 /* anim_family_bold.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_family_bold.json; sourceTree = "<group>"; };
+		F00000000000000000000033 /* anim_male_avater.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_male_avater.json; sourceTree = "<group>"; };
+		F00000000000000000000034 /* anim_female_avater.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_female_avater.json; sourceTree = "<group>"; };
+		F00000000000000000000035 /* anim_else_avatar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_else_avatar.json; sourceTree = "<group>"; };
+		F00000000000000000000036 /* anim_loading.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_loading.json; sourceTree = "<group>"; };
+		F00000000000000000000037 /* anim_family_avatar.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_family_avatar.json; sourceTree = "<group>"; };
+		F00000000000000000000038 /* anim_google_logo.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = anim_google_logo.json; sourceTree = "<group>"; };
+		F00000000000000000000070 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0E0000000000000000000022 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0E0000000000000000000080 /* FirebaseAuth in Frameworks */,
+				0E0000000000000000000081 /* FirebaseFirestore in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A17777777777777777777777 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E00000000000000000000020 /* FirebaseAuth in Frameworks */,
+				E00000000000000000000021 /* FirebaseFirestore in Frameworks */,
+				E00000000000000000000022 /* Lottie in Frameworks */,
+				E00000000000000000000023 /* GoogleSignIn in Frameworks */,
+				E00000000000000000000024 /* GoogleSignInSwift in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		0E0000000000000000000003 /* SecurityAngelAutoFill */ = {
+			isa = PBXGroup;
+			children = (
+				0E0000000000000000000040 /* CredentialProviderViewController.swift */,
+				0E0000000000000000000060 /* Info.plist */,
+				0E0000000000000000000061 /* SecurityAngelAutoFill.entitlements */,
+			);
+			path = SecurityAngelAutoFill;
+			sourceTree = "<group>";
+		};
+		A0BBBBBBBBBBBBBBBBBBBBBB = {
+			isa = PBXGroup;
+			children = (
+				A0DDDDDDDDDDDDDDDDDDDDDD /* SecurityAngelIOS */,
+				0E0000000000000000000003 /* SecurityAngelAutoFill */,
+				A0CCCCCCCCCCCCCCCCCCCCCC /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		A0CCCCCCCCCCCCCCCCCCCCCC /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				A19999999999999999999999 /* SecurityAngelIOS.app */,
+				0E0000000000000000000002 /* SecurityAngelAutoFill.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		A0DDDDDDDDDDDDDDDDDDDDDD /* SecurityAngelIOS */ = {
+			isa = PBXGroup;
+			children = (
+				B0000000000000000000001A /* App */,
+				B0000000000000000000002A /* DesignSystem */,
+				B00000000000000000000020 /* Models */,
+				B00000000000000000000021 /* Crypto */,
+				B00000000000000000000022 /* Services */,
+				B00000000000000000000023 /* Logic */,
+				B00000000000000000000024 /* State */,
+				F00000000000000000000010 /* Resources */,
+				F00000000000000000000070 /* Info.plist */,
+				0E0000000000000000000062 /* SecurityAngelIOS.entitlements */,
+				B0000000000000000000004A /* Features */,
+				B0000000000000000000003A /* Mock */,
+				A21111111111111111111111 /* Assets.xcassets */,
+				B00000000000000000000010 /* Preview Content */,
+				E743D2512FB4624300A3E8B7 /* GoogleService-Info.plist */,
+			);
+			path = SecurityAngelIOS;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000010 /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				A23333333333333333333333 /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		B0000000000000000000001A /* App */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000001 /* SecurityAngelIOSApp.swift */,
+				C00000000000000000000002 /* RootView.swift */,
+				C00000000000000000000003 /* Theme.swift */,
+			);
+			path = App;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000020 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000020 /* Models.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000021 /* Crypto */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000021 /* VaultCryptoManager.swift */,
+				C00000000000000000000022 /* KeychainHelper.swift */,
+			);
+			path = Crypto;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000022 /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000023 /* JailbreakDetector.swift */,
+				C00000000000000000000024 /* DevicePostureService.swift */,
+				C00000000000000000000025 /* VirusTotalAPI.swift */,
+				C00000000000000000000026 /* HaveIBeenPwnedAPI.swift */,
+				C00000000000000000000027 /* GeminiAPI.swift */,
+				C00000000000000000000033 /* AuthRepository.swift */,
+				C00000000000000000000034 /* UserRepository.swift */,
+				C00000000000000000000035 /* FamilyRepository.swift */,
+				C0000000000000000000003A /* InvitationRepository.swift */,
+				C00000000000000000000036 /* VaultRepository.swift */,
+				C00000000000000000000037 /* ScanHistoryRepository.swift */,
+				C00000000000000000000038 /* ChatHistoryRepository.swift */,
+				C00000000000000000000039 /* SecurityLogger.swift */,
+				F00000000000000000000022 /* GoogleSignInService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000023 /* Logic */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000028 /* ScoreCalculator.swift */,
+				C00000000000000000000029 /* DomainMatcher.swift */,
+				C0000000000000000000002A /* SecurityConstants.swift */,
+			);
+			path = Logic;
+			sourceTree = "<group>";
+		};
+		B00000000000000000000024 /* State */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000002B /* Secrets.swift */,
+				C00000000000000000000030 /* FirebaseSupport.swift */,
+				C00000000000000000000031 /* AppState.swift */,
+				C00000000000000000000032 /* VaultSession.swift */,
+				F00000000000000000000021 /* SharedKeychain.swift */,
+			);
+			path = State;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000002A /* DesignSystem */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000004 /* LiquidGlass.swift */,
+				C00000000000000000000005 /* GlassCard.swift */,
+				C00000000000000000000006 /* ScoreRing.swift */,
+				C00000000000000000000007 /* StatusPill.swift */,
+				C00000000000000000000008 /* PrimaryButton.swift */,
+				C00000000000000000000009 /* GlassTextField.swift */,
+				C0000000000000000000000A /* SectionHeader.swift */,
+				F00000000000000000000020 /* LottieAvatar.swift */,
+				F00000000000000000000023 /* AppLogo.swift */,
+			);
+			path = DesignSystem;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000003A /* Mock */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000000B /* MockData.swift */,
+			);
+			path = Mock;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000004A /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				B0000000000000000000005A /* Auth */,
+				B0000000000000000000006A /* Dashboard */,
+				B0000000000000000000007A /* Scanner */,
+				B0000000000000000000008A /* AI */,
+				B0000000000000000000009A /* Vault */,
+				B000000000000000000000AA /* Generator */,
+				B000000000000000000000BA /* Family */,
+				B000000000000000000000CA /* Posture */,
+				B000000000000000000000DA /* Logs */,
+				B000000000000000000000EA /* Settings */,
+				B000000000000000000000FA /* Menu */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000005A /* Auth */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000000C /* LoginView.swift */,
+				C0000000000000000000000D /* SignUpView.swift */,
+			);
+			path = Auth;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000006A /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000000E /* DashboardView.swift */,
+			);
+			path = Dashboard;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000007A /* Scanner */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000000F /* URLScannerView.swift */,
+			);
+			path = Scanner;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000008A /* AI */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000010 /* AIChatView.swift */,
+				C00000000000000000000011 /* ChatBubble.swift */,
+			);
+			path = AI;
+			sourceTree = "<group>";
+		};
+		B0000000000000000000009A /* Vault */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000012 /* PasswordVaultView.swift */,
+				C00000000000000000000013 /* PasswordRow.swift */,
+				C00000000000000000000014 /* AddPasswordSheet.swift */,
+			);
+			path = Vault;
+			sourceTree = "<group>";
+		};
+		B000000000000000000000AA /* Generator */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000015 /* PasswordGeneratorView.swift */,
+			);
+			path = Generator;
+			sourceTree = "<group>";
+		};
+		B000000000000000000000BA /* Family */ = {
+			isa = PBXGroup;
+			children = (
+				C00000000000000000000016 /* FamilySafetyView.swift */,
+				C00000000000000000000017 /* FamilyManagementView.swift */,
+				C00000000000000000000018 /* AddMemberView.swift */,
+				C00000000000000000000019 /* JoinFamilyView.swift */,
+			);
+			path = Family;
+			sourceTree = "<group>";
+		};
+		B000000000000000000000CA /* Posture */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000001A /* DevicePostureView.swift */,
+			);
+			path = Posture;
+			sourceTree = "<group>";
+		};
+		B000000000000000000000DA /* Logs */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000001B /* SecurityLogView.swift */,
+			);
+			path = Logs;
+			sourceTree = "<group>";
+		};
+		B000000000000000000000EA /* Settings */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000001C /* SettingsView.swift */,
+			);
+			path = Settings;
+			sourceTree = "<group>";
+		};
+		B000000000000000000000FA /* Menu */ = {
+			isa = PBXGroup;
+			children = (
+				C0000000000000000000001D /* MenuSheet.swift */,
+			);
+			path = Menu;
+			sourceTree = "<group>";
+		};
+		F00000000000000000000010 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000011 /* Lottie */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		F00000000000000000000011 /* Lottie */ = {
+			isa = PBXGroup;
+			children = (
+				F00000000000000000000030 /* anim_vault.json */,
+				F00000000000000000000031 /* anim_family.json */,
+				F00000000000000000000032 /* anim_family_bold.json */,
+				F00000000000000000000037 /* anim_family_avatar.json */,
+				F00000000000000000000033 /* anim_male_avater.json */,
+				F00000000000000000000034 /* anim_female_avater.json */,
+				F00000000000000000000035 /* anim_else_avatar.json */,
+				F00000000000000000000036 /* anim_loading.json */,
+				F00000000000000000000038 /* anim_google_logo.json */,
+			);
+			path = Lottie;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0E0000000000000000000001 /* SecurityAngelAutoFill */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0E0000000000000000000030 /* Build configuration list for PBXNativeTarget "SecurityAngelAutoFill" */;
+			buildPhases = (
+				0E0000000000000000000020 /* Sources */,
+				0E0000000000000000000022 /* Frameworks */,
+				0E0000000000000000000021 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = SecurityAngelAutoFill;
+			packageProductDependencies = (
+				0E0000000000000000000090 /* FirebaseAuth */,
+				0E0000000000000000000091 /* FirebaseFirestore */,
+			);
+			productName = SecurityAngelAutoFill;
+			productReference = 0E0000000000000000000002 /* SecurityAngelAutoFill.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		A0EEEEEEEEEEEEEEEEEEEEEE /* SecurityAngelIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A0FFFFFFFFFFFFFFFFFFFFFF /* Build configuration list for PBXNativeTarget "SecurityAngelIOS" */;
+			buildPhases = (
+				A16666666666666666666666 /* Sources */,
+				A17777777777777777777777 /* Frameworks */,
+				A18888888888888888888888 /* Resources */,
+				0E0000000000000000000023 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				0E0000000000000000000024 /* PBXTargetDependency */,
+			);
+			name = SecurityAngelIOS;
+			packageProductDependencies = (
+				E00000000000000000000010 /* FirebaseAuth */,
+				E00000000000000000000011 /* FirebaseFirestore */,
+				E00000000000000000000012 /* Lottie */,
+				E00000000000000000000013 /* GoogleSignIn */,
+				E00000000000000000000014 /* GoogleSignInSwift */,
+			);
+			productName = SecurityAngelIOS;
+			productReference = A19999999999999999999999 /* SecurityAngelIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		A0AAAAAAAAAAAAAAAAAAAAAA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2640;
+				LastUpgradeCheck = 2640;
+				TargetAttributes = {
+					A0EEEEEEEEEEEEEEEEEEEEEE = {
+						CreatedOnToolsVersion = 26.4.1;
+					};
+				};
+			};
+			buildConfigurationList = A11111111111111111111111 /* Build configuration list for PBXProject "SecurityAngelIOS" */;
+			compatibilityVersion = "Xcode 16.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = A0BBBBBBBBBBBBBBBBBBBBBB;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				E00000000000000000000002 /* XCRemoteSwiftPackageReference "lottie-spm" */,
+				E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+			);
+			productRefGroup = A0CCCCCCCCCCCCCCCCCCCCCC /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				A0EEEEEEEEEEEEEEEEEEEEEE /* SecurityAngelIOS */,
+				0E0000000000000000000001 /* SecurityAngelAutoFill */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		0E0000000000000000000021 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0E0000000000000000000063 /* GoogleService-Info.plist in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A18888888888888888888888 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E743D2522FB4624300A3E8B7 /* GoogleService-Info.plist in Resources */,
+				A22222222222222222222222 /* Assets.xcassets in Resources */,
+				F00000000000000000000040 /* anim_vault.json in Resources */,
+				F00000000000000000000041 /* anim_family.json in Resources */,
+				F00000000000000000000042 /* anim_family_bold.json in Resources */,
+				F00000000000000000000043 /* anim_male_avater.json in Resources */,
+				F00000000000000000000044 /* anim_female_avater.json in Resources */,
+				F00000000000000000000045 /* anim_else_avatar.json in Resources */,
+				F00000000000000000000046 /* anim_loading.json in Resources */,
+				F00000000000000000000047 /* anim_family_avatar.json in Resources */,
+				F00000000000000000000048 /* anim_google_logo.json in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0E0000000000000000000020 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0E0000000000000000000050 /* CredentialProviderViewController.swift in Sources */,
+				0E0000000000000000000070 /* Models.swift in Sources */,
+				0E0000000000000000000071 /* VaultCryptoManager.swift in Sources */,
+				0E0000000000000000000072 /* KeychainHelper.swift in Sources */,
+				0E0000000000000000000073 /* DomainMatcher.swift in Sources */,
+				0E0000000000000000000074 /* SharedKeychain.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A16666666666666666666666 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D00000000000000000000001 /* SecurityAngelIOSApp.swift in Sources */,
+				D00000000000000000000002 /* RootView.swift in Sources */,
+				D00000000000000000000003 /* Theme.swift in Sources */,
+				D00000000000000000000004 /* LiquidGlass.swift in Sources */,
+				D00000000000000000000005 /* GlassCard.swift in Sources */,
+				D00000000000000000000006 /* ScoreRing.swift in Sources */,
+				D00000000000000000000007 /* StatusPill.swift in Sources */,
+				D00000000000000000000008 /* PrimaryButton.swift in Sources */,
+				D00000000000000000000009 /* GlassTextField.swift in Sources */,
+				D0000000000000000000000A /* SectionHeader.swift in Sources */,
+				D0000000000000000000000B /* MockData.swift in Sources */,
+				D0000000000000000000000C /* LoginView.swift in Sources */,
+				D0000000000000000000000D /* SignUpView.swift in Sources */,
+				D0000000000000000000000E /* DashboardView.swift in Sources */,
+				D0000000000000000000000F /* URLScannerView.swift in Sources */,
+				D00000000000000000000010 /* AIChatView.swift in Sources */,
+				D00000000000000000000011 /* ChatBubble.swift in Sources */,
+				D00000000000000000000012 /* PasswordVaultView.swift in Sources */,
+				D00000000000000000000013 /* PasswordRow.swift in Sources */,
+				D00000000000000000000014 /* AddPasswordSheet.swift in Sources */,
+				D00000000000000000000015 /* PasswordGeneratorView.swift in Sources */,
+				D00000000000000000000016 /* FamilySafetyView.swift in Sources */,
+				D00000000000000000000017 /* FamilyManagementView.swift in Sources */,
+				D00000000000000000000018 /* AddMemberView.swift in Sources */,
+				D00000000000000000000019 /* JoinFamilyView.swift in Sources */,
+				D0000000000000000000001A /* DevicePostureView.swift in Sources */,
+				D0000000000000000000001B /* SecurityLogView.swift in Sources */,
+				D0000000000000000000001C /* SettingsView.swift in Sources */,
+				D0000000000000000000001D /* MenuSheet.swift in Sources */,
+				D00000000000000000000020 /* Models.swift in Sources */,
+				D00000000000000000000021 /* VaultCryptoManager.swift in Sources */,
+				D00000000000000000000022 /* KeychainHelper.swift in Sources */,
+				D00000000000000000000023 /* JailbreakDetector.swift in Sources */,
+				D00000000000000000000024 /* DevicePostureService.swift in Sources */,
+				D00000000000000000000025 /* VirusTotalAPI.swift in Sources */,
+				D00000000000000000000026 /* HaveIBeenPwnedAPI.swift in Sources */,
+				D00000000000000000000027 /* GeminiAPI.swift in Sources */,
+				D00000000000000000000028 /* ScoreCalculator.swift in Sources */,
+				D00000000000000000000029 /* DomainMatcher.swift in Sources */,
+				D0000000000000000000002A /* SecurityConstants.swift in Sources */,
+				D0000000000000000000002B /* Secrets.swift in Sources */,
+				D00000000000000000000030 /* FirebaseSupport.swift in Sources */,
+				D00000000000000000000031 /* AppState.swift in Sources */,
+				D00000000000000000000032 /* VaultSession.swift in Sources */,
+				D00000000000000000000033 /* AuthRepository.swift in Sources */,
+				D00000000000000000000034 /* UserRepository.swift in Sources */,
+				D00000000000000000000035 /* FamilyRepository.swift in Sources */,
+				D0000000000000000000003A /* InvitationRepository.swift in Sources */,
+				D00000000000000000000036 /* VaultRepository.swift in Sources */,
+				D00000000000000000000037 /* ScanHistoryRepository.swift in Sources */,
+				D00000000000000000000038 /* ChatHistoryRepository.swift in Sources */,
+				D00000000000000000000039 /* SecurityLogger.swift in Sources */,
+				F00000000000000000000050 /* LottieAvatar.swift in Sources */,
+				F00000000000000000000051 /* SharedKeychain.swift in Sources */,
+				F00000000000000000000052 /* GoogleSignInService.swift in Sources */,
+				F00000000000000000000053 /* AppLogo.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		0E0000000000000000000024 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0E0000000000000000000001 /* SecurityAngelAutoFill */;
+			targetProxy = 0E0000000000000000000025 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		0E0000000000000000000031 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SecurityAngelAutoFill/SecurityAngelAutoFill.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94T3QRCDAU;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SecurityAngelAutoFill/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zoz.SecurityAngelIOS.AutoFill;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		0E0000000000000000000032 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = SecurityAngelAutoFill/SecurityAngelAutoFill.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94T3QRCDAU;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SecurityAngelAutoFill/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zoz.SecurityAngelIOS.AutoFill;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A12222222222222222222222 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SecurityAngelIOS/SecurityAngelIOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SecurityAngelIOS/Preview Content\"";
+				DEVELOPMENT_TEAM = 94T3QRCDAU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SecurityAngelIOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zoz.SecurityAngelIOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		A13333333333333333333333 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = SecurityAngelIOS/SecurityAngelIOS.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"SecurityAngelIOS/Preview Content\"";
+				DEVELOPMENT_TEAM = 94T3QRCDAU;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = SecurityAngelIOS/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.zoz.SecurityAngelIOS;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		A14444444444444444444444 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		A15555555555555555555555 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0E0000000000000000000030 /* Build configuration list for PBXNativeTarget "SecurityAngelAutoFill" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0E0000000000000000000031 /* Debug */,
+				0E0000000000000000000032 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A0FFFFFFFFFFFFFFFFFFFFFF /* Build configuration list for PBXNativeTarget "SecurityAngelIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A12222222222222222222222 /* Debug */,
+				A13333333333333333333333 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		A11111111111111111111111 /* Build configuration list for PBXProject "SecurityAngelIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A14444444444444444444444 /* Debug */,
+				A15555555555555555555555 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.0.0;
+			};
+		};
+		E00000000000000000000002 /* XCRemoteSwiftPackageReference "lottie-spm" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-spm";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/google/GoogleSignIn-iOS";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 8.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		0E0000000000000000000090 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		0E0000000000000000000091 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		E00000000000000000000010 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		E00000000000000000000011 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		E00000000000000000000012 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000002 /* XCRemoteSwiftPackageReference "lottie-spm" */;
+			productName = Lottie;
+		};
+		E00000000000000000000013 /* GoogleSignIn */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignIn;
+		};
+		E00000000000000000000014 /* GoogleSignInSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E00000000000000000000003 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
+			productName = GoogleSignInSwift;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = A0AAAAAAAAAAAAAAAAAAAAAA /* Project object */;
+}

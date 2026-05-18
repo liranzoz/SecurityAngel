@@ -1,0 +1,273 @@
+import SwiftUI
+
+enum ScanState {
+    case idle
+    case scanning(String)
+    case safe(maliciousCount: Int)
+    case unsafe(maliciousCount: Int)
+    case failed(String)
+}
+
+struct URLScannerView: View {
+    @Binding var showMenu: Bool
+    @Environment(AppState.self) private var appState
+
+    @State private var url: String = ""
+    @State private var state: ScanState = .idle
+    @State private var engineResults: [VTEngineResult] = []
+    @State private var showInfo: Bool = false
+    @State private var currentTask: Task<Void, Never>? = nil
+
+    private let vt = VirusTotalAPI()
+    private let vendorsToShow: Set<String> = [
+        "Kaspersky", "Google Safebrowsing", "PhishTank", "OpenPhish",
+        "BitDefender", "ESET", "Sophos", "Microsoft", "McAfee"
+    ]
+
+    var body: some View {
+        ZStack {
+            Brand.backgroundGradient.ignoresSafeArea()
+
+            ScrollView {
+                VStack(spacing: 20) {
+                    ScreenTitleBar(
+                        title: "URL Scanner",
+                        onMenu: { showMenu = true },
+                        trailing: AnyView(
+                            Button { showInfo = true } label: {
+                                Image(systemName: "info.circle")
+                                    .font(.title3.weight(.semibold))
+                                    .foregroundStyle(.primary)
+                                    .frame(width: 40, height: 40)
+                                    .liquidGlassCard(cornerRadius: 12)
+                            }
+                        )
+                    )
+                    .padding(.top, 8)
+
+                    inputCard
+                    resultCard
+                    if !engineResults.isEmpty { enginesCard }
+                    Spacer(minLength: 80)
+                }
+                .padding(.bottom)
+            }
+        }
+        .toolbar(.hidden, for: .navigationBar)
+        .sheet(isPresented: $showInfo) {
+            scannerInfoSheet
+                .presentationDetents([.medium])
+                .presentationBackground(.regularMaterial)
+        }
+        .onDisappear { currentTask?.cancel() }
+    }
+
+    private var inputCard: some View {
+        GlassCard {
+            VStack(alignment: .leading, spacing: 14) {
+                Text("Check a URL")
+                    .font(Typography.sectionTitle)
+                HStack(spacing: 10) {
+                    GlassTextField(placeholder: "https://example.com", text: $url, icon: "link", keyboardType: .URL, contentType: .URL)
+                    Button {
+                        if let str = UIPasteboard.general.string { url = str }
+                    } label: {
+                        Image(systemName: "doc.on.clipboard")
+                            .foregroundStyle(.primary)
+                            .frame(width: 48, height: 48)
+                            .liquidGlassCard(cornerRadius: 16)
+                    }
+                }
+                PrimaryButton(
+                    title: scanButtonTitle,
+                    icon: "magnifyingglass",
+                    isLoading: isScanning
+                ) {
+                    runScan()
+                }
+                .disabled(url.isEmpty || isScanning)
+                .opacity(url.isEmpty ? 0.5 : 1)
+            }
+        }
+        .padding(.horizontal)
+    }
+
+    private var resultCard: some View {
+        GlassCard {
+            VStack(alignment: .center, spacing: 12) {
+                Image(systemName: resultIcon)
+                    .font(.system(size: 56, weight: .semibold))
+                    .foregroundStyle(resultColor)
+                    .padding(20)
+                    .liquidGlass(in: Circle(), tint: resultColor.opacity(0.15))
+
+                Text(resultTitle)
+                    .font(Typography.title)
+                Text(resultSubtitle)
+                    .font(.subheadline)
+                    .foregroundStyle(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 6)
+        }
+        .padding(.horizontal)
+    }
+
+    private var enginesCard: some View {
+        VStack(spacing: 12) {
+            SectionHeader("Engine Results")
+                .padding(.horizontal, 24)
+            VStack(spacing: 6) {
+                ForEach(displayEngines, id: \.engineName) { r in
+                    HStack {
+                        Image(systemName: r.isClean ? "checkmark.shield.fill" : "exclamationmark.triangle.fill")
+                            .foregroundStyle(r.isClean ? Brand.safe : Brand.unsafe)
+                        Text(r.engineName ?? "Unknown")
+                        Spacer()
+                        Text((r.result ?? "—").capitalized)
+                            .font(.caption.bold())
+                            .foregroundStyle(r.isClean ? Brand.safe : Brand.unsafe)
+                    }
+                    .padding(.vertical, 12)
+                    .padding(.horizontal, 16)
+                    .liquidGlassCard(cornerRadius: 16)
+                }
+            }
+            .padding(.horizontal)
+        }
+    }
+
+    private var scannerInfoSheet: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Capsule().fill(.gray.opacity(0.3)).frame(width: 40, height: 4).frame(maxWidth: .infinity)
+            Text("How it works").font(Typography.title)
+            Text("Our scanner analyzes URLs using over 70 antivirus engines (VirusTotal) to detect malware, phishing, and other threats.")
+                .font(.body)
+            Label("Green check — the site is safe.", systemImage: "checkmark.shield.fill")
+                .foregroundStyle(Brand.safe)
+            Label("Red warning — threats were detected.", systemImage: "exclamationmark.triangle.fill")
+                .foregroundStyle(Brand.unsafe)
+            Text("⚠️ While we use advanced analysis tools, no system is 100% perfect. Accessing any website is strictly at your own risk.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
+        .padding()
+    }
+
+    // MARK: - Scan
+
+    private func runScan() {
+        currentTask?.cancel()
+        engineResults = []
+        state = .scanning("Checking Database…")
+
+        currentTask = Task {
+            do {
+                if let attrs = try await vt.lookup(url: url) {
+                    await applyResult(attrs)
+                    return
+                }
+                await MainActor.run { state = .scanning("Submitting URL…") }
+                let id = try await vt.submit(url: url)
+                await MainActor.run { state = .scanning("Analyzing with 70 engines…") }
+                try await vt.pollUntilComplete(analysisId: id)
+                await MainActor.run { state = .scanning("Finalizing report…") }
+                if let final = try await vt.lookup(url: url) {
+                    await applyResult(final)
+                } else {
+                    await MainActor.run { state = .failed("VirusTotal returned no final report") }
+                }
+            } catch {
+                if Task.isCancelled { return }
+                await MainActor.run { state = .failed(error.localizedDescription) }
+            }
+        }
+    }
+
+    @MainActor
+    private func applyResult(_ attrs: VTAttributes) {
+        let malicious = attrs.maliciousCount
+        let isSafe = malicious == 0
+        state = isSafe ? .safe(maliciousCount: 0) : .unsafe(maliciousCount: malicious)
+        engineResults = (attrs.lastAnalysisResults ?? [:]).values
+            .sorted { lhs, rhs in
+                if lhs.isClean != rhs.isClean { return !lhs.isClean }
+                return (lhs.engineName ?? "") < (rhs.engineName ?? "")
+            }
+
+        if let uid = appState.firebaseUserId {
+            let urlCopy = url
+            Task {
+                try? await appState.scanRepo.save(uid: uid, url: urlCopy, isSafe: isSafe)
+                try? await appState.logger.logEvent(
+                    uid: uid,
+                    eventType: isSafe ? .scanSafe : .malware,
+                    description: "Website \(urlCopy) is \(isSafe ? "safe" : "not safe!")"
+                )
+            }
+        }
+    }
+
+    private var displayEngines: [VTEngineResult] {
+        engineResults.filter { r in
+            guard let name = r.engineName else { return false }
+            return vendorsToShow.contains(name) || !r.isClean
+        }
+    }
+
+    // MARK: - View helpers
+
+    private var isScanning: Bool {
+        if case .scanning = state { return true } else { return false }
+    }
+
+    private var scanButtonTitle: String {
+        if case .scanning(let label) = state { return label }
+        return "Scan"
+    }
+
+    private var resultIcon: String {
+        switch state {
+        case .idle:     return "shield.lefthalf.filled"
+        case .scanning: return "hourglass"
+        case .safe:     return "checkmark.shield.fill"
+        case .unsafe:   return "exclamationmark.triangle.fill"
+        case .failed:   return "wifi.exclamationmark"
+        }
+    }
+
+    private var resultColor: Color {
+        switch state {
+        case .idle, .scanning: return Brand.primary
+        case .safe:            return Brand.safe
+        case .unsafe:          return Brand.unsafe
+        case .failed:          return Brand.warning
+        }
+    }
+
+    private var resultTitle: String {
+        switch state {
+        case .idle:           return "Ready"
+        case .scanning(let s): return s
+        case .safe:           return "Safe"
+        case .unsafe:         return "Unsafe!"
+        case .failed:         return "Error"
+        }
+    }
+
+    private var resultSubtitle: String {
+        switch state {
+        case .idle:           return "Paste a URL and tap Scan."
+        case .scanning:       return "Querying VirusTotal…"
+        case .safe:           return "No threats detected by any of 70+ engines."
+        case .unsafe(let n):  return "Found \(n) threat\(n == 1 ? "" : "s")."
+        case .failed(let m):  return m
+        }
+    }
+}
+
+#Preview {
+    URLScannerView(showMenu: .constant(false))
+        .environment(AppState())
+}
