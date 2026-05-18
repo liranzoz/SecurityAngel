@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1032926031501",
+    "project_id": "securityangel-e429a",
+    "storage_bucket": "securityangel-e429a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1032926031501:android:7e7c19025cf6cf1888fcc4",
+        "android_client_info": {
+          "package_name": "com.example.securityangel"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1032926031501-rh486pd69bgf0pl4pjstd4p7d3rfjcoc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.securityangel",
+            "certificate_hash": "7808fe21a8b7b97da5659684092c7a7f6eceaacc"
+          }
+        },
+        {
+          "client_id": "1032926031501-9jnak44cqk8ordniv85qhp7mo2k8eeh9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBNkt4aycBXfJiouPBP9RmEEdmSE1syFW4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1032926031501-9jnak44cqk8ordniv85qhp7mo2k8eeh9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

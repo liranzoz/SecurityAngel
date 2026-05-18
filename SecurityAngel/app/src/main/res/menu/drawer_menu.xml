@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_dash"
+            android:icon="@drawable/ic_home"
+            android:title="Home" />
+        <item
+            android:id="@+id/nav_sand_box"
+            android:icon="@drawable/ic_scanner"
+            android:title="URL Scanner" />
+        <item
+            android:id="@+id/nav_ai_chat"
+            android:icon="@drawable/ic_ai_lock"
+            android:title="Angel AI" />
+        <item
+            android:id="@+id/nav_pass_vault"
+            android:icon="@drawable/ic_password"
+            android:title="My Passwords" />
+        <item
+            android:id="@+id/nav_generator"
+            android:icon="@drawable/ic_plus"
+            android:title="Password Generator" />
+        <item
+            android:id="@+id/nav_family"
+            android:icon="@drawable/ic_family"
+            android:title="Family Safety" />
+        <item
+            android:id="@+id/nav_root_check"
+            android:icon="@drawable/ic_shield_check"
+            android:title="Root Check" />
+        <item
+            android:id="@+id/nav_permission_monitor"
+            android:icon="@drawable/ic_lock_check"
+            android:title="Permission Monitor" />
+        <item
+            android:id="@+id/nav_Logs"
+            android:icon="@drawable/ic_log"
+            android:title="Log" />
+        <item
+            android:id="@+id/nav_settings"
+            android:icon="@drawable/ic_settings"
+            android:title="Settings" />
+
+    </group>
+</menu>

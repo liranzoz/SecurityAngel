@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="primary_green">#15B79F</color>
+    <color name="primary_green_dark">#0F8E7A</color>
+    <color name="accent_green">#34D399</color>
+    <color name="light_green">#D1FAE5</color>
+
+    <color name="background_main">#F8F9FA</color> <color name="white">#FFFFFF</color>           <color name="divider">#E0E0E0</color>
+
+    <color name="text_primary">#212121</color>     <color name="text_secondary">#757575</color>   <color name="status_safe_bg">#D1FAE5</color>
+    <color name="status_safe_text">#065F46</color>
+
+    <color name="ui_ic">#BDBDBD</color>
+
+    <color name="status_unsafe_bg">#FEE2E2</color>
+    <color name="status_unsafe_text">#991B1B</color>
+
+    <color name="status_warning_bg">#FEF3C7</color>
+    <color name="status_warning_text">#C89808</color>
+    <color name="status_warning_text_red">#FF0000</color>
+
+    <color name="in_app_window_safe_stroke">#A7F3D0</color>
+    <color name="in_app_window_safe">#ECFDF5</color>
+    <color name="in_app_window_safe_text">#065F46</color>
+
+    <color name="grey">#757575</color>
+
+    <color name="icon_blue_bg">#E3F2FD</color>
+    <color name="icon_blue">#1976D2</color>
+</resources>
