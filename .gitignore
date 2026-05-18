@@ -14,3 +14,14 @@
 .cxx
 local.properties
 google-services.json
+
+# Signing key — must never be committed
+SecurityAngelKeyStore.jks
+
+# IDE / agent caches
+.claude/
+.idea/
+*.iml
+
+# Release build artifacts (regenerated)
+app/release/
