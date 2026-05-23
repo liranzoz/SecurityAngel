@@ -31,27 +31,16 @@
 
 ## Table of Contents
 
-- [Why Security Angel](#why-security-angel)
 - [Feature Tour](#feature-tour)
 - [Screenshots](#screenshots)
+- [iOS Screenshots](#ios-screenshots)
 - [Repository Layout](#repository-layout)
 - [Architecture at a Glance](#architecture-at-a-glance)
 - [Cross-Platform Parity](#cross-platform-parity)
 - [Getting Started — Android](#getting-started--android)
 - [Getting Started — iOS](#getting-started--ios)
 - [Tech Stack](#tech-stack)
-- [Roadmap](#roadmap)
 - [Author](#author)
-
----
-
-## Why Security Angel
-
-Modern phishing campaigns no longer arrive as obvious spam — they look like your bank, your delivery service, your kid's school. Security Angel is built around a simple idea: a security tool should **see what the user sees, know what the user knows, and act on the user's behalf**.
-
-Instead of bolting features together, every piece of the app — vault, scanner, family dashboard, AI assistant — feeds the same context engine. When the assistant answers a question, it already knows how many of your passwords were leaked last night, whether your jailbreak status changed, and whether your daughter's score dropped this week.
-
-The same app, the same backend, the same crypto, on both platforms.
 
 ---
 
@@ -135,6 +124,45 @@ Continuously evaluates the device itself: jailbreak / root detection, passcode s
 
 ---
 
+## iOS Screenshots
+
+Liquid-Glass SwiftUI port, captured on iPhone 17 Pro · iOS 26.
+
+<table>
+  <tr>
+    <th align="center">Dashboard 🛡️</th>
+    <th align="center">URL Scanner 🔍</th>
+    <th align="center">AI Assistant 🧠</th>
+  </tr>
+  <tr>
+    <td align="center"><img src="SecurityAngelIOS/Screenshots/01-dashboard.png" width="220" alt="Dashboard" /></td>
+    <td align="center"><img src="SecurityAngelIOS/Screenshots/02-url-scanner.png" width="220" alt="URL Scanner" /></td>
+    <td align="center"><img src="SecurityAngelIOS/Screenshots/03-ai-chat.png" width="220" alt="AI Assistant" /></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><i>Animated security score · family alerts · recent scans</i></sub></td>
+    <td align="center"><sub><i>Live 70-engine VirusTotal verdict</i></sub></td>
+    <td align="center"><sub><i>Multimodal phishing analysis (text + screenshot)</i></sub></td>
+  </tr>
+  <tr>
+    <th align="center">Password Vault 🔐</th>
+    <th align="center">Password Generator ➕</th>
+    <th></th>
+  </tr>
+  <tr>
+    <td align="center"><img src="SecurityAngelIOS/Screenshots/04-password-vault.png" width="220" alt="Password Vault" /></td>
+    <td align="center"><img src="SecurityAngelIOS/Screenshots/05-password-generator.png" width="220" alt="Password Generator" /></td>
+    <td></td>
+  </tr>
+  <tr>
+    <td align="center"><sub><i>AES-GCM encrypted · leak-flagged · Face ID unlock</i></sub></td>
+    <td align="center"><sub><i>Configurable strong-password generator</i></sub></td>
+    <td></td>
+  </tr>
+</table>
+
+---
+
 ## Repository Layout
 
 This is a **monorepo** containing the full Security Angel product for both mobile platforms, plus the shared documentation.
@@ -181,18 +209,6 @@ Both apps share the same backend and the same data model.
                            ▼
               External services (shared)
               VirusTotal · HaveIBeenPwned · Gemini (Vision + Text)
-```
-
-Firestore collections are identical across platforms:
-
-```
-users/{uid}                          — profile, score, leak counts
-users/{uid}/vault/{id}               — AES-GCM encrypted credentials
-users/{uid}/scans/{id}               — URL scan history
-users/{uid}/chat_history/{id}        — AI assistant transcripts
-families/{familyId}                  — family group + members
-invitations/{email}                  — one-time join codes
-security_logs/{id}                   — admin-only activity timeline
 ```
 
 ---
@@ -320,19 +336,6 @@ To enable AutoFill:
 </td>
 </tr>
 </table>
-
----
-
-## Roadmap
-
-- ✅ Static UI on both platforms
-- ✅ Firebase Auth + Firestore repositories
-- ✅ AES-GCM vault with cross-platform byte compatibility
-- ✅ AutoFill extension (iOS) · CredentialManager provider (Android)
-- ✅ Real-time family safety dashboard + admin activity log
-- ⏳ Push notifications (APNs + FCM via Cloud Function)
-- ⏳ Google Sign-In on iOS
-- ⏳ Wire AI `[ACTION:…]` tags to native tab/sheet navigation on iOS
 
 ---
 
