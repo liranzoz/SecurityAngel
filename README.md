@@ -133,34 +133,21 @@ Liquid-Glass SwiftUI port, captured on iPhone 17 Pro · iOS 26.
     <th align="center">Dashboard 🛡️</th>
     <th align="center">URL Scanner 🔍</th>
     <th align="center">AI Assistant 🧠</th>
-    <th align="center">Password Vault 🔐</th>
+    <th align="center">Password Generator ➕</th>
   </tr>
   <tr>
     <td align="center"><img src="SecurityAngelIOS/Screenshots/01-dashboard.png" width="220" alt="Dashboard" /></td>
     <td align="center"><img src="SecurityAngelIOS/Screenshots/02-url-scanner.png" width="220" alt="URL Scanner" /></td>
     <td align="center"><img src="SecurityAngelIOS/Screenshots/03-ai-chat.png" width="220" alt="AI Assistant" /></td>
-    <td align="center"><img src="SecurityAngelIOS/Screenshots/04-password-vault.png" width="220" alt="Password Vault" /></td>
+    <td align="center"><img src="SecurityAngelIOS/Screenshots/05-password-generator.png" width="220" alt="Password Generator" /></td>
   </tr>
   <tr>
     <td align="center"><sub><i>Animated score · family alerts · recent scans</i></sub></td>
     <td align="center"><sub><i>Live 70-engine VirusTotal verdict</i></sub></td>
     <td align="center"><sub><i>Multimodal phishing analysis</i></sub></td>
-    <td align="center"><sub><i>AES-GCM encrypted · leak-flagged</i></sub></td>
+    <td align="center"><sub><i>Configurable strong-password generator</i></sub></td>
   </tr>
 </table>
-
-<details>
-<summary><b>More screens →</b></summary>
-
-<br/>
-
-<table>
-  <tr>
-    <td align="center"><img src="SecurityAngelIOS/Screenshots/05-password-generator.png" width="220" /></td>
-  </tr>
-</table>
-
-</details>
 
 ---
 
